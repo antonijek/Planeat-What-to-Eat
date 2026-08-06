@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Env / secrets
+.env
+.env.local
+.env*.local
+
+# Expo
+.expo/
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+
+# Build / cache
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+mobile/node_modules/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Playwright screenshots/artifacts
+.playwright-mcp/

@@ -1,0 +1,247 @@
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  SafeAreaView,
+  Modal,
+} from "react-native";
+import { useShoppingStore } from "../store/shoppingStore";
+import { useUserStore } from "../store/userStore";
+import { planService } from "../services/planService";
+import { colors } from "../constants/theme";
+import { PremiumLockScreen } from "../components/PremiumLockScreen";
+
+export function ShoppingScreen() {
+  const { items, load, toggle, remove, addManual, replaceMany, clearChecked } = useShoppingStore();
+  const { isPremium } = useUserStore();
+  const [name, setName] = useState("");
+  const [info, setInfo] = useState<string | null>(null);
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  if (!isPremium) {
+    return (
+      <PremiumLockScreen
+        emoji="🛒"
+        title="Shopping list"
+        description="Premium feature. Upgrade to auto-build your shopping list from the meal planer."
+      />
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <FlatList
+          data={items}
+          keyExtractor={(i) => i.id}
+          ListHeaderComponent={
+            <View>
+              <View style={styles.headerRow}>
+                <Text style={styles.title}>Shopping list</Text>
+                <Pressable
+                  style={styles.planBtn}
+                  onPress={async () => {
+                    const ingredients = await planService.getShoppingIngredients();
+                    if (ingredients.length === 0) {
+                      setInfo("Your meal plan is empty. Add recipes to the Meal Planer first.");
+                      return;
+                    }
+                    await replaceMany(
+                      ingredients.map((i) => ({
+                        id: `auto-${i.name}-${Date.now()}`,
+                        name: i.name,
+                        amount: i.amount,
+                        unit: i.unit,
+                        category: "Ostalo",
+                        isManual: false,
+                        isChecked: false,
+                        sourceRecipeIds: [],
+                      }))
+                    );
+                    setInfo(
+                      `${ingredients.length} ingredient${
+                        ingredients.length === 1 ? "" : "s"
+                      } added from your meal plan.`
+                    );
+                  }}
+                >
+                  <Text style={styles.planBtnText}>📅 From planer</Text>
+                </Pressable>
+              </View>
+              <View style={styles.inputRow}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Add item..."
+                  value={name}
+                  onChangeText={setName}
+                  placeholderTextColor={colors.textFaint}
+                />
+                <Pressable
+                  style={styles.addBtn}
+                  onPress={() => {
+                    if (!name.trim()) return;
+                    addManual({ name: name.trim(), amount: 1, unit: "kom", category: "Ostalo" });
+                    setName("");
+                  }}
+                >
+                  <Text style={styles.addBtnText}>+</Text>
+                </Pressable>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summary}>
+                  {items.filter((i) => i.isChecked).length}/{items.length} done
+                </Text>
+                <Pressable onPress={clearChecked}>
+                  <Text style={styles.clearBtn}>Clear checked</Text>
+                </Pressable>
+              </View>
+            </View>
+          }
+          contentContainerStyle={styles.content}
+          renderItem={({ item }) => (
+            <Pressable
+              style={[styles.item, item.isChecked && styles.itemDone]}
+              onPress={() => toggle(item.id)}
+              onLongPress={() => remove(item.id)}
+            >
+              <View style={styles.check}>
+                <Text style={styles.checkText}>{item.isChecked ? "✓" : ""}</Text>
+              </View>
+              <Text style={styles.itemName} numberOfLines={2}>
+                {item.name}
+              </Text>
+              {item.amount > 0 && (
+                <Text style={styles.itemAmount}>
+                  {item.amount} {item.unit}
+                </Text>
+              )}
+            </Pressable>
+          )}
+        />
+
+      {info != null && (
+        <Modal visible transparent animationType="fade" onRequestClose={() => setInfo(null)}>
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalIcon}>🛒</Text>
+              <Text style={styles.modalText}>{info}</Text>
+              <Pressable style={styles.modalBtn} onPress={() => setInfo(null)}>
+                <Text style={styles.modalBtnText}>OK</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
+  content: { padding: 16 },
+  title: { fontSize: 24, fontWeight: "800", color: colors.text },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 8,
+  },
+  planBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  planBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
+  inputRow: { flexDirection: "row", gap: 10, marginTop: 16 },
+  input: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  addBtn: {
+    width: 46,
+    borderRadius: 12,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addBtnText: { color: "#fff", fontSize: 26, lineHeight: 30 },
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  summary: { color: colors.textMuted, fontSize: 13 },
+  clearBtn: {
+    color: colors.danger,
+    fontSize: 14,
+    fontWeight: "700",
+    backgroundColor: colors.dangerLight,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    overflow: "hidden",
+  },
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginTop: 8,
+  },
+  itemDone: { opacity: 0.6 },
+  check: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    marginRight: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkText: { color: colors.primary, fontWeight: "700" },
+  itemName: { flex: 1, color: colors.text, fontSize: 15 },
+  itemNameDone: { textDecorationLine: "line-through" },
+  itemAmount: { color: colors.textMuted, fontSize: 13 },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 340,
+    backgroundColor: colors.card,
+    borderRadius: 20,
+    padding: 24,
+    alignItems: "center",
+  },
+  modalIcon: { fontSize: 40, marginBottom: 12 },
+  modalText: { fontSize: 15, color: colors.text, textAlign: "center", lineHeight: 22 },
+  modalBtn: {
+    marginTop: 18,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+  },
+  modalBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+});

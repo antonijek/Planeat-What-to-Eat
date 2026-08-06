@@ -1,0 +1,209 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  TextInput,
+  StyleSheet,
+  SafeAreaView,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/types";
+import { RecipeCard } from "../components/RecipeCard";
+import { AddRecipeModal } from "../components/AddRecipeModal";
+import { myRecipesService } from "../services/myRecipesService";
+import { useUserStore } from "../store/userStore";
+import { Recipe } from "../types";
+import { colors } from "../constants/theme";
+import { PremiumLockScreen } from "../components/PremiumLockScreen";
+import { AppModal } from "../components/AppModal";
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
+
+export function MyRecipesScreen() {
+  const nav = useNavigation<Nav>();
+  const { isPremium } = useUserStore();
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [editing, setEditing] = useState<Recipe | null>(null);
+  const [query, setQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<Recipe | null>(null);
+
+  const reload = useCallback(() => {
+    myRecipesService.getAll().then(setRecipes);
+  }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return recipes;
+    return recipes.filter(
+      (r) =>
+        r.name.toLowerCase().includes(q) ||
+        r.category.toLowerCase().includes(q)
+    );
+  }, [recipes, query]);
+
+  function confirmDelete(r: Recipe) {
+    setDeleteTarget(r);
+  }
+
+  async function doDelete() {
+    if (!deleteTarget) return;
+    await myRecipesService.remove(deleteTarget.id);
+    setDeleteTarget(null);
+    reload();
+  }
+
+  if (!isPremium) {
+    return (
+      <PremiumLockScreen
+        emoji="👨‍🍳"
+        title="My Recipes"
+        description="Premium feature. Add your own recipes and customize them."
+      />
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <FlatList
+        data={filtered}
+        keyExtractor={(r) => r.id}
+        ListHeaderComponent={
+          <View>
+            <View style={styles.headerRow}>
+              <Text style={styles.title}>My recipes ({filtered.length})</Text>
+              <Pressable
+                style={styles.addBtn}
+                onPress={() => {
+                  setEditing(null);
+                  setAddOpen(true);
+                }}
+              >
+                <Text style={styles.addBtnText}>+ Add</Text>
+              </Pressable>
+            </View>
+            <TextInput
+              style={styles.search}
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search my recipes..."
+              placeholderTextColor={colors.textFaint}
+            />
+          </View>
+        }
+        contentContainerStyle={styles.content}
+        ListEmptyComponent={
+          <Text style={styles.empty}>
+            {query.trim()
+              ? "No matches."
+              : "No own recipes yet. Add the first one!"}
+          </Text>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.rowWrap}>
+            <RecipeCard
+              recipe={item}
+              onPress={() => nav.navigate("RecipeDetail", { id: item.id })}
+            />
+            <View style={styles.rowActions}>
+              <Pressable
+                style={styles.actionBtn}
+                hitSlop={8}
+                onPress={() => {
+                  setEditing(item);
+                  setAddOpen(true);
+                }}
+              >
+                <Text style={styles.actionText}>✏️</Text>
+              </Pressable>
+              <Pressable
+                style={styles.actionBtn}
+                hitSlop={8}
+                onPress={() => confirmDelete(item)}
+              >
+                <Text style={styles.actionText}>🗑️</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+      />
+
+      <AddRecipeModal
+        visible={addOpen}
+        editing={editing}
+        onClose={() => setAddOpen(false)}
+        onSaved={reload}
+      />
+
+      <AppModal
+        visible={deleteTarget !== null}
+        title="Delete recipe?"
+        onClose={() => setDeleteTarget(null)}
+        onCancel={() => setDeleteTarget(null)}
+        onSave={doDelete}
+        saveLabel="Delete"
+      >
+        <Text style={{ color: colors.text }}>
+          Are you sure you want to delete "{deleteTarget?.name}"?
+        </Text>
+      </AppModal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
+  content: { padding: 16, paddingBottom: 60 },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  title: { fontSize: 24, fontWeight: "800", color: colors.text },
+  search: {
+    backgroundColor: colors.card,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 6,
+  },
+  addBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  addBtnText: { color: "#fff", fontWeight: "700" },
+  empty: { color: colors.textMuted, fontSize: 15, marginTop: 24, textAlign: "center" },
+  rowWrap: { position: "relative" },
+  cardPress: {},
+  rowActions: {
+    position: "absolute",
+    right: 10,
+    top: 10,
+    flexDirection: "row",
+    gap: 6,
+  },
+  actionBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.card,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  actionText: { fontSize: 15 },
+});

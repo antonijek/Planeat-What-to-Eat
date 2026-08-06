@@ -1,0 +1,120 @@
+import React, { useEffect, useState } from "react";
+import { View, Text, FlatList, Image, Pressable, StyleSheet, SafeAreaView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/types";
+import { historyService, CookedDay } from "../services/historyService";
+import { useUserStore } from "../store/userStore";
+import { colors } from "../constants/theme";
+import { PremiumLockScreen } from "../components/PremiumLockScreen";
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
+
+function dayLabel(day: string): string {
+  const today = new Date();
+  const toKey = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const todayKey = toKey(today);
+  const yest = new Date();
+  yest.setDate(today.getDate() - 1);
+  const yestKey = toKey(yest);
+  if (day === todayKey) return "Today";
+  if (day === yestKey) return "Yesterday";
+  return new Date(day + "T00:00:00").toLocaleDateString();
+}
+
+export function HistoryScreen() {
+  const nav = useNavigation<Nav>();
+  const { isPremium } = useUserStore();
+  const [days, setDays] = useState<CookedDay[]>([]);
+
+  useEffect(() => {
+    historyService.getCookedGroupedByDay().then(setDays);
+  }, []);
+
+  if (!isPremium) {
+    return (
+      <PremiumLockScreen
+        emoji="🥘"
+        title="What I cooked"
+        description="Premium feature. Keep track of the meals you actually cooked."
+      />
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <FlatList
+        data={days}
+        keyExtractor={(d) => d.dateKey}
+        ListHeaderComponent={
+          <View style={styles.headerRow}>
+            <Text style={styles.title}>What I cooked</Text>
+            <Pressable
+              onPress={async () => {
+                await historyService.clearCooked();
+                setDays([]);
+              }}
+            >
+              <Text style={styles.clearBtn}>Clear</Text>
+            </Pressable>
+          </View>
+        }
+        contentContainerStyle={styles.content}
+        ListEmptyComponent={
+          <Text style={styles.empty}>
+            Nothing cooked yet. Tap "I cooked this" on any recipe to start tracking.
+          </Text>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{dayLabel(item.day)}</Text>
+            {item.items.map((c) => (
+              <Pressable
+                key={c.recipeId + c.time}
+                style={styles.row}
+                onPress={() => nav.navigate("RecipeDetail", { id: c.recipeId })}
+              >
+                {c.imageUrl ? (
+                  <Image source={{ uri: c.imageUrl }} style={styles.thumb} />
+                ) : (
+                  <View style={[styles.thumb, styles.thumbPlaceholder]} />
+                )}
+                <View style={styles.rowBody}>
+                  <Text style={styles.rowTitle} numberOfLines={1}>
+                    {c.name}
+                  </Text>
+                  <Text style={styles.rowSub}>Cooked at {c.time}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        )}
+      />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
+  content: { padding: 16 },
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
+  title: { fontSize: 24, fontWeight: "800", color: colors.text },
+  clearBtn: { color: colors.danger, fontWeight: "600" },
+  section: { marginBottom: 16 },
+  sectionLabel: { fontSize: 16, fontWeight: "700", color: colors.textMuted, marginBottom: 8 },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 8,
+  },
+  thumb: { width: 52, height: 52, borderRadius: 8, backgroundColor: colors.imageBg },
+  thumbPlaceholder: { backgroundColor: colors.placeholderBg },
+  rowBody: { flex: 1, marginLeft: 12 },
+  rowTitle: { fontSize: 15, fontWeight: "600", color: colors.text },
+  rowSub: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  empty: { color: colors.textMuted, fontSize: 15, marginTop: 24, textAlign: "center", lineHeight: 22 },
+});
