@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "MealMate AI",
-    "slug": "mealmate-ai",
+    "name": "Planeat — What to Eat",
+    "slug": "planeat",
+    "description": "Spin to pick a meal, plan your week and track calories.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
