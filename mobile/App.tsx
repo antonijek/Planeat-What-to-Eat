@@ -1,4 +1,5 @@
 import "react-native-gesture-handler";
+import "./src/i18n";
 import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -9,10 +10,7 @@ export default function App() {
   const loadUserData = useUserStore((s) => s.loadUserData);
 
   useEffect(() => {
-    console.log("[App] mount, calling loadUserData");
-    loadUserData()
-      .then(() => console.log("[App] loadUserData OK"))
-      .catch((e) => console.log("[App] loadUserData error", e));
+    loadUserData().catch((e) => console.error("[App]", e));
   }, [loadUserData]);
 
   return (
