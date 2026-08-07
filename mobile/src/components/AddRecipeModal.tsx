@@ -3,10 +3,9 @@ import { Text, TextInput, Pressable, View, StyleSheet, ScrollView } from "react-
 import { Difficulty, Ingredient, Recipe } from "../types";
 import { myRecipesService } from "../services/myRecipesService";
 import { textToIngredients, textToLines } from "../utils/ingredients";
-import { gramsFromAmountAndUnit, pieceApproxGrams } from "../utils/helpers";
 import { parseRecipeText } from "../utils/importRecipe";
-import { matchIngredient, suggestIngredients } from "../services/calorieCalculator";
 import { AppModal, appModalStyles } from "./AppModal";
+import { IngredientEditor } from "./IngredientEditor";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -22,7 +21,6 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   srednje: "Medium",
   teško: "Hard",
 };
-const UNITS = ["g", "kg", "ml", "cl", "kom", "tbsp", "tsp", "cup"];
 
 export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   const [name, setName] = useState("");
@@ -36,10 +34,6 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   const [servings, setServings] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [ingName, setIngName] = useState("");
-  const [ingAmount, setIngAmount] = useState("");
-  const [ingUnit, setIngUnit] = useState("g");
-  const [ingSug, setIngSug] = useState<{ label: string; type: string }[]>([]);
   const [instructionsText, setInstructionsText] = useState("");
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState("");
@@ -60,44 +54,17 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
       setIngredients(editing?.ingredients ?? []);
       setInstructionsText((editing?.instructions ?? []).join("\n"));
       setMessage(null);
-      setIngName("");
-      setIngAmount("");
-      setIngUnit("g");
-      setIngSug([]);
     }
   }, [visible, editing]);
 
-  function onIngNameChange(text: string) {
-    setIngName(text);
-    const sug = suggestIngredients(text);
-    setIngSug(sug.slice(0, 4).map((s) => ({ label: s.label, type: s.type })));
-  }
-
-  function addIngredient() {
-    if (!ingName.trim()) {
-      setMessage("Enter an ingredient name.");
-      return;
+  function handleCompute(kcal: number, protein: number, carbs: number, fats: number) {
+    setCalories(String(Math.round(kcal)));
+    setProtein(String(Math.round(protein)));
+    setCarbs(String(Math.round(carbs)));
+    setFats(String(Math.round(fats)));
+    if (!servings.trim()) {
+      setServings(String(Math.max(1, Math.round(kcal / 550))));
     }
-    const amount = parseFloat(ingAmount);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      setMessage("Enter a valid amount.");
-      return;
-    }
-    const ing: Ingredient = {
-      name: ingName.trim(),
-      amount,
-      unit: ingUnit.trim() || "kom",
-      measure: "",
-      grams: gramsFromAmountAndUnit(amount, ingUnit),
-    };
-    setIngredients([...ingredients, ing]);
-    setIngName("");
-    setIngAmount("");
-    setIngUnit("g");
-  }
-
-  function removeIngredient(idx: number) {
-    setIngredients(ingredients.filter((_, i) => i !== idx));
   }
 
   async function save() {
@@ -157,57 +124,6 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   }
 
   /** Izračunaj kcal/makroe iz sastojaka (po gramaži iz ingredient_map). */
-  function computeNutrition() {
-    if (ingredients.length === 0) {
-      setMessage("Add ingredients first, then tap Compute.");
-      return;
-    }
-    let kcal = 0, p = 0, c = 0, f = 0;
-    const unknown: string[] = [];
-    for (const ing of ingredients) {
-      let g = ing.grams ?? 0;
-      if (!g || g <= 0) {
-        g = gramsFromAmountAndUnit(ing.amount, ing.unit);
-      }
-      if (!g || g <= 0) {
-        g = pieceApproxGrams(ing.name, ing.unit) * ing.amount;
-      }
-      const m = matchIngredient(ing.name);
-      if (!m) {
-        unknown.push(ing.name);
-        continue;
-      }
-      if (!g || g <= 0) {
-        unknown.push(`${ing.name} (${ing.amount} ${ing.unit})`);
-        continue;
-      }
-      kcal += (m.per100.kcal * g) / 100;
-      p += (m.per100.protein * g) / 100;
-      c += (m.per100.carbs * g) / 100;
-      f += (m.per100.fat * g) / 100;
-    }
-    if (kcal <= 0) {
-      setMessage(
-        unknown.length
-          ? `Not found / unmeasurable: ${unknown.slice(0, 4).join(", ")}${unknown.length > 4 ? "..." : ""}`
-          : "None of the ingredients matched the nutrition map."
-      );
-      return;
-    }
-    setCalories(String(Math.round(kcal)));
-    setProtein(String(Math.round(p)));
-    setCarbs(String(Math.round(c)));
-    setFats(String(Math.round(f)));
-    if (!servings.trim()) {
-      setServings(String(Math.max(1, Math.round(kcal / 550))));
-    }
-    if (unknown.length) {
-      setMessage(
-        `Some ingredients skipped: ${unknown.slice(0, 4).join(", ")}${unknown.length > 4 ? "..." : ""}`
-      );
-    }
-  }
-
   return (
     <AppModal
       visible={visible}
@@ -251,74 +167,12 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
         </View>
       </View>
 
-      <Text style={appModalStyles.label}>Ingredients</Text>
-      <View style={styles.ingAddRow}>
-        <TextInput
-          style={[appModalStyles.input, styles.ingNameInput]}
-          value={ingName}
-          onChangeText={onIngNameChange}
-          placeholder="Name (e.g. milk)"
-          placeholderTextColor={colors.textFaint}
-        />
-      </View>
-      {ingSug.length > 0 && ingName.trim() && (
-        <View style={styles.ingSugBox}>
-          {ingSug.map((s) => (
-            <Pressable
-              key={s.label}
-              style={styles.ingSugRow}
-              onPress={() => {
-                setIngName(s.label);
-                setIngSug([]);
-              }}
-            >
-              <Text style={styles.ingSugText}>{s.label}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-      <View style={styles.ingAddRow}>
-        <TextInput
-          style={[appModalStyles.input, styles.ingAmountInput]}
-          value={ingAmount}
-          onChangeText={setIngAmount}
-          keyboardType="numeric"
-          placeholder="Amount"
-          placeholderTextColor={colors.textFaint}
-        />
-        <Pressable style={styles.ingAddBtn} onPress={addIngredient}>
-          <Text style={styles.ingAddBtnText}>+</Text>
-        </Pressable>
-      </View>
-      <View style={styles.unitChips}>
-        {UNITS.map((u) => (
-          <Pressable
-            key={u}
-            style={[styles.unitChip, ingUnit === u && styles.unitChipActive]}
-            onPress={() => setIngUnit(u)}
-          >
-            <Text style={[styles.unitChipText, ingUnit === u && styles.unitChipTextActive]}>{u}</Text>
-          </Pressable>
-        ))}
-      </View>
-      {ingredients.length > 0 && (
-        <View style={styles.ingList}>
-          {ingredients.map((ing, idx) => (
-            <View key={idx} style={styles.ingRow}>
-              <Text style={styles.ingRowText} numberOfLines={1}>
-                {ing.name} — {ing.amount} {ing.unit}
-              </Text>
-              <Pressable onPress={() => removeIngredient(idx)} hitSlop={8}>
-                <Text style={styles.ingDel}>✕</Text>
-              </Pressable>
-            </View>
-          ))}
-        </View>
-      )}
-
-      <Pressable style={styles.computeBtn} onPress={computeNutrition}>
-        <Text style={styles.computeBtnText}>🧮 Compute nutrition from ingredients</Text>
-      </Pressable>
+      <IngredientEditor
+        ingredients={ingredients}
+        onChangeIngredients={setIngredients}
+        onCompute={handleCompute}
+        onMessage={setMessage}
+      />
 
       <View style={styles.row}>
         <View style={styles.col}>
@@ -450,14 +304,6 @@ const styles = StyleSheet.create({
   diffTextActive: { color: "#fff", fontWeight: "700" },
   pasteToggle: { marginTop: 14, alignSelf: "flex-start" },
   pasteToggleText: { color: colors.primary, fontWeight: "700", fontSize: 15 },
-  computeBtn: {
-    marginTop: 14,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  computeBtnText: { color: "#fff", fontWeight: "700" },
   pasteBox: { marginTop: 12 },
   pasteInput: { minHeight: 100, marginTop: 6 },
   pasteImport: {
@@ -468,55 +314,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pasteImportText: { color: "#fff", fontWeight: "700" },
-  ingAddRow: { flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center", flexWrap: "wrap" },
-  ingNameInput: { flex: 1 },
-  ingAmountInput: { width: 90 },
-  unitChips: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
-  unitChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: "#fff",
-  },
-  unitChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  unitChipText: { color: colors.textMuted, fontSize: 12 },
-  unitChipTextActive: { color: "#fff", fontWeight: "700" },
-  ingAddBtn: {
-    height: 48,
-    minWidth: 48,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 18,
-  },
-  ingAddBtnText: { color: "#fff", fontSize: 26, lineHeight: 30, fontWeight: "700" },
-  ingList: { marginTop: 10 },
-  ingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.primaryLight,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginTop: 6,
-  },
-  ingRowText: { flex: 1, color: colors.text, fontSize: 14 },
-  ingDel: { color: colors.danger, fontSize: 16 },
-  ingSugBox: {
-    marginTop: 8,
-    backgroundColor: colors.primaryLight,
-    borderRadius: 12,
-    padding: 6,
-  },
-  ingSugRow: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    marginVertical: 1,
-  },
-  ingSugText: { color: colors.success, fontSize: 15, fontWeight: "600" },
 });
