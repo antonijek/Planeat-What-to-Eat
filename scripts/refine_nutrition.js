@@ -18,8 +18,26 @@ const API = "https://api.nal.usda.gov/fdc/v1/foods/search";
 const API_KEY = process.env.USDA_API_KEY;
 
 const cache = JSON.parse(fs.readFileSync(CACHE_PATH, "utf-8"));
-const badList = JSON.parse(fs.readFileSync(BAD_PATH, "utf-8"));
 const queryMap = JSON.parse(fs.readFileSync(QUERY_PATH, "utf-8"));
+
+// badmap.json = lista neispravnih sastojaka za ponovno povlačenje.
+// Ako ne postoji, generiši ga iz keša (missing / kcal=0 / bez per100),
+// da skripta može da se pokrene i prvi put.
+let badList;
+if (fs.existsSync(BAD_PATH)) {
+  badList = JSON.parse(fs.readFileSync(BAD_PATH, "utf-8"));
+} else {
+  badList = Object.keys(cache).filter((k) => {
+    const c = cache[k];
+    if (!c) return true;
+    if (c.missing) return true;
+    if (!c.per100) return true;
+    return c.per100.kcal === 0 || c.per100.kcal == null;
+  });
+  badList = Array.from(new Set(badList));
+  fs.writeFileSync(BAD_PATH, JSON.stringify(badList, null, 2));
+  console.log(`[OK] badmap.json nije postojao — generisano ${badList.length} neispravnih iz keša.`);
+}
 
 const PLURAL_RULES = [[/ies$/i, "y"], [/ves$/i, "f"], [/oes$/i, "o"], [/s$/i, ""]];
 function singular(w) { for (const [re, rep] of PLURAL_RULES) if (re.test(w)) return w.replace(re, rep); return w; }

@@ -26,7 +26,7 @@ export function PremiumLockScreen({ emoji, title, description }: Props) {
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
         <Pressable style={styles.button} onPress={() => nav.navigate("Premium")}>
-          <Text style={styles.buttonText}>💎 Nadogradi</Text>
+          <Text style={styles.buttonText}>💎 Upgrade</Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -46,5 +46,5 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 32,
   },
-  buttonText: { color: "#fff", fontWeight: "700" },
+  buttonText: { color: colors.card, fontWeight: "700" },
 });

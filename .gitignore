@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.local
 .env*.local
+.env.example
 
 # Expo
 .expo/
@@ -25,3 +26,6 @@ Thumbs.db
 
 # Playwright screenshots/artifacts
 .playwright-mcp/
+
+# Generated data artifacts (regenerisani skriptama)
+data/badmap.json
