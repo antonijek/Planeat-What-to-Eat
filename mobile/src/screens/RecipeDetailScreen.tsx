@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { PersonStepper } from "../components/PersonStepper";
 import { IngredientList } from "../components/IngredientList";
+import { NutritionTable } from "../components/NutritionTable";
 import { EditRecipeModal } from "../components/EditRecipeModal";
 import { AppModal } from "../components/AppModal";
 import { overrideService } from "../services/overrideService";
@@ -23,7 +24,7 @@ import { calorieLogService } from "../services/calorieLogService";
 import { useUserStore } from "../store/userStore";
 import { useRecipeStore } from "../store/recipeStore";
 import { Recipe } from "../types";
-import { formatDuration, perServing, perServingRound } from "../utils/helpers";
+import { formatDuration, perServingRound } from "../utils/helpers";
 import { DIFFICULTY_LABELS } from "../constants/categories";
 import { colors } from "../constants/theme";
 
@@ -38,7 +39,6 @@ export function RecipeDetailScreen() {
   const recipeStoreGetById = useRecipeStore((s) => s.getById);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [modified, setModified] = useState(false);
-  const [showMore, setShowMore] = useState(false);
   const [persons, setPersons] = useState(2);
   const [editOpen, setEditOpen] = useState(false);
   const [cooked, setCooked] = useState(false);
@@ -201,89 +201,7 @@ export function RecipeDetailScreen() {
             </Pressable>
           )}
 
-          <View style={styles.nutritionCard}>
-            <View style={styles.nutritionHeader}>
-              <Text style={styles.nutritionTitle}>Nutrition per serving</Text>
-              {recipe.servings ? <Text style={styles.nutritionServing}>{recipe.servings} servings</Text> : null}
-            </View>
-            {recipe.calories ? (
-              <Text style={styles.nutritionTotal}>
-                Whole recipe: ~{recipe.calories.toLocaleString()} kcal · per serving: ~
-                {perServingRound(recipe.calories, recipe.servings)} kcal
-              </Text>
-            ) : null}
-
-            {/* Glavni red — kao na proizvodima */}
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionName}>Energy</Text>
-              <Text style={styles.nutritionValue}>
-                {recipe.calories ? `~${perServingRound(recipe.calories, recipe.servings)} kcal` : "—"}
-              </Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionName}>Fat</Text>
-              <Text style={styles.nutritionValue}>
-                {recipe.fats ? `~${perServingRound(recipe.fats, recipe.servings)}g` : "—"}
-              </Text>
-            </View>
-            <View style={[styles.nutritionRow, styles.nutritionRowSub]}>
-              <Text style={styles.nutritionNameSub}>of which saturates</Text>
-              <Text style={styles.nutritionValueSub}>
-                {recipe.saturatedFat ? `~${perServingRound(recipe.saturatedFat, recipe.servings)}g` : "—"}
-              </Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionName}>Carbohydrate</Text>
-              <Text style={styles.nutritionValue}>
-                {recipe.carbs ? `~${perServingRound(recipe.carbs, recipe.servings)}g` : "—"}
-              </Text>
-            </View>
-            <View style={[styles.nutritionRow, styles.nutritionRowSub]}>
-              <Text style={styles.nutritionNameSub}>of which sugars (added)</Text>
-              <Text style={styles.nutritionValueSub}>
-                {recipe.addedSugar ? `~${perServingRound(recipe.addedSugar, recipe.servings)}g` : "—"}
-              </Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionName}>Protein</Text>
-              <Text style={styles.nutritionValue}>
-                {recipe.protein ? `~${perServingRound(recipe.protein, recipe.servings)}g` : "—"}
-              </Text>
-            </View>
-            <View style={styles.nutritionRow}>
-              <Text style={styles.nutritionName}>Fiber</Text>
-              <Text style={styles.nutritionValue}>
-                {recipe.fiber ? `~${perServingRound(recipe.fiber, recipe.servings)}g` : "—"}
-              </Text>
-            </View>
-
-            {/* Još — dodatne vrednosti */}
-            <Pressable onPress={() => setShowMore(!showMore)} style={styles.moreBtn}>
-              <Text style={styles.moreBtnText}>{showMore ? "Show less" : "More values"}</Text>
-            </Pressable>
-            {showMore && (
-              <View>
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionName}>Salt</Text>
-                  <Text style={styles.nutritionValue}>
-                    {recipe.sodium ? `~${(perServing(recipe.sodium, recipe.servings) / 1000).toFixed(1)}g` : "—"}
-                  </Text>
-                </View>
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionName}>Cholesterol</Text>
-                  <Text style={styles.nutritionValue}>
-                    {recipe.cholesterol ? `~${perServingRound(recipe.cholesterol, recipe.servings)}mg` : "—"}
-                  </Text>
-                </View>
-                <View style={styles.nutritionRow}>
-                  <Text style={styles.nutritionName}>Sodium</Text>
-                  <Text style={styles.nutritionValue}>
-                    {recipe.sodium ? `~${perServingRound(recipe.sodium, recipe.servings)}mg` : "—"}
-                  </Text>
-                </View>
-              </View>
-            )}
-          </View>
+          <NutritionTable recipe={recipe} />
 
           <Text style={styles.section}>Number of people (recipe for {recipe.servings || "?"})</Text>
           <PersonStepper value={persons} onChange={setPersons} />
@@ -424,36 +342,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   calorieLogBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
-  nutritionCard: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    marginTop: 16,
-    padding: 16,
-  },
-  nutritionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  nutritionTitle: { fontSize: 14, fontWeight: "700", color: colors.text },
-  nutritionServing: { fontSize: 12, color: colors.textMuted },
-  nutritionTotal: { fontSize: 12, color: colors.textMuted, marginBottom: 8, fontStyle: "italic" },
-  nutritionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 6,
-    borderBottomColor: colors.border,
-    borderBottomWidth: 0.5,
-  },
-  nutritionRowSub: { paddingLeft: 16, paddingVertical: 3 },
-  nutritionName: { fontSize: 14, color: colors.text },
-  nutritionNameSub: { fontSize: 13, color: colors.textMuted },
-  nutritionValue: { fontSize: 14, fontWeight: "600", color: colors.text },
-  nutritionValueSub: { fontSize: 13, fontWeight: "600", color: colors.textMuted },
-  moreBtn: { marginTop: 12, alignSelf: "center", paddingVertical: 6 },
-  moreBtnText: { color: colors.primary, fontWeight: "600", fontSize: 14 },
   section: { fontSize: 18, fontWeight: "700", color: colors.text, marginTop: 20, marginBottom: 8 },
   step: { flexDirection: "row", marginBottom: 12, alignItems: "flex-start" },
   stepNum: {
