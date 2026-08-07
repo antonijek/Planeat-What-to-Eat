@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Recipe } from "../types";
 import { formatDuration, perServingRound } from "../utils/helpers";
-import { DIFFICULTY_LABELS } from "../constants/categories";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 }
 
 export function RecipeCard({ recipe, onPress, modified }: Props) {
+  const { t } = useTranslation();
   return (
     <Pressable style={styles.card} onPress={onPress}>
       {recipe.imageUrl ? (
@@ -29,7 +30,7 @@ export function RecipeCard({ recipe, onPress, modified }: Props) {
       <View style={styles.body}>
         {modified && (
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>EDITED</Text>
+            <Text style={styles.badgeText}>{t("recipeDetail.edited")}</Text>
           </View>
         )}
         <Text style={styles.title} numberOfLines={1}>
@@ -46,8 +47,10 @@ export function RecipeCard({ recipe, onPress, modified }: Props) {
               {recipe.calories ? `~${perServingRound(recipe.calories, recipe.servings)} kcal` : "— kcal"}
             </Text>
           </View>
-          <Text style={styles.metaText}>{DIFFICULTY_LABELS[recipe.difficulty] ?? recipe.difficulty}</Text>
+          <Text style={styles.metaText}>{t(`difficulty.${recipe.difficulty}`)}</Text>
         </View>
+
+
       </View>
     </Pressable>
   );

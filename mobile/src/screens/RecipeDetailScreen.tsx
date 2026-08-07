@@ -26,6 +26,7 @@ import { useRecipeStore } from "../store/recipeStore";
 import { Recipe } from "../types";
 import { formatDuration, perServingRound } from "../utils/helpers";
 import { DIFFICULTY_LABELS } from "../constants/categories";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 type Route = RouteProp<RootStackParamList, "RecipeDetail">;
@@ -34,6 +35,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 export function RecipeDetailScreen() {
   const route = useRoute<Route>();
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   const { id } = route.params;
   const { isPremium, toggleFavorite, favorites } = useUserStore();
   const recipeStoreGetById = useRecipeStore((s) => s.getById);
@@ -175,7 +177,7 @@ export function RecipeDetailScreen() {
             }}
           >
             <Text style={[styles.cookedBtnText, cooked && styles.cookedBtnTextOn]}>
-              {cooked ? "✅ I cooked this" : "🍳 I cooked this"}
+                  {cooked ? t("recipeDetail.cookedThisDone") : t("recipeDetail.cookedThis")}
             </Text>
           </Pressable>
 
@@ -197,19 +199,19 @@ export function RecipeDetailScreen() {
                 );
               }}
             >
-              <Text style={styles.calorieLogBtnText}>➕ Add to Calorie tracker</Text>
+                <Text style={styles.calorieLogBtnText}>{t("recipeDetail.addToTracker")}</Text>
             </Pressable>
           )}
 
           <NutritionTable recipe={recipe} />
 
-          <Text style={styles.section}>Number of people (recipe for {recipe.servings || "?"})</Text>
+          <Text style={styles.section}>{t("recipeDetail.numberPeople", { count: recipe.servings || "?" })}</Text>
           <PersonStepper value={persons} onChange={setPersons} />
 
-          <Text style={styles.section}>Ingredients</Text>
+          <Text style={styles.section}>{t("recipeDetail.ingredients")}</Text>
           <IngredientList ingredients={recipe.ingredients} persons={persons} servings={recipe.servings} />
 
-          <Text style={styles.section}>Instructions</Text>
+          <Text style={styles.section}>{t("recipeDetail.instructions")}</Text>
           {recipe.instructions.map((step, i) => (
             <View key={i} style={styles.step}>
               <View style={styles.stepNum}>
@@ -228,7 +230,7 @@ export function RecipeDetailScreen() {
                 setRecipe(await overrideService.getEffective(id));
               }}
             >
-              <Text style={styles.resetText}>↩︎ Restore to original</Text>
+                      <Text style={styles.resetText}>↩︎ {t("recipeDetail.resetChanges")}</Text>
             </Pressable>
           )}
 

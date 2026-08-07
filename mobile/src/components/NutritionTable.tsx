@@ -1,66 +1,70 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Recipe } from "../types";
 import { perServing, perServingRound } from "../utils/helpers";
 import { colors } from "../constants/theme";
 
 /** Nutricioni prikaz recepta (po porciji), kao na proizvodima + "More values". */
 export function NutritionTable({ recipe }: { recipe: Recipe }) {
+  const { t } = useTranslation();
   const [showMore, setShowMore] = useState(false);
   const s = recipe.servings;
 
   return (
     <View style={styles.nutritionCard}>
       <View style={styles.nutritionHeader}>
-        <Text style={styles.nutritionTitle}>Nutrition per serving</Text>
-        {recipe.servings ? <Text style={styles.nutritionServing}>{recipe.servings} servings</Text> : null}
+        <Text style={styles.nutritionTitle}>{t("recipeDetail.nutritionPerServing")}</Text>
+        {recipe.servings ? <Text style={styles.nutritionServing}>{t("recipeDetail.servings", { count: recipe.servings })}</Text> : null}
       </View>
       {recipe.calories ? (
         <Text style={styles.nutritionTotal}>
-          Whole recipe: ~{recipe.calories.toLocaleString()} kcal · per serving: ~
-          {perServingRound(recipe.calories, s)} kcal
+          {t("recipeDetail.wholeRecipe", {
+            total: recipe.calories.toLocaleString(),
+            per: perServingRound(recipe.calories, s),
+          })}
         </Text>
       ) : null}
 
       {/* Glavni red — kao na proizvodima */}
       <View style={styles.nutritionRow}>
-        <Text style={styles.nutritionName}>Energy</Text>
+        <Text style={styles.nutritionName}>{t("recipeDetail.energy")}</Text>
         <Text style={styles.nutritionValue}>
           {recipe.calories ? `~${perServingRound(recipe.calories, s)} kcal` : "—"}
         </Text>
       </View>
       <View style={styles.nutritionRow}>
-        <Text style={styles.nutritionName}>Fat</Text>
+        <Text style={styles.nutritionName}>{t("recipeDetail.fat")}</Text>
         <Text style={styles.nutritionValue}>
           {recipe.fats ? `~${perServingRound(recipe.fats, s)}g` : "—"}
         </Text>
       </View>
       <View style={[styles.nutritionRow, styles.nutritionRowSub]}>
-        <Text style={styles.nutritionNameSub}>of which saturates</Text>
+        <Text style={styles.nutritionNameSub}>{t("recipeDetail.ofWhichSaturates")}</Text>
         <Text style={styles.nutritionValueSub}>
           {recipe.saturatedFat ? `~${perServingRound(recipe.saturatedFat, s)}g` : "—"}
         </Text>
       </View>
       <View style={styles.nutritionRow}>
-        <Text style={styles.nutritionName}>Carbohydrate</Text>
+        <Text style={styles.nutritionName}>{t("recipeDetail.carbohydrate")}</Text>
         <Text style={styles.nutritionValue}>
           {recipe.carbs ? `~${perServingRound(recipe.carbs, s)}g` : "—"}
         </Text>
       </View>
       <View style={[styles.nutritionRow, styles.nutritionRowSub]}>
-        <Text style={styles.nutritionNameSub}>of which sugars (added)</Text>
+        <Text style={styles.nutritionNameSub}>{t("recipeDetail.ofWhichSugars")}</Text>
         <Text style={styles.nutritionValueSub}>
           {recipe.addedSugar ? `~${perServingRound(recipe.addedSugar, s)}g` : "—"}
         </Text>
       </View>
       <View style={styles.nutritionRow}>
-        <Text style={styles.nutritionName}>Protein</Text>
+        <Text style={styles.nutritionName}>{t("recipeDetail.protein")}</Text>
         <Text style={styles.nutritionValue}>
           {recipe.protein ? `~${perServingRound(recipe.protein, s)}g` : "—"}
         </Text>
       </View>
       <View style={styles.nutritionRow}>
-        <Text style={styles.nutritionName}>Fiber</Text>
+        <Text style={styles.nutritionName}>{t("recipeDetail.fiber")}</Text>
         <Text style={styles.nutritionValue}>
           {recipe.fiber ? `~${perServingRound(recipe.fiber, s)}g` : "—"}
         </Text>
@@ -68,24 +72,24 @@ export function NutritionTable({ recipe }: { recipe: Recipe }) {
 
       {/* Još — dodatne vrednosti */}
       <Pressable onPress={() => setShowMore(!showMore)} style={styles.moreBtn}>
-        <Text style={styles.moreBtnText}>{showMore ? "Show less" : "More values"}</Text>
+        <Text style={styles.moreBtnText}>{showMore ? t("recipeDetail.showLess") : t("recipeDetail.moreValues")}</Text>
       </Pressable>
       {showMore && (
         <View>
           <View style={styles.nutritionRow}>
-            <Text style={styles.nutritionName}>Salt</Text>
+            <Text style={styles.nutritionName}>{t("recipeDetail.salt")}</Text>
             <Text style={styles.nutritionValue}>
               {recipe.sodium ? `~${(perServing(recipe.sodium, s) / 1000).toFixed(1)}g` : "—"}
             </Text>
           </View>
           <View style={styles.nutritionRow}>
-            <Text style={styles.nutritionName}>Cholesterol</Text>
+            <Text style={styles.nutritionName}>{t("recipeDetail.cholesterol")}</Text>
             <Text style={styles.nutritionValue}>
               {recipe.cholesterol ? `~${perServingRound(recipe.cholesterol, s)}mg` : "—"}
             </Text>
           </View>
           <View style={styles.nutritionRow}>
-            <Text style={styles.nutritionName}>Sodium</Text>
+            <Text style={styles.nutritionName}>{t("recipeDetail.sodium")}</Text>
             <Text style={styles.nutritionValue}>
               {recipe.sodium ? `~${perServingRound(recipe.sodium, s)}mg` : "—"}
             </Text>

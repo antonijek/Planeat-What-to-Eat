@@ -19,19 +19,20 @@ import { useUserStore } from "../store/userStore";
 import { useRecipeStore } from "../store/recipeStore";
 import { useRecipesFilterStore, RecipesFilters } from "../store/recipesFilterStore";
 import { parseIngredientInput } from "../utils/ingredients";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const FILTER_CHIPS: { key: keyof RecipesFilters; label: string; emoji: string }[] = [
-  { key: "keto", label: "Keto", emoji: "🥑" },
-  { key: "lowCarb", label: "Low carb", emoji: "🥦" },
-  { key: "highProtein", label: "Protein", emoji: "💪" },
-  { key: "noSugar", label: "No sugar", emoji: "🫰" },
-  { key: "healthy", label: "Healthy", emoji: "🌿" },
-  { key: "rich", label: "Rich", emoji: "🍖" },
-  { key: "treat", label: "Treat", emoji: "🍰" },
-  { key: "vegetarian", label: "Veggie", emoji: "🥬" },
+const FILTER_CHIPS: { key: keyof RecipesFilters; labelKey: string; emoji: string }[] = [
+  { key: "keto", labelKey: "recipes.keto", emoji: "🥑" },
+  { key: "lowCarb", labelKey: "recipes.lowCarb", emoji: "🥦" },
+  { key: "highProtein", labelKey: "recipes.protein", emoji: "💪" },
+  { key: "noSugar", labelKey: "recipes.noSugar", emoji: "🫰" },
+  { key: "healthy", labelKey: "recipes.healthy", emoji: "🌿" },
+  { key: "rich", labelKey: "recipes.rich", emoji: "🍖" },
+  { key: "treat", labelKey: "recipes.treat", emoji: "🍰" },
+  { key: "vegetarian", labelKey: "recipes.veggie", emoji: "🥬" },
 ];
 
 // najčešće kuhinje u bazi (za filter po zemlji)
@@ -56,6 +57,7 @@ export const AREA_OPTIONS: { label: string; value: string }[] = [
 
 export function RecipesScreen() {
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   const { isPremium } = useUserStore();
   const allRecipes = useRecipeStore((s) => s.recipes);
   const userRecipes = allRecipes.filter((r) => r.id.startsWith("user-"));
@@ -143,11 +145,11 @@ export function RecipesScreen() {
         contentContainerStyle={styles.content}
         ListHeaderComponent={
           <View>
-            {!query.trim() && <Text style={styles.title}>All recipes</Text>}
+            {!query.trim() && <Text style={styles.title}>{t("recipes.title")}</Text>}
             <View style={[styles.searchRow, compact && styles.searchRowCompact]}>
               <TextInput
                 style={styles.search}
-                placeholder="Search by name or ingredient..."
+                placeholder={t("recipes.searchPlaceholder")}
                 value={query}
                 onChangeText={setQuery}
                 placeholderTextColor={colors.textFaint}
@@ -158,7 +160,7 @@ export function RecipesScreen() {
             {!query.trim() && (
               <>{isPremium ? (
               <View style={styles.haveBox}>
-                <Text style={styles.haveTitle}>🥘 What do I have at home?</Text>
+                <Text style={styles.haveTitle}>🥘 {t("recipes.haveTitle")}</Text>
                 <IngredientInputChips
                   value={ingredientInput}
                   onChangeText={setIngredientInput}
@@ -167,7 +169,7 @@ export function RecipesScreen() {
                   onRemove={removeIngredient}
                   hint={
                     haveIngredients.length > 0
-                      ? `Showing recipes you can make with ${haveIngredients.join(", ")}.`
+                      ? t("recipes.haveHint", { list: haveIngredients.join(", ") })
                       : undefined
                   }
                 />
@@ -175,7 +177,7 @@ export function RecipesScreen() {
             ) : (
               <Pressable style={styles.premiumBanner} onPress={() => nav.navigate("Premium")}>
                 <Text style={styles.premiumBannerText}>
-                  💎 "What do I have at home" filter is a Premium feature
+                  💎 {t("recipes.premiumBanner")}
                 </Text>
               </Pressable>
             )}
@@ -183,10 +185,10 @@ export function RecipesScreen() {
 
             <View style={styles.filterSection}>
               <View style={styles.filterRow}>
-                <Text style={styles.filterTitle}>⚡ Refine</Text>
+                <Text style={styles.filterTitle}>⚡ {t("recipes.refine")}</Text>
                 {anyFilter && (
                   <Pressable onPress={clearAll} hitSlop={8}>
-                    <Text style={styles.filterClear}>Clear</Text>
+                    <Text style={styles.filterClear}>{t("recipes.clearFilters")}</Text>
                   </Pressable>
                 )}
               </View>
@@ -201,7 +203,7 @@ export function RecipesScreen() {
                       onPress={() => toggleFilter(chip.key)}
                     >
                       <Text style={[styles.filterChipText, compact && styles.filterChipTextCompact, active && styles.filterChipTextOn]}>
-                        {chip.emoji} {chip.label}
+                        {chip.emoji} {t(chip.labelKey)}
                       </Text>
                     </Pressable>
                   );
@@ -217,7 +219,7 @@ export function RecipesScreen() {
                       filters.maxPrep != null && styles.filterChipTextOn,
                     ]}
                   >
-                    ⏱️ Fast
+                    ⏱️ {t("recipes.fast")}
                   </Text>
                 </Pressable>
                 <Pressable
@@ -231,7 +233,7 @@ export function RecipesScreen() {
                       showFilters && styles.filterChipTextOn,
                     ]}
                   >
-                    {showFilters ? "▾ More" : "▸ More"}
+                    {showFilters ? `▾ ${t("recipes.more")}` : `▸ ${t("recipes.more")}`}
                   </Text>
                 </Pressable>
               </View>
@@ -258,7 +260,7 @@ export function RecipesScreen() {
                       ))}
                     </View>
 
-                    <Text style={styles.filterSubtitle}>🌍 Cuisine</Text>
+                    <Text style={styles.filterSubtitle}>🌍 {t("recipes.cuisine")}</Text>
                     <View style={styles.chipsRow}>
                       {AREA_OPTIONS.map((area) => {
                         const active = filters.areas.includes(area.value);
