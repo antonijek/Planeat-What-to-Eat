@@ -9,6 +9,7 @@ import { StatsScreen } from "../screens/StatsScreen";
 import { PlanerScreen } from "../screens/PlanerScreen";
 import { MyRecipesScreen } from "../screens/MyRecipesScreen";
 import { CalorieLogScreen } from "../screens/CalorieLogScreen";
+import { AboutScreen } from "../screens/AboutScreen";
 import { RootStackParamList } from "./types";
 import { colors } from "../constants/theme";
 
@@ -34,6 +35,7 @@ export function RootNavigator() {
         <Stack.Screen name="Planer" component={PlanerScreen} />
         <Stack.Screen name="MyRecipes" component={MyRecipesScreen} />
         <Stack.Screen name="CalorieLog" component={CalorieLogScreen} />
+        <Stack.Screen name="About" component={AboutScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

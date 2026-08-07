@@ -10,6 +10,7 @@ export type RootStackParamList = {
   Planer: undefined;
   MyRecipes: undefined;
   CalorieLog: undefined;
+  About: undefined;
 };
 
 export type MainTabParamList = {

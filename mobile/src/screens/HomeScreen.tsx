@@ -181,6 +181,10 @@ export function HomeScreen() {
               <MaterialCommunityIcons name="chart-bar" size={26} color={colors.primary} />
               <Text style={styles.shortcutLabel}>Stats</Text>
             </Pressable>
+            <Pressable style={styles.shortcut} onPress={() => nav.navigate("About")}>
+              <MaterialCommunityIcons name="information-outline" size={26} color={colors.primary} />
+              <Text style={styles.shortcutLabel}>About</Text>
+            </Pressable>
           </View>
         </View>
         </ScrollView>
