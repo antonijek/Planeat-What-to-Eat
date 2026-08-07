@@ -22,6 +22,7 @@ import { WheelResultModal } from "../components/WheelResultModal";
 import { recipesForMoment } from "../constants/mealMoments";
 import { Recipe } from "../types";
 import { parseIngredientInput } from "../utils/ingredients";
+import { IngredientInputChips } from "../components/IngredientInputChips";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../constants/theme";
 
@@ -111,40 +112,23 @@ export function HomeScreen() {
               </Text>
             </Pressable>
             <View style={styles.haveRow}>
-              <TextInput
-                style={styles.haveInput}
-                placeholder="e.g. chicken, rice..."
+              <IngredientInputChips
                 value={haveInput}
                 onChangeText={setHaveInput}
-                onSubmitEditing={addHave}
-                placeholderTextColor={colors.textFaint}
+                onSubmit={addHave}
+                ingredients={haveIngredients}
+                onRemove={(ing) => setHaveIngredients(haveIngredients.filter((i) => i !== ing))}
+                placeholder="e.g. chicken, rice..."
+                emptyHint="1. Type an ingredient → 2. Press + → 3. Spin"
+                hint={
+                  haveIngredients.length > 0
+                    ? `🎡 ${filteredRecipes.length} recipe${
+                        filteredRecipes.length === 1 ? "" : "s"
+                      } available with: ${haveIngredients.join(", ")}`
+                    : undefined
+                }
               />
-              <Pressable style={styles.haveAdd} onPress={addHave}>
-                <Text style={styles.haveAddText}>+</Text>
-              </Pressable>
             </View>
-            {haveIngredients.length === 0 && (
-              <Text style={styles.haveGuide}>1. Type an ingredient → 2. Press + → 3. Spin</Text>
-            )}
-            {haveIngredients.length > 0 && (
-              <View style={styles.chips}>
-                {haveIngredients.map((ing) => (
-                  <Pressable
-                    key={ing}
-                    style={styles.chip}
-                    onPress={() => setHaveIngredients(haveIngredients.filter((i) => i !== ing))}
-                  >
-                    <Text style={styles.chipText}>{ing} ✕</Text>
-                  </Pressable>
-                ))}
-              </View>
-            )}
-            {haveIngredients.length > 0 && (
-              <Text style={styles.haveHint}>
-                🎡 {filteredRecipes.length} recipe
-                {filteredRecipes.length === 1 ? "" : "s"} available with: {haveIngredients.join(", ")}
-              </Text>
-            )}
           </View>
         </View>
 

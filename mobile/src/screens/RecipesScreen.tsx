@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { RecipeCard } from "../components/RecipeCard";
+import { IngredientInputChips } from "../components/IngredientInputChips";
 import { Recipe } from "../types";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
@@ -158,37 +159,18 @@ export function RecipesScreen() {
               <>{isPremium ? (
               <View style={styles.haveBox}>
                 <Text style={styles.haveTitle}>🥘 What do I have at home?</Text>
-                <View style={styles.haveInputRow}>
-                  <TextInput
-                    style={styles.haveInput}
-                    placeholder="E.g. chicken, potatoes..."
-                    value={ingredientInput}
-                    onChangeText={setIngredientInput}
-                    onSubmitEditing={addIngredient}
-                    placeholderTextColor={colors.textFaint}
-                  />
-                  <Pressable style={styles.haveAdd} onPress={addIngredient} hitSlop={8}>
-                    <Text style={styles.haveAddText}>+</Text>
-                  </Pressable>
-                </View>
-                {haveIngredients.length > 0 && (
-                  <>
-                    <View style={styles.chips}>
-                      {haveIngredients.map((ing) => (
-                        <Pressable
-                          key={ing}
-                          style={styles.chip}
-                          onPress={() => removeIngredient(ing)}
-                        >
-                          <Text style={styles.chipText}>{ing} ✕</Text>
-                        </Pressable>
-                      ))}
-                    </View>
-                    <Text style={styles.haveHint}>
-                      Showing recipes you can make with {haveIngredients.join(", ")}.
-                    </Text>
-                  </>
-                )}
+                <IngredientInputChips
+                  value={ingredientInput}
+                  onChangeText={setIngredientInput}
+                  onSubmit={addIngredient}
+                  ingredients={haveIngredients}
+                  onRemove={removeIngredient}
+                  hint={
+                    haveIngredients.length > 0
+                      ? `Showing recipes you can make with ${haveIngredients.join(", ")}.`
+                      : undefined
+                  }
+                />
               </View>
             ) : (
               <Pressable style={styles.premiumBanner} onPress={() => nav.navigate("Premium")}>
