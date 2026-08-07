@@ -126,6 +126,8 @@ export default {
   },
   myRecipes: {
     title: "Meine Rezepte ({{count}})",
+    premiumTitle: "Meine Rezepte",
+    premiumDesc: "Premium-Funktion. Füge eigene Rezepte hinzu und passe sie an.",
     searchPlaceholder: "Meine Rezepte suchen...",
     add: "+ Hinzufügen",
     empty: "Noch keine eigenen Rezepte. Füge das erste hinzu!",
@@ -155,6 +157,9 @@ export default {
     imageUrl: "Bild-URL (optional)",
     instructions: "Zubereitung (ein Schritt pro Zeile)",
     paste: "📋 Rezept einfügen",
+    pasteHide: "✕ Import ausblenden",
+    pasteLabel: "Rezepttext einfügen",
+    headsUp: "Hinweis",
     import: "Importieren",
     save: "Speichern",
     cancel: "Abbrechen",

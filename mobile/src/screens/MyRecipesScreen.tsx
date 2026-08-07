@@ -19,11 +19,13 @@ import { Recipe } from "../types";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { AppModal } from "../components/AppModal";
+import { useTranslation } from "react-i18next";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function MyRecipesScreen() {
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   const { isPremium } = useUserStore();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [addOpen, setAddOpen] = useState(false);
@@ -64,8 +66,8 @@ export function MyRecipesScreen() {
     return (
       <PremiumLockScreen
         emoji="👨‍🍳"
-        title="My Recipes"
-        description="Premium feature. Add your own recipes and customize them."
+        title={t("myRecipes.premiumTitle")}
+        description={t("myRecipes.premiumDesc")}
       />
     );
   }
@@ -78,7 +80,7 @@ export function MyRecipesScreen() {
         ListHeaderComponent={
           <View>
             <View style={styles.headerRow}>
-              <Text style={styles.title}>My recipes ({filtered.length})</Text>
+              <Text style={styles.title}>{t("myRecipes.title", { count: filtered.length })}</Text>
               <Pressable
                 style={styles.addBtn}
                 onPress={() => {
@@ -86,14 +88,14 @@ export function MyRecipesScreen() {
                   setAddOpen(true);
                 }}
               >
-                <Text style={styles.addBtnText}>+ Add</Text>
+                <Text style={styles.addBtnText}>{t("myRecipes.add")}</Text>
               </Pressable>
             </View>
             <TextInput
               style={styles.search}
               value={query}
               onChangeText={setQuery}
-              placeholder="Search my recipes..."
+              placeholder={t("myRecipes.searchPlaceholder")}
               placeholderTextColor={colors.textFaint}
             />
           </View>
@@ -101,9 +103,7 @@ export function MyRecipesScreen() {
         contentContainerStyle={styles.content}
         ListEmptyComponent={
           <Text style={styles.empty}>
-            {query.trim()
-              ? "No matches."
-              : "No own recipes yet. Add the first one!"}
+            {query.trim() ? t("myRecipes.emptySearch") : t("myRecipes.empty")}
           </Text>
         }
         renderItem={({ item }) => (
@@ -144,14 +144,14 @@ export function MyRecipesScreen() {
 
       <AppModal
         visible={deleteTarget !== null}
-        title="Delete recipe?"
+        title={t("myRecipes.deleteTitle")}
         onClose={() => setDeleteTarget(null)}
         onCancel={() => setDeleteTarget(null)}
         onSave={doDelete}
-        saveLabel="Delete"
+        saveLabel={t("myRecipes.delete")}
       >
         <Text style={{ color: colors.text }}>
-          Are you sure you want to delete "{deleteTarget?.name}"?
+          {t("myRecipes.deleteConfirm", { name: deleteTarget?.name ?? "" })}
         </Text>
       </AppModal>
     </SafeAreaView>

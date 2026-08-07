@@ -119,6 +119,8 @@ export default {
   },
   myRecipes: {
     title: "Mes recettes ({{count}})",
+    premiumTitle: "Mes recettes",
+    premiumDesc: "Fonction Premium. Ajoutez vos recettes et personnalisez-les.",
     searchPlaceholder: "Rechercher mes recettes...",
     add: "+ Ajouter",
     empty: "Aucune recette personnelle. Ajoutez la première !",
@@ -148,6 +150,9 @@ export default {
     imageUrl: "URL de l'image (optionnel)",
     instructions: "Préparation (une étape par ligne)",
     paste: "📋 Coller une recette",
+    pasteHide: "✕ Masquer",
+    pasteLabel: "Coller le texte",
+    headsUp: "Heads up",
     import: "Importer",
     save: "Enregistrer",
     cancel: "Annuler",

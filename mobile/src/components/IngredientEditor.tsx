@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Ingredient } from "../types";
 import { suggestIngredients, matchIngredient } from "../services/calorieCalculator";
 import { gramsFromAmountAndUnit, pieceApproxGrams } from "../utils/helpers";
@@ -22,6 +23,7 @@ export function IngredientEditor({
   onCompute,
   onMessage,
 }: Props) {
+  const { t } = useTranslation();
   const [ingName, setIngName] = useState("");
   const [ingAmount, setIngAmount] = useState("");
   const [ingUnit, setIngUnit] = useState("g");
@@ -35,12 +37,12 @@ export function IngredientEditor({
 
   function addIngredient() {
     if (!ingName.trim()) {
-      onMessage("Enter an ingredient name.");
+      onMessage(t("addRecipe.addIngredientName"));
       return;
     }
     const amount = parseFloat(ingAmount);
     if (!Number.isFinite(amount) || amount <= 0) {
-      onMessage("Enter a valid amount.");
+      onMessage(t("addRecipe.addIngredientAmount"));
       return;
     }
     const ing: Ingredient = {
@@ -62,7 +64,7 @@ export function IngredientEditor({
 
   function computeNutrition() {
     if (ingredients.length === 0) {
-      onMessage("Add ingredients first, then tap Compute.");
+      onMessage(t("addRecipe.computeEmpty"));
       return;
     }
     let kcal = 0, p = 0, c = 0, f = 0;
@@ -88,26 +90,26 @@ export function IngredientEditor({
     if (kcal <= 0) {
       onMessage(
         unknown.length
-          ? `Not found / unmeasurable: ${unknown.slice(0, 4).join(", ")}${unknown.length > 4 ? "..." : ""}`
-          : "None of the ingredients matched the nutrition map."
+          ? t("addRecipe.notFound", { list: unknown.slice(0, 4).join(", ") + (unknown.length > 4 ? "..." : "") })
+          : t("addRecipe.noMatch")
       );
       return;
     }
     onCompute(kcal, p, c, f);
     if (unknown.length) {
-      onMessage(`Some ingredients skipped: ${unknown.slice(0, 4).join(", ")}${unknown.length > 4 ? "..." : ""}`);
+      onMessage(t("addRecipe.skipped", { list: unknown.slice(0, 4).join(", ") + (unknown.length > 4 ? "..." : "") }));
     }
   }
 
   return (
     <>
-      <Text style={appModalStyles.label}>Ingredients</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.ingredients")}</Text>
       <View style={styles.ingAddRow}>
         <TextInput
           style={[appModalStyles.input, styles.ingNameInput]}
           value={ingName}
           onChangeText={onIngNameChange}
-          placeholder="Name (e.g. milk)"
+          placeholder={t("addRecipe.ingredientName")}
           placeholderTextColor={colors.textFaint}
         />
       </View>
@@ -133,7 +135,7 @@ export function IngredientEditor({
           value={ingAmount}
           onChangeText={setIngAmount}
           keyboardType="numeric"
-          placeholder="Amount"
+          placeholder={t("addRecipe.amount")}
           placeholderTextColor={colors.textFaint}
         />
         <Pressable style={styles.ingAddBtn} onPress={addIngredient}>
@@ -167,7 +169,7 @@ export function IngredientEditor({
       )}
 
       <Pressable style={styles.computeBtn} onPress={computeNutrition}>
-        <Text style={styles.computeBtnText}>🧮 Compute nutrition from ingredients</Text>
+        <Text style={styles.computeBtnText}>🧮 {t("addRecipe.compute")}</Text>
       </Pressable>
     </>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, TextInput, Pressable, View, StyleSheet, ScrollView } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Difficulty, Ingredient, Recipe } from "../types";
 import { myRecipesService } from "../services/myRecipesService";
 import { textToIngredients, textToLines } from "../utils/ingredients";
@@ -23,6 +24,7 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
 };
 
 export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Other");
   const [prepTime, setPrepTime] = useState("30");
@@ -69,7 +71,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
 
   async function save() {
     if (!name.trim()) {
-      setMessage("Name is required.");
+      setMessage(t("addRecipe.nameRequired"));
       return;
     }
     const data = {
@@ -103,7 +105,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
     setMessage(null);
     // Brisanje kroz potvrdni modal — jednostavno odmah briše uz poruku
     setPasteOpen(false);
-    setMessage("Deleted.");
+      setMessage(t("addRecipe.deleted"));
     myRecipesService.remove(editing.id).then(() => {
       onSaved();
       onClose();
@@ -113,7 +115,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   function applyImport() {
     const parsed = parseRecipeText(pasteText);
     if (!parsed) {
-      setMessage("Nothing to import. Paste a recipe text, then tap Import.");
+      setMessage(t("addRecipe.importNothing"));
       return;
     }
     if (parsed.name && !name.trim()) setName(parsed.name);
@@ -127,26 +129,26 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   return (
     <AppModal
       visible={visible}
-      title={editing ? "Edit recipe" : "New recipe"}
+      title={editing ? t("addRecipe.titleEdit") : t("addRecipe.titleNew")}
       onClose={onClose}
       onSave={save}
       onDelete={editing ? remove : undefined}
     >
-      <Text style={appModalStyles.label}>Name *</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.name")}</Text>
       <TextInput style={appModalStyles.input} value={name} onChangeText={setName} />
 
-      <Text style={appModalStyles.label}>Category</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.category")}</Text>
       <TextInput
         style={appModalStyles.input}
         value={category}
         onChangeText={setCategory}
-        placeholder="E.g. Balkan, Italian..."
+        placeholder={t("addRecipe.categoryPlaceholder")}
         placeholderTextColor={colors.textFaint}
       />
 
       <View style={styles.row}>
         <View style={styles.col}>
-          <Text style={appModalStyles.label}>Time (min)</Text>
+          <Text style={appModalStyles.label}>{t("addRecipe.timeMinutes")}</Text>
           <TextInput
             style={appModalStyles.input}
             value={prepTime}
@@ -155,7 +157,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
           />
         </View>
         <View style={styles.col}>
-          <Text style={appModalStyles.label}>Servings</Text>
+          <Text style={appModalStyles.label}>{t("addRecipe.servings")}</Text>
           <TextInput
             style={appModalStyles.input}
             value={servings}
@@ -176,7 +178,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
 
       <View style={styles.row}>
         <View style={styles.col}>
-          <Text style={appModalStyles.label}>Calories</Text>
+          <Text style={appModalStyles.label}>{t("addRecipe.calories")}</Text>
           <TextInput
             style={appModalStyles.input}
             value={calories}
@@ -185,7 +187,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
           />
         </View>
         <View style={styles.col}>
-          <Text style={appModalStyles.label}>Protein (g)</Text>
+          <Text style={appModalStyles.label}>{t("addRecipe.proteinG")}</Text>
           <TextInput
             style={appModalStyles.input}
             value={protein}
@@ -197,7 +199,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
 
       <View style={styles.row}>
         <View style={styles.col}>
-          <Text style={appModalStyles.label}>Carbs (g)</Text>
+          <Text style={appModalStyles.label}>{t("addRecipe.carbsG")}</Text>
           <TextInput
             style={appModalStyles.input}
             value={carbs}
@@ -206,7 +208,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
           />
         </View>
         <View style={styles.col}>
-          <Text style={appModalStyles.label}>Fat (g)</Text>
+          <Text style={appModalStyles.label}>{t("addRecipe.fatG")}</Text>
           <TextInput
             style={appModalStyles.input}
             value={fats}
@@ -216,7 +218,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
         </View>
       </View>
 
-      <Text style={appModalStyles.label}>Difficulty</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.difficulty")}</Text>
       <View style={styles.diffRow}>
         {DIFFICULTIES.map((d) => (
           <Pressable
@@ -225,13 +227,13 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
             onPress={() => setDifficulty(d)}
           >
             <Text style={[styles.diffText, difficulty === d && styles.diffTextActive]}>
-              {DIFFICULTY_LABELS[d]}
+              {t(`difficulty.${d}`)}
             </Text>
           </Pressable>
         ))}
       </View>
 
-      <Text style={appModalStyles.label}>Image URL (optional)</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.imageUrl")}</Text>
       <TextInput
         style={appModalStyles.input}
         value={imageUrl}
@@ -241,7 +243,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
         autoCapitalize="none"
       />
 
-      <Text style={appModalStyles.label}>Instructions (one step per line)</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.instructions")}</Text>
       <TextInput
         style={[appModalStyles.input, appModalStyles.multiline]}
         value={instructionsText}
@@ -252,33 +254,33 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
 
       <Pressable style={styles.pasteToggle} onPress={() => setPasteOpen(!pasteOpen)}>
         <Text style={styles.pasteToggleText}>
-          {pasteOpen ? "✕ Hide import" : "📋 Paste a recipe"}
+          {pasteOpen ? t("addRecipe.pasteHide") : t("addRecipe.paste")}
         </Text>
       </Pressable>
 
       {pasteOpen && (
         <View style={styles.pasteBox}>
-          <Text style={appModalStyles.label}>Paste recipe text</Text>
+          <Text style={appModalStyles.label}>{t("addRecipe.pasteLabel")}</Text>
           <TextInput
             style={[appModalStyles.input, appModalStyles.multiline, styles.pasteInput]}
             value={pasteText}
             onChangeText={setPasteText}
             multiline
-            placeholder={"Ingredients:\n2 cups chicken\n1 onion\n\nInstructions:\n1. Cut..."}
+            placeholder={t("addRecipe.pastePlaceholder")}
             placeholderTextColor={colors.textFaint}
           />
           <Pressable style={styles.pasteImport} onPress={applyImport}>
-            <Text style={styles.pasteImportText}>⬇️ Import</Text>
+            <Text style={styles.pasteImportText}>{t("addRecipe.import")}</Text>
           </Pressable>
         </View>
       )}
 
       <AppModal
         visible={message !== null}
-        title="Heads up"
+        title={t("addRecipe.headsUp")}
         onClose={() => setMessage(null)}
         onSave={() => setMessage(null)}
-        saveLabel="OK"
+        saveLabel={t("common.ok")}
       >
         <Text style={{ color: colors.text }}>{message}</Text>
       </AppModal>
