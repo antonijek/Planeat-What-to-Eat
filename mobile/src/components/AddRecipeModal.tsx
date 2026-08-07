@@ -15,18 +15,18 @@ interface Props {
   onSaved: () => void;
 }
 
-const DIFFICULTIES: Difficulty[] = ["lako", "srednje", "teško"];
+const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  lako: "Easy",
-  srednje: "Medium",
-  teško: "Hard",
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
 };
 
 export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("Ostalo");
+  const [category, setCategory] = useState("Other");
   const [prepTime, setPrepTime] = useState("30");
-  const [difficulty, setDifficulty] = useState<Difficulty>("srednje");
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
   const [carbs, setCarbs] = useState("");
@@ -42,9 +42,9 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   useEffect(() => {
     if (visible) {
       setName(editing?.name ?? "");
-      setCategory(editing?.category ?? "Ostalo");
+      setCategory(editing?.category ?? "Other");
       setPrepTime(String(editing?.prepTime ?? 30));
-      setDifficulty(editing?.difficulty ?? "srednje");
+      setDifficulty(editing?.difficulty ?? "medium");
       setCalories(String(editing?.calories ?? ""));
       setProtein(String(editing?.protein ?? ""));
       setCarbs(String(editing?.carbs ?? ""));
@@ -74,7 +74,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
     }
     const data = {
       name: name.trim(),
-      category: category.trim() || "Ostalo",
+      category: category.trim() || "Other",
       prepTime: parseInt(prepTime) || 30,
       difficulty,
       calories: parseInt(calories) || 0,

@@ -53,8 +53,8 @@ export const premiumService = {
   },
 
   /**
-   * Koliko vrtnji je preostalo danas. Premium = neograničeno.
-   * Free = FREE_DAILY_SPINS dnevno (od ove verzije: bez reklama, zaključano).
+   * How many spins remain today. Premium = unlimited.
+   * Free = FREE_DAILY_SPINS per day (from this version: no ads, locked).
    */
   async remainingSpinsToday(): Promise<number | null> {
     if (await this.isPremium()) return null; // null = neograničeno

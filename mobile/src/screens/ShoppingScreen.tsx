@@ -58,7 +58,7 @@ export function ShoppingScreen() {
                         name: i.name,
                         amount: i.amount,
                         unit: i.unit,
-                        category: "Ostalo",
+                        category: "Other",
                         isManual: false,
                         isChecked: false,
                         sourceRecipeIds: [],
@@ -86,7 +86,7 @@ export function ShoppingScreen() {
                   style={styles.addBtn}
                   onPress={() => {
                     if (!name.trim()) return;
-                    addManual({ name: name.trim(), amount: 1, unit: "kom", category: "Ostalo" });
+                    addManual({ name: name.trim(), amount: 1, unit: "kom", category: "Other" });
                     setName("");
                   }}
                 >

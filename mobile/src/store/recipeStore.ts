@@ -28,7 +28,7 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
 
   async spin() {
     const { recipes } = get();
-    if (recipes.length === 0) throw new Error("Nema recepata");
+    if (recipes.length === 0) throw new Error("No recipes");
     const rand = recipes[Math.floor(Math.random() * recipes.length)];
     set((s) => ({
       lastSpunRecipeId: rand.id,
@@ -40,7 +40,7 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
   async getById(id) {
     if (id.startsWith("user-")) {
       const mine = await recipeService.getByIdAny(id);
-      if (!mine) throw new Error("Sopstveni recept nije nađen");
+      if (!mine) throw new Error("Custom recipe not found");
       return mine;
     }
     return overrideService.getEffective(id);

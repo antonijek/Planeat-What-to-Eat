@@ -1,3 +1,5 @@
+import { Difficulty } from "../types";
+
 export const CATEGORIES = [
   "Beef",
   "Breakfast",
@@ -15,10 +17,10 @@ export const CATEGORIES = [
   "Vegetarian",
 ] as const;
 
-export const DIFFICULTY_LABELS: Record<string, string> = {
-  lako: "Easy",
-  srednje: "Medium",
-  teško: "Hard",
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
 };
 
 export const MAX_PINNED = 5;

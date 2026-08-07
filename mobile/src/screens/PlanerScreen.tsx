@@ -22,9 +22,9 @@ import { PremiumLockScreen } from "../components/PremiumLockScreen";
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const MEAL_TYPES: { key: "ručak" | "večera"; label: string }[] = [
-  { key: "ručak", label: "🍳 Lunch" },
-  { key: "večera", label: "🍽️ Dinner" },
+const MEAL_TYPES: { key: "lunch" | "dinner"; label: string }[] = [
+  { key: "lunch", label: "🍳 Lunch" },
+  { key: "dinner", label: "🍽️ Dinner" },
 ];
 
 export function PlanerScreen() {
@@ -32,7 +32,7 @@ export function PlanerScreen() {
   const { isPremium } = useUserStore();
   const [plan, setPlan] = useState<MealPlanEntry[]>([]);
   const [pickerDay, setPickerDay] = useState<number | null>(null);
-  const [pickerMeal, setPickerMeal] = useState<"ručak" | "večera" | null>(null);
+  const [pickerMeal, setPickerMeal] = useState<"lunch" | "dinner" | null>(null);
   const [search, setSearch] = useState("");
 
   useEffect(() => {

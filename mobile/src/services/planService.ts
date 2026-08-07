@@ -29,7 +29,7 @@ export const planService = {
     return plan;
   },
 
-  async remove(dayOfWeek: number, mealType: "ručak" | "večera"): Promise<MealPlanEntry[]> {
+  async remove(dayOfWeek: number, mealType: "lunch" | "dinner"): Promise<MealPlanEntry[]> {
     const plan = await getPlan();
     const next = plan.filter((p) => !(p.dayOfWeek === dayOfWeek && p.mealType === mealType));
     await setPlan(next);

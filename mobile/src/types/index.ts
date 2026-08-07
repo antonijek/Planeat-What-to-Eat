@@ -1,4 +1,4 @@
-export type Difficulty = "lako" | "srednje" | "teško";
+export type Difficulty = "easy" | "medium" | "hard";
 export type PremiumType = "free" | "monthly" | "lifetime";
 
 export interface Ingredient {
@@ -84,8 +84,8 @@ export interface CalorieDayLog {
 
 export interface MealPlanEntry {
   id: string;
-  dayOfWeek: number; // 0=Pon ... 6=Ned
-  mealType: "ručak" | "večera";
+  dayOfWeek: number; // 0=Mon ... 6=Sun
+  mealType: "lunch" | "dinner";
   recipeId: string;
   persons: number;
 }

@@ -20,7 +20,7 @@ export function textToIngredients(text: string): Ingredient[] {
     .map((line) => {
       const parts = line.split("|").map((p) => p.trim());
       return {
-        name: parts[0] ?? "Sastojak",
+        name: parts[0] ?? "Ingredient",
         amount: parseFloat(parts[1]) || 1,
         unit: parts[2] || "kom",
         measure: "",

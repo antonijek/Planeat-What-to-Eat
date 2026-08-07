@@ -6,7 +6,7 @@ export interface MealMoment {
 }
 
 /**
- * "Trenuci obroka" — kako korisnik stvarno razmišlja ("šta za ručak?").
+ * "Meal moments" — how users actually think ("what for lunch?").
  * Svaki trenutak mapira se na kategorije iz baze recepata.
  */
 export const MEAL_MOMENTS: MealMoment[] = [
