@@ -18,11 +18,12 @@ import { suggestIngredients } from "../services/calorieCalculator";
 import { useUserStore } from "../store/userStore";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { CalorieGoalModal } from "../components/CalorieGoalModal";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
-function dayTitle(offset: number): string {
-  if (offset === 0) return "Today";
-  if (offset === -1) return "Yesterday";
+function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown>) => string): string {
+  if (offset === 0) return t("tracker.today");
+  if (offset === -1) return t("tracker.yesterday");
   const d = new Date();
   d.setDate(d.getDate() + offset);
   return d.toLocaleDateString();
@@ -60,6 +61,7 @@ export function CalorieLogScreen() {
   const gramsRef = useRef<TextInput>(null);
   const [goalModal, setGoalModal] = useState(false);
   const { isPremium, calorieGoal, setCalorieGoal } = useUserStore();
+  const { t } = useTranslation();
 
   const dateKey = dateKeyOffset(offset);
   const todayKey = dateKeyForToday();
@@ -169,13 +171,13 @@ export function CalorieLogScreen() {
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
           <View>
-            <Text style={styles.title}>Calorie tracker</Text>
+            <Text style={styles.title}>{t("tracker.title")}</Text>
 
             <View style={styles.dayNav}>
               <Pressable style={styles.navBtn} onPress={() => changeOffset(-1)}>
                 <Text style={styles.navText}>◀</Text>
               </Pressable>
-              <Text style={styles.dayLabel}>{dayTitle(offset)}</Text>
+              <Text style={styles.dayLabel}>{dayTitle(offset, t)}</Text>
               <Pressable
                 style={styles.navBtn}
                 onPress={() => (offset < 0 ? changeOffset(1) : null)}
@@ -187,37 +189,37 @@ export function CalorieLogScreen() {
 
             <View style={styles.dayCard}>
               <View style={styles.dayTop}>
-                <Text style={styles.dayTotal}>{totals.kcal.toLocaleString()} kcal</Text>
+                <Text style={styles.dayTotal}>{t("tracker.macKcal", { count: totals.kcal.toLocaleString() })}</Text>
                 {isToday && (
                   overBudget ? (
-                    <Text style={styles.dayOver}>🔥 {Math.abs(kcalLeft).toLocaleString()} over {calorieGoal}</Text>
+                    <Text style={styles.dayOver}>{t("tracker.overBudget", { count: Math.abs(kcalLeft).toLocaleString(), goal: calorieGoal })}</Text>
                   ) : (
-                    <Text style={styles.dayLeft}>~{kcalLeft} left of {calorieGoal}</Text>
+                    <Text style={styles.dayLeft}>{t("tracker.leftOf", { count: kcalLeft, goal: calorieGoal })}</Text>
                   )
                 )}
               </View>
               <Pressable style={styles.goalBtn} onPress={openGoalModal}>
-                <Text style={styles.goalBtnText}>⚙ Set daily goal ({calorieGoal} kcal)</Text>
+                <Text style={styles.goalBtnText}>{t("tracker.goalBtn", { count: calorieGoal })}</Text>
               </Pressable>
               <View style={styles.macRow}>
-                <Text style={styles.mac}>{totals.protein}g protein</Text>
-                <Text style={styles.mac}>{totals.fat}g fat</Text>
-                <Text style={styles.mac}>{totals.carbs}g carbs</Text>
+                <Text style={styles.mac}>{t("tracker.protein", { count: totals.protein })}</Text>
+                <Text style={styles.mac}>{t("tracker.fat", { count: totals.fat })}</Text>
+                <Text style={styles.mac}>{t("tracker.carbs", { count: totals.carbs })}</Text>
               </View>
               {isToday && overBudget && (
                 <Text style={styles.overBanner}>
-                  🔥 You've exceeded your daily goal of {calorieGoal} kcal.
+                  {t("tracker.overBanner", { goal: calorieGoal })}
                 </Text>
               )}
             </View>
 
             {isToday && (
               <>
-                <Text style={styles.label}>What did you eat?</Text>
+                <Text style={styles.label}>{t("tracker.foodLabel")}</Text>
                 <View style={styles.inputRow}>
                   <TextInput
                     style={[styles.input, styles.nameInput]}
-                    placeholder="Food (e.g. chicken)"
+                    placeholder={t("tracker.foodPlaceholder")}
                     value={name}
                     onChangeText={onNameChange}
                     placeholderTextColor={colors.textFaint}
@@ -225,7 +227,7 @@ export function CalorieLogScreen() {
                   <TextInput
                     ref={gramsRef}
                     style={[styles.input, styles.gramsInput]}
-                    placeholder="Gram"
+                    placeholder={t("tracker.gram")}
                     value={grams}
                     onChangeText={setGrams}
                     keyboardType="numeric"
@@ -236,15 +238,15 @@ export function CalorieLogScreen() {
                   </Pressable>
                 </View>
                 {name.trim().length > 0 && manualMode && (
-                  <Text style={styles.hintWarn}>Not found in database.</Text>
+                  <Text style={styles.hintWarn}>{t("tracker.notFound")}</Text>
                 )}
 
                 {hasCookedRawSuggestion && !!name.trim() && !selectedSug && (
-                  <Text style={styles.hint}>Tap a suggestion to choose cooked/raw, then add grams +.</Text>
+                  <Text style={styles.hint}>{t("tracker.cookedRawHint")}</Text>
                 )}
                 {selectedSug && (
                   <Text style={[styles.hint, { color: colors.primary }]}>
-                    Selected: {selectedSug.label} — enter grams and tap +.
+                    {t("tracker.selected", { name: selectedSug.label })}
                   </Text>
                 )}
                 {suggestions.length > 0 && !!name.trim() && (
@@ -261,15 +263,15 @@ export function CalorieLogScreen() {
                 {manualMode && (
                   <View style={styles.notFoundBox}>
                     <Text style={styles.notFoundTitle}>
-                      Not in our ingredient/common-dish database.
+                      {t("tracker.notInDbTitle")}
                     </Text>
                     <Text style={styles.notFoundText}>
-                      The database covers ingredients and common dishes. If it's not here, enter calories manually below.
+                      {t("tracker.notInDbText")}
                     </Text>
                     <View style={styles.manualRow}>
                       <TextInput
                         style={[styles.input, styles.manualInput]}
-                        placeholder="kcal (e.g. 350)"
+                        placeholder={t("tracker.manualKcal")}
                         value={manualKcal}
                         onChangeText={setManualKcal}
                         keyboardType="numeric"
@@ -285,13 +287,13 @@ export function CalorieLogScreen() {
             )}
 
             <Text style={styles.section}>
-              {dayTitle(offset)} {totals.count ? `(${totals.count})` : ""}
+              {dayTitle(offset, t)} {totals.count ? `(${totals.count})` : ""}
             </Text>
           </View>
         }
         contentContainerStyle={styles.content}
         contentInset={{ bottom: 40 }}
-        ListEmptyComponent={<Text style={styles.empty}>No entries for this day.</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>{t("tracker.noEntries")}</Text>}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.rowBody}>

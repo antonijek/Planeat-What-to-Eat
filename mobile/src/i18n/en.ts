@@ -192,6 +192,7 @@ export default {
     fat: "{{count}}g fat",
     carbs: "{{count}}g carbs",
     foodPlaceholder: "Food (e.g. chicken)",
+    foodLabel: "What did you eat?",
     gram: "Gram",
     add: "+",
     noEntries: "No entries for this day.",

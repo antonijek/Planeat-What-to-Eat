@@ -174,6 +174,7 @@ export default {
     fat: "{{count}}g mat. grasses",
     carbs: "{{count}}g glucides",
     foodPlaceholder: "Aliment (p. ex. poulet)",
+    foodLabel: "Qu'avez-vous mangé ?",
     gram: "Grammes",
     add: "+",
     noEntries: "Aucune entrée pour ce jour.",

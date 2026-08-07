@@ -181,6 +181,7 @@ export default {
     fat: "{{count}}g Fett",
     carbs: "{{count}}g Kohlenhydrate",
     foodPlaceholder: "Lebensmittel (z. B. Huhn)",
+    foodLabel: "Was hast du gegessen?",
     gram: "Gramm",
     add: "+",
     noEntries: "Keine Einträge für diesen Tag.",

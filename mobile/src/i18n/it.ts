@@ -174,6 +174,7 @@ export default {
     fat: "{{count}}g grassi",
     carbs: "{{count}}g carboidrati",
     foodPlaceholder: "Cibo (es. pollo)",
+    foodLabel: "Cosa hai mangiato?",
     gram: "Grammi",
     add: "+",
     noEntries: "Nessuna voce per questo giorno.",

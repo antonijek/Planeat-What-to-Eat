@@ -174,6 +174,7 @@ export default {
     fat: "{{count}}g grasas",
     carbs: "{{count}}g hidratos",
     foodPlaceholder: "Alimento (ej. pollo)",
+    foodLabel: "¿Qué comiste?",
     gram: "Gramos",
     add: "+",
     noEntries: "Sin entradas para este día.",

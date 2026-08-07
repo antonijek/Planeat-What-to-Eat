@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { calculateMifflinGoal, ActivityLevel, CalorieGoal } from "../services/calorieCalculator";
 import { AppModal, appModalStyles } from "./AppModal";
 import { colors } from "../constants/theme";
@@ -12,21 +13,22 @@ interface Props {
 }
 
 const ACTIVITIES: [ActivityLevel, string][] = [
-  ["sedentary", "Sedentary"],
-  ["light", "Light"],
-  ["moderate", "Moderate"],
-  ["active", "Active"],
-  ["very_active", "Very active"],
+  ["sedentary", "tracker.sedentary"],
+  ["light", "tracker.light"],
+  ["moderate", "tracker.moderate"],
+  ["active", "tracker.active"],
+  ["very_active", "tracker.veryActive"],
 ];
 
 const GOALS: [CalorieGoal, string][] = [
-  ["lose", "Lose weight (−500)"],
-  ["maintain", "Maintain"],
-  ["gain", "Gain weight (+500)"],
+  ["lose", "tracker.lose"],
+  ["maintain", "tracker.maintain"],
+  ["gain", "tracker.gain"],
 ];
 
 /** Modal za podešavanje dnevnog cilja kalorija (ručno ili Mifflin-St Jeor). */
 export function CalorieGoalModal({ visible, initialGoal, onClose, onSave }: Props) {
+  const { t } = useTranslation();
   const [manualGoal, setManualGoal] = useState("");
   const [genPreference, setGenPreference] = useState<"male" | "female">("male");
   const [pKg, setPKg] = useState("");
@@ -67,23 +69,23 @@ export function CalorieGoalModal({ visible, initialGoal, onClose, onSave }: Prop
   return (
     <AppModal
       visible={visible}
-      title="Daily calorie goal"
+      title={t("tracker.goalTitle")}
       onClose={onClose}
       onCancel={onClose}
       onSave={save}
-      saveLabel={mifflinResult !== null ? "Use calculated" : "Save"}
+      saveLabel={mifflinResult !== null ? t("tracker.useCalculated") : t("common.save")}
     >
-      <Text style={appModalStyles.label}>My daily target (kcal)</Text>
+      <Text style={appModalStyles.label}>{t("tracker.targetLabel")}</Text>
       <TextInput
         style={appModalStyles.input}
         value={manualGoal}
         onChangeText={setManualGoal}
         keyboardType="numeric"
-        placeholder="e.g. 2000"
+        placeholder={t("tracker.targetPlaceholder")}
         placeholderTextColor={colors.textFaint}
       />
 
-      <Text style={styles.goalSection}>Calculate from your profile</Text>
+      <Text style={styles.goalSection}>{t("tracker.calcProfile")}</Text>
       <View style={styles.genderRow}>
         {(["male", "female"] as const).map((g) => (
           <Pressable
@@ -92,42 +94,42 @@ export function CalorieGoalModal({ visible, initialGoal, onClose, onSave }: Prop
             onPress={() => setGenPreference(g)}
           >
             <Text style={[styles.genderText, genPreference === g && styles.genderTextActive]}>
-              {g === "male" ? "Male" : "Female"}
+              {g === "male" ? t("tracker.male") : t("tracker.female")}
             </Text>
           </Pressable>
         ))}
       </View>
 
-      <Text style={appModalStyles.label}>Weight (kg)</Text>
+      <Text style={appModalStyles.label}>{t("tracker.weightKg")}</Text>
       <TextInput style={appModalStyles.input} value={pKg} onChangeText={setPKg} keyboardType="numeric" placeholder="e.g. 75" placeholderTextColor={colors.textFaint} />
-      <Text style={appModalStyles.label}>Height (cm)</Text>
+      <Text style={appModalStyles.label}>{t("tracker.heightCm")}</Text>
       <TextInput style={appModalStyles.input} value={pCm} onChangeText={setPCm} keyboardType="numeric" placeholder="e.g. 178" placeholderTextColor={colors.textFaint} />
-      <Text style={appModalStyles.label}>Age</Text>
+      <Text style={appModalStyles.label}>{t("tracker.age")}</Text>
       <TextInput style={appModalStyles.input} value={pAge} onChangeText={setPAge} keyboardType="numeric" placeholder="e.g. 30" placeholderTextColor={colors.textFaint} />
 
-      <Text style={appModalStyles.label}>Activity</Text>
-      {ACTIVITIES.map(([val, label]) => (
+      <Text style={appModalStyles.label}>{t("tracker.activity")}</Text>
+      {ACTIVITIES.map(([val, labelKey]) => (
         <Pressable
           key={val}
           style={[styles.activityRow, pActivity === val && activeBorder]}
           onPress={() => setPActivity(val)}
         >
-          <Text style={[styles.activityText, pActivity === val && styles.activeText]}>{label}</Text>
+          <Text style={[styles.activityText, pActivity === val && styles.activeText]}>{t(labelKey)}</Text>
         </Pressable>
       ))}
 
-      <Text style={appModalStyles.label}>Goal</Text>
-      {GOALS.map(([val, label]) => (
+      <Text style={appModalStyles.label}>{t("tracker.goal")}</Text>
+      {GOALS.map(([val, labelKey]) => (
         <Pressable key={val} style={[styles.activityRow, pGoal === val && activeBorder]} onPress={() => setPGoal(val)}>
-          <Text style={[styles.activityText, pGoal === val && styles.activeText]}>{label}</Text>
+          <Text style={[styles.activityText, pGoal === val && styles.activeText]}>{t(labelKey)}</Text>
         </Pressable>
       ))}
 
       <Pressable style={styles.calcBtn} onPress={computeMifflin}>
-        <Text style={styles.calcBtnText}>Calculate</Text>
+        <Text style={styles.calcBtnText}>{t("tracker.calculate")}</Text>
       </Pressable>
       {mifflinResult !== null && (
-        <Text style={styles.mifflinResult}>Recommended: ~{mifflinResult} kcal/day</Text>
+        <Text style={styles.mifflinResult}>{t("tracker.recommended", { count: mifflinResult })}</Text>
       )}
     </AppModal>
   );
