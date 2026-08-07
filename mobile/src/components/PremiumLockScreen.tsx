@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useTranslation } from "react-i18next";
 import { RootStackParamList } from "../navigation/types";
 import { colors } from "../constants/theme";
 
@@ -19,6 +20,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
  */
 export function PremiumLockScreen({ emoji, title, description }: Props) {
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
@@ -26,7 +28,7 @@ export function PremiumLockScreen({ emoji, title, description }: Props) {
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
         <Pressable style={styles.button} onPress={() => nav.navigate("Premium")}>
-          <Text style={styles.buttonText}>💎 Upgrade</Text>
+          <Text style={styles.buttonText}>{t("premiumLock.upgrade")}</Text>
         </Pressable>
       </View>
     </SafeAreaView>

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function PersonStepper({ value, onChange, min = 1, max = 30 }: Props) {
+  const { t } = useTranslation();
   return (
     <View style={styles.row}>
       <Pressable
@@ -20,7 +22,7 @@ export function PersonStepper({ value, onChange, min = 1, max = 30 }: Props) {
         <Text style={styles.btnText}>−</Text>
       </Pressable>
       <View style={styles.center}>
-        <Text style={styles.label}>PERSONS</Text>
+        <Text style={styles.label}>{t("recipeDetail.personsLabel")}</Text>
         <Text style={styles.value}>{value}</Text>
       </View>
       <Pressable

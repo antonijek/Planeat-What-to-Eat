@@ -16,19 +16,21 @@ import { planService } from "../services/planService";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
 import { MealPlanEntry } from "../types";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const MEAL_TYPES: { key: "lunch" | "dinner"; label: string }[] = [
-  { key: "lunch", label: "🍳 Lunch" },
-  { key: "dinner", label: "🍽️ Dinner" },
+const MEAL_TYPES: { key: "lunch" | "dinner"; labelKey: string }[] = [
+  { key: "lunch", labelKey: "planer.lunch" },
+  { key: "dinner", labelKey: "planer.dinner" },
 ];
 
 export function PlanerScreen() {
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   const { isPremium } = useUserStore();
   const [plan, setPlan] = useState<MealPlanEntry[]>([]);
   const [pickerDay, setPickerDay] = useState<number | null>(null);
@@ -73,8 +75,8 @@ export function PlanerScreen() {
     return (
       <PremiumLockScreen
         emoji="📅"
-        title="Meal Planer"
-        description="Premium feature. Plan your meals for the whole week."
+        title={t("planer.title")}
+        description={t("planer.premiumDesc")}
       />
     );
   }
@@ -87,12 +89,12 @@ export function PlanerScreen() {
         ListHeaderComponent={
           <View>
             <View style={styles.header}>
-              <Text style={styles.title}>Meal Planer</Text>
+              <Text style={styles.title}>{t("planer.title")}</Text>
             </View>
             {summary.meals > 0 && (
               <View style={styles.summaryCard}>
                 <Text style={styles.summaryTitle}>
-                  Week total ({summary.meals} meals)
+                  {t("planer.weekTotal", { count: summary.meals })}
                 </Text>
                 <View style={styles.summaryRow}>
                   <View style={styles.summaryStat}>
@@ -141,13 +143,13 @@ export function PlanerScreen() {
                     setPickerMeal(meal.key);
                   }}
                 >
-                  <Text style={styles.mealLabel}>{meal.label}</Text>
+                  <Text style={styles.mealLabel}>{t(meal.labelKey)}</Text>
                   {entry && recipe ? (
                     <View style={styles.mealAssigned}>
                       <Text style={styles.mealRecipeName} numberOfLines={1}>
                         {recipe.name}
                       </Text>
-                      <Text style={styles.mealPersons}>{entry.persons} pers.</Text>
+                      <Text style={styles.mealPersons}>{t("planer.persons", { count: entry.persons })}</Text>
                       <Pressable
                         onPress={async () => {
                           await planService.remove(index, meal.key);
@@ -159,7 +161,7 @@ export function PlanerScreen() {
                       </Pressable>
                     </View>
                   ) : (
-                    <Text style={styles.mealEmpty}>+ assign recipe</Text>
+                    <Text style={styles.mealEmpty}>{t("planer.assignRecipe")}</Text>
                   )}
                 </Pressable>
               );
@@ -177,11 +179,11 @@ export function PlanerScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>
-              {DAYS[pickerDay ?? 0]} · {MEAL_TYPES.find((m) => m.key === pickerMeal)?.label}
+              {DAYS[pickerDay ?? 0]} · {MEAL_TYPES.find((m) => m.key === pickerMeal)?.labelKey ? t(MEAL_TYPES.find((m) => m.key === pickerMeal)!.labelKey) : ""}
             </Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="Search recipe..."
+              placeholder={t("planer.searchPlaceholder")}
               value={search}
               onChangeText={setSearch}
               placeholderTextColor={colors.textFaint}
@@ -213,7 +215,7 @@ export function PlanerScreen() {
               )}
             />
             <Pressable style={styles.cancelBtn} onPress={() => setPickerDay(null)}>
-              <Text style={styles.cancelText}>Close</Text>
+              <Text style={styles.cancelText}>{t("common.close")}</Text>
             </Pressable>
           </View>
         </View>

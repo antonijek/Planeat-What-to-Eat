@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, TextInput } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Recipe } from "../types";
 import { overrideService } from "../services/overrideService";
 import { ingredientsToText, textToIngredients, textToLines } from "../utils/ingredients";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
+  const { t } = useTranslation();
   const [name, setName] = useState(recipe.name);
   const [category, setCategory] = useState(recipe.category);
   const [prepTime, setPrepTime] = useState(String(recipe.prepTime));
@@ -48,15 +50,15 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
       title="Edit recipe"
       onClose={onClose}
       onSave={save}
-      saveLabel="Save changes"
+      saveLabel={t("common.save")}
     >
-      <Text style={appModalStyles.label}>Name</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.name")}</Text>
       <TextInput style={appModalStyles.input} value={name} onChangeText={setName} />
 
-      <Text style={appModalStyles.label}>Category</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.category")}</Text>
       <TextInput style={appModalStyles.input} value={category} onChangeText={setCategory} />
 
-      <Text style={appModalStyles.label}>Prep time (min)</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.timeMinutes")}</Text>
       <TextInput
         style={appModalStyles.input}
         value={prepTime}
@@ -64,9 +66,7 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
         keyboardType="numeric"
       />
 
-      <Text style={appModalStyles.label}>
-        Ingredients (one per line: name | amount | unit)
-      </Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.ingredients")}</Text>
       <TextInput
         style={[appModalStyles.input, appModalStyles.multiline]}
         value={ingredients}
@@ -76,7 +76,7 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
         placeholderTextColor={colors.textFaint}
       />
 
-      <Text style={appModalStyles.label}>Instructions (one step per line)</Text>
+      <Text style={appModalStyles.label}>{t("addRecipe.instructions")}</Text>
       <TextInput
         style={[appModalStyles.input, appModalStyles.multiline]}
         value={instructions}

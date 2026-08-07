@@ -1,22 +1,24 @@
 import React from "react";
 import { View, Text, StyleSheet, SafeAreaView, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import { useUserStore } from "../store/userStore";
 import { colors } from "../constants/theme";
 
 export function PremiumScreen() {
   const nav = useNavigation();
+  const { t } = useTranslation();
   const { isPremium, setPremium } = useUserStore();
 
   const features = [
-    "Unlimited wheel spins",
-    '"What do I have at home" filter',
-    "All filters and diets",
-    "Add and edit recipes",
-    "Weekly meal planer",
-    "Shopping list",
-    "History and stats",
-    "Dark theme",
+    "premium.pfUnlimited",
+    "premium.pfHave",
+    "premium.pfFilters",
+    "premium.pfRecipes",
+    "premium.pfPlaner",
+    "premium.pfShopping",
+    "premium.pfStats",
+    "premium.pfTheme",
   ];
 
   if (isPremium) {
@@ -24,8 +26,8 @@ export function PremiumScreen() {
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
           <Text style={styles.doneEmoji}>💎</Text>
-          <Text style={styles.doneTitle}>Premium is active!</Text>
-          <Text style={styles.doneText}>Enjoy all features.</Text>
+          <Text style={styles.doneTitle}>{t("premium.alreadyPremium")}</Text>
+          <Text style={styles.doneText}>{t("premium.enjoy")}</Text>
         </View>
       </SafeAreaView>
     );
@@ -34,14 +36,14 @@ export function PremiumScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.content}>
-        <Text style={styles.badge}>PREMIUM</Text>
-        <Text style={styles.title}>Unlock the full power of the wheel</Text>
-        <Text style={styles.subtitle}>Say goodbye to "I don't know what to eat".</Text>
+        <Text style={styles.badge}>{t("premium.badge")}</Text>
+        <Text style={styles.title}>{t("premium.title")}</Text>
+        <Text style={styles.subtitle}>{t("premium.subtitle")}</Text>
 
         {features.map((f) => (
           <View key={f} style={styles.featureRow}>
             <Text style={styles.check}>✓</Text>
-            <Text style={styles.featureText}>{f}</Text>
+            <Text style={styles.featureText}>{t(f)}</Text>
           </View>
         ))}
 
@@ -49,17 +51,17 @@ export function PremiumScreen() {
           style={styles.button}
           onPress={() => setPremium("monthly")}
         >
-          <Text style={styles.buttonText}>Monthly · 2.99€</Text>
+          <Text style={styles.buttonText}>{t("premium.monthly", { price: "2.99€" })}</Text>
         </Pressable>
         <Pressable
           style={[styles.button, styles.buttonAlt]}
           onPress={() => setPremium("lifetime")}
         >
-          <Text style={[styles.buttonText, styles.buttonTextAlt]}>Lifetime · 49.99€</Text>
+          <Text style={[styles.buttonText, styles.buttonTextAlt]}>{t("premium.lifetime", { price: "49.99€" })}</Text>
         </Pressable>
 
         <Pressable onPress={() => nav.goBack()}>
-          <Text style={styles.back}>Back to the wheel</Text>
+          <Text style={styles.back}>{t("premium.back")}</Text>
         </Pressable>
       </View>
     </SafeAreaView>

@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, SafeAreaView } from "react-native";
 import { historyService } from "../services/historyService";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 
@@ -14,6 +15,7 @@ interface RankItem {
 }
 
 export function StatsScreen() {
+  const { t } = useTranslation();
   const { isPremium } = useUserStore();
   const [totalCooked, setTotalCooked] = useState(0);
   const [thisWeek, setThisWeek] = useState(0);
@@ -88,23 +90,23 @@ export function StatsScreen() {
     return (
       <PremiumLockScreen
         emoji="📊"
-        title="My cooking stats"
-        description="Premium feature. See your real cooking habits."
+        title={t("stats.premiumTitle")}
+        description={t("stats.premiumDesc")}
       />
     );
   }
 
   const statCards = [
-    { label: "Meals cooked", value: String(totalCooked) },
-    { label: "This week", value: String(thisWeek) },
-    { label: "Avg kcal", value: avgKcal ? `~${avgKcal}` : "—" },
-    { label: "Avg protein", value: avgProtein ? `~${avgProtein}g` : "—" },
+    { label: t("stats.mealsCooked"), value: String(totalCooked) },
+    { label: t("stats.thisWeek"), value: String(thisWeek) },
+    { label: t("stats.avgKcal"), value: avgKcal ? `~${avgKcal}` : "—" },
+    { label: t("stats.avgProtein"), value: avgProtein ? `~${avgProtein}g` : "—" },
   ];
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>My cooking stats</Text>
+        <Text style={styles.title}>{t("stats.title")}</Text>
 
         <View style={styles.cardsRow}>
           {statCards.map((c) => (
@@ -117,13 +119,13 @@ export function StatsScreen() {
 
         <View style={styles.banner}>
           <Text style={styles.bannerText}>
-            Total added sugar from cooked meals: ~{sumSugar}g
+            {t("stats.totalSugar", { count: sumSugar })}
           </Text>
         </View>
 
-        <Text style={styles.section}>Most cooked</Text>
+        <Text style={styles.section}>{t("stats.mostCooked")}</Text>
         {top.length === 0 ? (
-          <Text style={styles.empty}>No data yet.</Text>
+          <Text style={styles.empty}>{t("stats.noData")}</Text>
         ) : (
           top.map((t, i) => (
             <View key={t.name} style={styles.listRow}>
@@ -136,9 +138,9 @@ export function StatsScreen() {
           ))
         )}
 
-        <Text style={styles.section}>Top categories</Text>
+        <Text style={styles.section}>{t("stats.topCategories")}</Text>
         {topCategories.length === 0 ? (
-          <Text style={styles.empty}>No data yet.</Text>
+          <Text style={styles.empty}>{t("stats.noData")}</Text>
         ) : (
           topCategories.map((c, i) => (
             <View key={c.name} style={styles.listRow}>

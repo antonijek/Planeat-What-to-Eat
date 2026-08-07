@@ -12,10 +12,12 @@ import {
 import { useShoppingStore } from "../store/shoppingStore";
 import { useUserStore } from "../store/userStore";
 import { planService } from "../services/planService";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 
 export function ShoppingScreen() {
+  const { t } = useTranslation();
   const { items, load, toggle, remove, addManual, replaceMany, clearChecked } = useShoppingStore();
   const { isPremium } = useUserStore();
   const [name, setName] = useState("");
@@ -29,8 +31,8 @@ export function ShoppingScreen() {
     return (
       <PremiumLockScreen
         emoji="🛒"
-        title="Shopping list"
-        description="Premium feature. Upgrade to auto-build your shopping list from the meal planer."
+        title={t("shopping.title")}
+        description={t("shopping.premiumDesc")}
       />
     );
   }
@@ -43,13 +45,13 @@ export function ShoppingScreen() {
           ListHeaderComponent={
             <View>
               <View style={styles.headerRow}>
-                <Text style={styles.title}>Shopping list</Text>
+                <Text style={styles.title}>{t("shopping.title")}</Text>
                 <Pressable
                   style={styles.planBtn}
                   onPress={async () => {
                     const ingredients = await planService.getShoppingIngredients();
                     if (ingredients.length === 0) {
-                      setInfo("Your meal plan is empty. Add recipes to the Meal Planer first.");
+                      setInfo(t("shopping.planEmpty"));
                       return;
                     }
                     await replaceMany(
@@ -64,20 +66,16 @@ export function ShoppingScreen() {
                         sourceRecipeIds: [],
                       }))
                     );
-                    setInfo(
-                      `${ingredients.length} ingredient${
-                        ingredients.length === 1 ? "" : "s"
-                      } added from your meal plan.`
-                    );
+                    setInfo(t("shopping.addedFromPlan", { count: ingredients.length }));
                   }}
                 >
-                  <Text style={styles.planBtnText}>📅 From planer</Text>
+                  <Text style={styles.planBtnText}>{t("shopping.fromPlanner")}</Text>
                 </Pressable>
               </View>
               <View style={styles.inputRow}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Add item..."
+                  placeholder={t("shopping.addPlaceholder")}
                   value={name}
                   onChangeText={setName}
                   placeholderTextColor={colors.textFaint}
@@ -98,7 +96,7 @@ export function ShoppingScreen() {
                   {items.filter((i) => i.isChecked).length}/{items.length} done
                 </Text>
                 <Pressable onPress={clearChecked}>
-                  <Text style={styles.clearBtn}>Clear checked</Text>
+                  <Text style={styles.clearBtn}>{t("shopping.clearChecked")}</Text>
                 </Pressable>
               </View>
             </View>
@@ -132,7 +130,7 @@ export function ShoppingScreen() {
               <Text style={styles.modalIcon}>🛒</Text>
               <Text style={styles.modalText}>{info}</Text>
               <Pressable style={styles.modalBtn} onPress={() => setInfo(null)}>
-                <Text style={styles.modalBtnText}>OK</Text>
+                <Text style={styles.modalBtnText}>{t("common.ok")}</Text>
               </Pressable>
             </View>
           </View>

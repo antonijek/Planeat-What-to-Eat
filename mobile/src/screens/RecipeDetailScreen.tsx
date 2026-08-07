@@ -107,7 +107,7 @@ export function RecipeDetailScreen() {
   if (!recipe) {
     return (
       <SafeAreaView style={styles.safe}>
-        <Text style={{ padding: 24, color: colors.textMuted }}>Loading...</Text>
+        <Text style={{ padding: 24, color: colors.textMuted }}>{t("common.loading")}</Text>
       </SafeAreaView>
     );
   }
@@ -242,7 +242,7 @@ export function RecipeDetailScreen() {
 
           {similar.length > 0 && (
             <View style={styles.similarBlock}>
-              <Text style={styles.section}>More like this</Text>
+              <Text style={styles.section}>{t("recipeDetail.similar")}</Text>
               {similar.map((r) => (
                 <Pressable
                   key={r.id}

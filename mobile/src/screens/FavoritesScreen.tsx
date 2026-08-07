@@ -6,12 +6,14 @@ import { RootStackParamList } from "../navigation/types";
 import { RecipeCard } from "../components/RecipeCard";
 import { useUserStore } from "../store/userStore";
 import { recipeService } from "../services/recipeService";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function FavoritesScreen() {
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   const { favorites } = useUserStore();
   const recipes = favorites
     .map((f) => recipeService.getById(f.recipeId))
@@ -22,10 +24,10 @@ export function FavoritesScreen() {
       <FlatList
         data={recipes}
         keyExtractor={(r) => r.id}
-        ListHeaderComponent={<Text style={styles.title}>Favorites ({recipes.length})</Text>}
+        ListHeaderComponent={<Text style={styles.title}>{t("favorites.title", { count: recipes.length })}</Text>}
         contentContainerStyle={styles.content}
         ListEmptyComponent={
-          <Text style={styles.empty}>No favorites yet. 🤍 Spin the wheel and save something.</Text>
+          <Text style={styles.empty}>{t("favorites.empty")}</Text>
         }
         renderItem={({ item }) => (
           <RecipeCard recipe={item} onPress={() => nav.navigate("RecipeDetail", { id: item.id })} />

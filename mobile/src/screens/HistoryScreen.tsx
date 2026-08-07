@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { historyService, CookedDay } from "../services/historyService";
 import { useUserStore } from "../store/userStore";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 
@@ -25,6 +26,7 @@ function dayLabel(day: string): string {
 
 export function HistoryScreen() {
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   const { isPremium } = useUserStore();
   const [days, setDays] = useState<CookedDay[]>([]);
 
@@ -36,8 +38,8 @@ export function HistoryScreen() {
     return (
       <PremiumLockScreen
         emoji="🥘"
-        title="What I cooked"
-        description="Premium feature. Keep track of the meals you actually cooked."
+        title={t("history.premiumTitle")}
+        description={t("history.premiumDesc")}
       />
     );
   }
@@ -49,21 +51,21 @@ export function HistoryScreen() {
         keyExtractor={(d) => d.dateKey}
         ListHeaderComponent={
           <View style={styles.headerRow}>
-            <Text style={styles.title}>What I cooked</Text>
+            <Text style={styles.title}>{t("history.title")}</Text>
             <Pressable
               onPress={async () => {
                 await historyService.clearCooked();
                 setDays([]);
               }}
             >
-              <Text style={styles.clearBtn}>Clear</Text>
+              <Text style={styles.clearBtn}>{t("history.clear")}</Text>
             </Pressable>
           </View>
         }
         contentContainerStyle={styles.content}
         ListEmptyComponent={
           <Text style={styles.empty}>
-            Nothing cooked yet. Tap "I cooked this" on any recipe to start tracking.
+            {t("history.empty")}
           </Text>
         }
         renderItem={({ item }) => (
@@ -84,7 +86,7 @@ export function HistoryScreen() {
                   <Text style={styles.rowTitle} numberOfLines={1}>
                     {c.name}
                   </Text>
-                  <Text style={styles.rowSub}>Cooked at {c.time}</Text>
+                  <Text style={styles.rowSub}>{t("history.cookedAt", { time: c.time })}</Text>
                 </View>
               </Pressable>
             ))}

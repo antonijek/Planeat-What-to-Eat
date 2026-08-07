@@ -11,6 +11,7 @@ import Animated, {
 import { useAudioPlayer } from "expo-audio";
 import Svg, { Path, G, Circle } from "react-native-svg";
 import { Recipe } from "../types";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -110,6 +111,7 @@ function pickRandom(recipes: Recipe[], count: number): Recipe[] {
 }
 
 export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
+  const { t } = useTranslation();
   const rotation = useSharedValue(0);
   const spinning = useSharedValue(0); // 1 dok se vrti, 0 u mirovanju
   const [isSpinning, setIsSpinning] = useState(false);
@@ -272,7 +274,7 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
         return <EmojiLabel key={recipe.id} angle={mid} emoji={WHEEL_EMOJIS[i % WHEEL_EMOJIS.length]} rotation={rotation} />;
       })}
       <Pressable style={[styles.spinBtn, disabled && styles.spinBtnDisabled]} onPress={spin} disabled={isSpinning || disabled}>
-        <Text style={styles.spinText}>Spin the wheel</Text>
+        <Text style={styles.spinText}>{t("home.spin")}</Text>
       </Pressable>
     </View>
   );
