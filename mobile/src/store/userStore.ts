@@ -1,11 +1,8 @@
 import { create } from "zustand";
 import { Favorite, PremiumType } from "../types";
-import {
-  getItem,
-  setItem,
-  STORAGE_KEYS,
-} from "../storage/storage";
 import { premiumService } from "../services/premiumService";
+import { favoritesService } from "../services/favoritesService";
+import { settingsService } from "../services/settingsService";
 
 interface UserState {
   premium: PremiumType;
@@ -30,9 +27,9 @@ export const useUserStore = create<UserState>((set, get) => ({
   async loadUserData() {
     const isPremium = await premiumService.isPremium();
     const st = await premiumService.getState();
-    const favorites = (await getItem<Favorite[]>(STORAGE_KEYS.favorites)) ?? [];
-    const ratings = (await getItem<Record<string, number>>(STORAGE_KEYS.ratings)) ?? {};
-    const calorieGoal = (await getItem<number>(STORAGE_KEYS.calorieGoal)) ?? 2000;
+    const favorites = await favoritesService.getFavorites();
+    const ratings = await favoritesService.getRatings();
+    const calorieGoal = await settingsService.getCalorieGoal();
     set({ isPremium, premium: st.type, favorites, ratings, calorieGoal });
   },
 
@@ -51,7 +48,7 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   async setCalorieGoal(kcal: number) {
     const goal = Number.isFinite(kcal) && kcal > 0 ? Math.round(kcal) : 2000;
-    await setItem(STORAGE_KEYS.calorieGoal, goal);
+    await settingsService.saveCalorieGoal(goal);
     set({ calorieGoal: goal });
   },
 
@@ -63,13 +60,13 @@ export const useUserStore = create<UserState>((set, get) => ({
     } else {
       favorites.push({ recipeId, isPinned: pinned ?? false, addedAt: new Date().toISOString() });
     }
-    await setItem(STORAGE_KEYS.favorites, favorites);
+    await favoritesService.saveFavorites(favorites);
     set({ favorites });
   },
 
   async rate(recipeId: string, score: number) {
     const ratings = { ...get().ratings, [recipeId]: score };
-    await setItem(STORAGE_KEYS.ratings, ratings);
+    await favoritesService.saveRatings(ratings);
     set({ ratings });
   },
 }));

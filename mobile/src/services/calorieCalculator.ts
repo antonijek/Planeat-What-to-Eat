@@ -30,6 +30,10 @@ type MapEntry = { per100: Record<string, number | undefined> } | undefined;
 const map: Record<string, MapEntry> = ingredientMap as Record<string, MapEntry>;
 const dishEntries: Record<string, MapEntry> = dishMap as Record<string, MapEntry>;
 
+// Keš ključeva — izbegava ponovni Object.keys() na svako kucanje u dnevniku.
+const mapKeys = Object.keys(map);
+const dishKeys = Object.keys(dishEntries);
+
 function singular(w: string): string {
   if (/ies$/i.test(w)) return w.replace(/ies$/i, "y");
   if (/(s|oes)$/i.test(w)) return w.replace(/(s|oes)$/i, "");
@@ -112,13 +116,13 @@ export function matchIngredient(rawName: string): MatchResult | null {
   // 4) Namirnica — podstring (npr. "chicken breast fillet" → "chicken breast")
   //    Jelo NIKADA ne sme da se pogađa podstringom.
   let best: { key: string; per100: Macros } | null = null;
-  for (const key of Object.keys(map)) {
+  for (const key of mapKeys) {
     if (n.includes(key) && (!best || key.length > best.key.length)) {
       best = { key, per100: toMacros(map[key]!.per100) };
     }
   }
   if (!best) {
-    for (const key of Object.keys(map)) {
+    for (const key of mapKeys) {
       if (key.includes(n) && (!best || key.length > best.key.length)) {
         best = { key, per100: toMacros(map[key]!.per100) };
       }
@@ -250,12 +254,12 @@ export function suggestIngredients(query: string): Suggestion[] {
   //    Tako "mi" → "Milk" dolazi pre "Milkshake", a "panc" → "Pancakes" ostaje ispred
   //    "Rice flour pancakes" (koji je tek podstring).
   const candidates: { key: string; type: "dish" | "ingredient" }[] = [];
-  for (const key of Object.keys(dishEntries)) {
+  for (const key of dishKeys) {
     if (key !== q && (key.startsWith(q) || q.startsWith(key) || key.includes(q))) {
       candidates.push({ key, type: "dish" });
     }
   }
-  for (const key of Object.keys(map)) {
+  for (const key of mapKeys) {
     if (key !== q && (key.startsWith(q) || q.startsWith(key) || key.includes(q))) {
       candidates.push({ key, type: "ingredient" });
     } else if (key !== q) {

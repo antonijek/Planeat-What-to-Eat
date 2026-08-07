@@ -39,7 +39,9 @@ export const useRecipeStore = create<RecipeState>((set, get) => ({
 
   async getById(id) {
     if (id.startsWith("user-")) {
-      return (await recipeService.getByIdAny(id)) as Recipe;
+      const mine = await recipeService.getByIdAny(id);
+      if (!mine) throw new Error("Sopstveni recept nije nađen");
+      return mine;
     }
     return overrideService.getEffective(id);
   },
