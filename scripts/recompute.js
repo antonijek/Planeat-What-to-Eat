@@ -305,7 +305,7 @@ for (const r of db.recipes) {
     // NAPOMENA: ne koristi 4-4-9 poređenje — ono lažno trigira za začíne/alkohol
     // (vlakna i alkohol imaju kcal koje 4-4-9 ne računa, npr. cimet 249 je tačno).
     let kcal100 = p100.kcal;
-    const isFat = /oil|butter|lard|shortening|ghee|suet|margarine|goose fat|tallow/i.test(ing.name);
+    const isFat = /oil|butter|lard|shortening|ghee|suet|margarine|goose fat|tallow|mayonnaise|aioli|mayo/i.test(ing.name);
     if (kcal100 > 700 && !isFat) kcal100 = kcal100 / 4.184;
     kcal += (kcal100 * grams) / 100;
     protein += (p100.protein * grams) / 100;

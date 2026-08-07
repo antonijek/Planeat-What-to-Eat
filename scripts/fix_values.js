@@ -27,7 +27,6 @@ const FIXES = {
   "coco sugar": { kcal: 375, protein: 0, fat: 0, carbs: 94, fiber: 0, sugars: 94, sodium: 0, cholesterol: 0, satFat: 0 },
   // black eyed peas — izabran wasabi peas
   "black eyed peas": { kcal: 116, protein: 7.7, fat: 0.5, carbs: 20.3, fiber: 5.5, sugars: 3.3, sodium: 4, cholesterol: 0, satFat: 0.1 },
-  "raw tiger prawns": { kcal: 99, protein: 24, fat: 0.3, carbs: 0.2, fiber: 0, sugars: 0, sodium: 111, cholesterol: 189, satFat: 0.1, description: "Crustaceans, shrimp, cooked" },
   "achiote seeds": { kcal: 305, protein: 14.6, fat: 19, carbs: 37.8, fiber: 11.9, sugars: 0, sodium: 30, cholesterol: 0, satFat: 1.9, description: "Seeds, annatto (achiote), dried" },
   // prave greske iz find_real_bad
   "free-range eggs, beaten": { kcal: 143, protein: 12.6, fat: 9.5, carbs: 0.7, fiber: 0, sugars: 0.4, sodium: 142, cholesterol: 372, satFat: 3.1 },
@@ -78,7 +77,6 @@ const FIXES = {
   lime: { kcal: 30, protein: 0.7, fat: 0.2, carbs: 10.5, fiber: 2.8, sugars: 1.7, sodium: 2, cholesterol: 0, satFat: 0, description: "Limes, raw" },
   ginger: { kcal: 80, protein: 1.8, fat: 0.8, carbs: 18, fiber: 2, sugars: 1.7, sodium: 13, cholesterol: 0, satFat: 0.2 },
   // === pogresan USDA izbor (klasa D) + kcal=0 greske (klasa A) ===
-  "baking powder": { kcal: 53, protein: 0, fat: 0, carbs: 27.6, fiber: 0.2, sugars: 0, sodium: 10608, cholesterol: 0, satFat: 0, description: "Leavening agents, baking powder, double-acting" },
   "baking soda": { kcal: 0, protein: 0, fat: 0, carbs: 0, fiber: 0, sugars: 0, sodium: 27360, cholesterol: 0, satFat: 0, description: "Leavening agents, baking soda" },
   // suvi pasulj — kcal=0 je bilo pogresno (ima ~340 kcal/100g)
   "dried white navy beans": { kcal: 337, protein: 24.1, fat: 1.51, carbs: 60.7, fiber: 20.8, sugars: 3.9, sodium: 6, cholesterol: 0, satFat: 0.19, description: "Beans, navy, mature seeds, raw" },
