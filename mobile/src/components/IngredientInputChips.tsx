@@ -25,7 +25,7 @@ export function IngredientInputChips({
   emptyHint,
 }: Props) {
   return (
-    <View>
+    <View style={styles.container}>
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
@@ -57,6 +57,7 @@ export function IngredientInputChips({
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
   inputRow: { flexDirection: "row", gap: 8, marginTop: 10 },
   input: {
     flex: 1,

@@ -189,6 +189,7 @@ export function PlanerScreen() {
             <FlatList
               data={recipes}
               keyExtractor={(r) => r.id}
+              keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
                 <Pressable
                   style={styles.recipeRow}

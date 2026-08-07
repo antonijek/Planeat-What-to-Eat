@@ -111,24 +111,22 @@ export function HomeScreen() {
                 🥘 What do I have at home?{haveIngredients.length > 0 ? ` (${haveIngredients.length})` : ""}
               </Text>
             </Pressable>
-            <View style={styles.haveRow}>
-              <IngredientInputChips
-                value={haveInput}
-                onChangeText={setHaveInput}
-                onSubmit={addHave}
-                ingredients={haveIngredients}
-                onRemove={(ing) => setHaveIngredients(haveIngredients.filter((i) => i !== ing))}
-                placeholder="e.g. chicken, rice..."
-                emptyHint="1. Type an ingredient → 2. Press + → 3. Spin"
-                hint={
-                  haveIngredients.length > 0
-                    ? `🎡 ${filteredRecipes.length} recipe${
-                        filteredRecipes.length === 1 ? "" : "s"
-                      } available with: ${haveIngredients.join(", ")}`
-                    : undefined
-                }
-              />
-            </View>
+            <IngredientInputChips
+              value={haveInput}
+              onChangeText={setHaveInput}
+              onSubmit={addHave}
+              ingredients={haveIngredients}
+              onRemove={(ing) => setHaveIngredients(haveIngredients.filter((i) => i !== ing))}
+              placeholder="e.g. chicken, rice..."
+              emptyHint="1. Type an ingredient → 2. Press + → 3. Spin"
+              hint={
+                haveIngredients.length > 0
+                  ? `🎡 ${filteredRecipes.length} recipe${
+                      filteredRecipes.length === 1 ? "" : "s"
+                    } available with: ${haveIngredients.join(", ")}`
+                  : undefined
+              }
+            />
           </View>
         </View>
 
@@ -239,7 +237,6 @@ const styles = StyleSheet.create({
   },
   haveHead: { alignItems: "center", paddingVertical: 2 },
   haveHeadText: { color: colors.text, fontSize: 14, fontWeight: "700" },
-  haveRow: { flexDirection: "row", gap: 8, marginTop: 8, paddingRight: 12 },
   haveInput: {
     flex: 1,
     backgroundColor: colors.card,

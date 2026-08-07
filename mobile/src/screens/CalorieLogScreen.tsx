@@ -235,14 +235,9 @@ export function CalorieLogScreen() {
                     <Text style={styles.addText}>+</Text>
                   </Pressable>
                 </View>
-                {name.trim().length > 0 &&
-                  (selectedSug ? (
-                    <Text style={styles.hint}>~{selectedSug.per100.kcal} kcal per 100g</Text>
-                  ) : lookup.found ? (
-                    <Text style={styles.hint}>~{lookup.per100Kcal} kcal per 100g</Text>
-                  ) : manualMode ? (
-                    <Text style={styles.hintWarn}>Not found in database.</Text>
-                  ) : null)}
+                {name.trim().length > 0 && manualMode && (
+                  <Text style={styles.hintWarn}>Not found in database.</Text>
+                )}
 
                 {hasCookedRawSuggestion && !!name.trim() && !selectedSug && (
                   <Text style={styles.hint}>Tap a suggestion to choose cooked/raw, then add grams +.</Text>
