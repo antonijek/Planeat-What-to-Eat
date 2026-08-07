@@ -16,6 +16,7 @@ export default {
     noData: "Keine Daten",
   },
   tab: { wheel: "Glücksrad", recipes: "Rezepte", favorites: "Favoriten", shopping: "Einkaufen" },
+  wheelResult: { yourMeal: "Dein Gericht", view: "Rezept ansehen", spinAgain: "Erneut drehen" },
   home: {
     title: "Was soll ich heute essen?",
     subtitle: "Dreh das Rad und entdecke ein Gericht",
@@ -34,6 +35,8 @@ export default {
     shortcutStats: "Statistik",
     shortcutAbout: "Über",
     spinLeft: "{{count}}× 🎡",
+    noRecipes: "Keine Rezepte in dieser Kategorie.",
+    spinsLeftToday: "Verbleibende Drehungen heute: {{count}}",
   },
   mealMoment: {
     all: "Alle",

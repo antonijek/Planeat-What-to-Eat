@@ -18,9 +18,13 @@ export default {
     favorites: "Favorites",
     shopping: "Shopping",
   },
+  wheelResult: {
+    yourMeal: "Your meal",
+    view: "View recipe",
+    spinAgain: "Spin again",
+  },
   home: {
-    title: "What should I eat today?",
-    subtitle: "Spin the wheel and discover a meal",
+    title: "What should I eat today?",    subtitle: "Spin the wheel and discover a meal",
     spin: "Spin the wheel",
     haveHead: "What do I have at home?",
     havePlaceholder: "e.g. chicken, rice...",
@@ -36,6 +40,8 @@ export default {
     shortcutStats: "Stats",
     shortcutAbout: "About",
     spinLeft: "{{count}}× 🎡",
+    noRecipes: "No recipes in this category.",
+    spinsLeftToday: "Spins left today: {{count}}",
   },
   mealMoment: {
     all: "All",

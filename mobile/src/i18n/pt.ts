@@ -16,6 +16,7 @@ export default {
     noData: "Sem dados",
   },
   tab: { wheel: "Roda", recipes: "Receitas", favorites: "Favoritos", shopping: "Compras" },
+  wheelResult: { yourMeal: "Seu prato", view: "Ver receita", spinAgain: "Girar de novo" },
   home: {
     title: "O que como hoje?",
     subtitle: "Gire a roda e descubra um prato",
@@ -34,6 +35,8 @@ export default {
     shortcutStats: "Estatísticas",
     shortcutAbout: "Sobre",
     spinLeft: "{{count}}× 🎡",
+    noRecipes: "Nenhuma receita nesta categoria.",
+    spinsLeftToday: "Giros restantes hoje: {{count}}",
   },
   mealMoment: { all: "Tudo", breakfast: "Café da manhã", lunch: "Almoço", dinner: "Jantar", dessert: "Sobremesa", snack: "Lanche" },
   recipes: {

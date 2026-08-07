@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { MEAL_MOMENTS } from "../constants/mealMoments";
 import { colors } from "../constants/theme";
 
@@ -9,13 +10,14 @@ interface Props {
 }
 
 export function MealMomentPicker({ selected, onSelect }: Props) {
+  const { t } = useTranslation();
   return (
     <View style={styles.wrap}>
       <Pressable
         style={[styles.chip, selected === null && styles.chipActive]}
         onPress={() => onSelect(null)}
       >
-        <Text style={[styles.chipText, selected === null && styles.chipTextActive]}>✨ All</Text>
+        <Text style={[styles.chipText, selected === null && styles.chipTextActive]}>✨ {t("mealMoment.all")}</Text>
       </Pressable>
       {MEAL_MOMENTS.map((m) => {
         const active = selected === m.id;
@@ -26,7 +28,7 @@ export function MealMomentPicker({ selected, onSelect }: Props) {
             onPress={() => onSelect(active ? null : m.id)}
           >
             <Text style={styles.chipEmoji}>{m.emoji}</Text>
-            <Text style={[styles.chipText, active && styles.chipTextActive]}>{m.label}</Text>
+            <Text style={[styles.chipText, active && styles.chipTextActive]}>{t(m.labelKey)}</Text>
           </Pressable>
         );
       })}

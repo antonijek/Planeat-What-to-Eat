@@ -1,20 +1,20 @@
 export interface MealMoment {
   id: string;
   emoji: string;
-  label: string;
+  labelKey: string;
   categories: string[];
 }
 
 /**
  * "Meal moments" — how users actually think ("what for lunch?").
- * Svaki trenutak mapira se na kategorije iz baze recepata.
+ * Each moment maps to recipe categories in the database.
  */
 export const MEAL_MOMENTS: MealMoment[] = [
-  { id: "breakfast", emoji: "🍳", label: "Breakfast", categories: ["Breakfast"] },
+  { id: "breakfast", emoji: "🍳", labelKey: "mealMoment.breakfast", categories: ["Breakfast"] },
   {
     id: "lunch",
     emoji: "🍽️",
-    label: "Lunch",
+    labelKey: "mealMoment.lunch",
     categories: [
       "Seafood",
       "Lamb",
@@ -31,7 +31,7 @@ export const MEAL_MOMENTS: MealMoment[] = [
   {
     id: "dinner",
     emoji: "🌙",
-    label: "Dinner",
+    labelKey: "mealMoment.dinner",
     categories: [
       "Seafood",
       "Lamb",
@@ -45,8 +45,8 @@ export const MEAL_MOMENTS: MealMoment[] = [
       "Miscellaneous",
     ],
   },
-  { id: "dessert", emoji: "🍰", label: "Dessert", categories: ["Dessert"] },
-  { id: "snack", emoji: "🍿", label: "Snack", categories: ["Starter", "Side"] },
+  { id: "dessert", emoji: "🍰", labelKey: "mealMoment.dessert", categories: ["Dessert"] },
+  { id: "snack", emoji: "🍿", labelKey: "mealMoment.snack", categories: ["Starter", "Side"] },
 ];
 
 export function recipesForMoment(

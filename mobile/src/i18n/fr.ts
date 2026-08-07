@@ -16,6 +16,7 @@ export default {
     noData: "Aucune donnée",
   },
   tab: { wheel: "Roue", recipes: "Recettes", favorites: "Favoris", shopping: "Courses" },
+  wheelResult: { yourMeal: "Votre plat", view: "Voir la recette", spinAgain: "Re-tourner" },
   home: {
     title: "Que dois-je manger aujourd'hui ?",
     subtitle: "Fais tourner la roue et découvre un plat",
@@ -34,6 +35,8 @@ export default {
     shortcutStats: "Statistiques",
     shortcutAbout: "À propos",
     spinLeft: "{{count}}× 🎡",
+    noRecipes: "Aucune recette dans cette catégorie.",
+    spinsLeftToday: "Tours restants aujourd'hui : {{count}}",
   },
   mealMoment: { all: "Tout", breakfast: "Petit-déj", lunch: "Déjeuner", dinner: "Dîner", dessert: "Dessert", snack: "En-cas" },
   recipes: {

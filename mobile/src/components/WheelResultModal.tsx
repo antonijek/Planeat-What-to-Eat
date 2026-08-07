@@ -10,6 +10,7 @@ import {
 import { Recipe } from "../types";
 import { formatDuration } from "../utils/helpers";
 import { getRecipeEmoji } from "../utils/emoji";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
+  const { t } = useTranslation();
   return (
     <Modal
       visible={recipe != null}
@@ -30,7 +32,7 @@ export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
         <View style={styles.backdrop}>
           <View style={styles.card}>
             <Text style={styles.emoji}>{getRecipeEmoji(recipe.name)}</Text>
-            <Text style={styles.title}>🎉 Your meal:</Text>
+            <Text style={styles.title}>🎉 {t("wheelResult.yourMeal")}:</Text>
             <Text style={styles.name}>{recipe.name}</Text>
 
             <View style={styles.metaRow}>
@@ -42,10 +44,10 @@ export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
             </View>
 
             <Pressable style={styles.primaryBtn} onPress={onView}>
-              <Text style={styles.primaryText}>View recipe</Text>
+              <Text style={styles.primaryText}>{t("wheelResult.view")}</Text>
             </Pressable>
             <Pressable onPress={onSpinAgain} hitSlop={8}>
-              <Text style={styles.secondaryText}>Spin again</Text>
+              <Text style={styles.secondaryText}>{t("wheelResult.spinAgain")}</Text>
             </Pressable>
           </View>
         </View>

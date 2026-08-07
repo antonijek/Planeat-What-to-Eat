@@ -14,6 +14,7 @@ import { RootStackParamList } from "../navigation/types";
 import { Wheel } from "../components/Wheel";
 import { useRecipeStore } from "../store/recipeStore";
 import { useUserStore } from "../store/userStore";
+import { useTranslation } from "react-i18next";
 import { historyService } from "../services/historyService";
 import { premiumService } from "../services/premiumService";
 import { recipeService } from "../services/recipeService";
@@ -30,6 +31,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function HomeScreen() {
   const nav = useNavigation<Nav>();
+  const { t } = useTranslation();
   const { recipes, load, lastSpunRecipeId } = useRecipeStore();
   const { isPremium } = useUserStore();
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
@@ -92,13 +94,13 @@ export function HomeScreen() {
           <View style={styles.titleRow}>
             <View style={styles.titleWrap}>
               <Text style={styles.title} numberOfLines={1}>
-                What should I eat today?
+                {t("home.title")}
               </Text>
               <Text style={styles.sub} numberOfLines={1}>
-                Spin the wheel and discover a meal
+                {t("home.subtitle")}
               </Text>
             </View>
-            <Text style={styles.spinCount}>{spinCount}× 🎡</Text>
+            <Text style={styles.spinCount}>{t("home.spinLeft", { count: spinCount })}</Text>
           </View>
 
           <View style={styles.haveWrap}>
@@ -108,7 +110,8 @@ export function HomeScreen() {
               style={styles.haveHead}
             >
               <Text style={styles.haveHeadText}>
-                🥘 What do I have at home?{haveIngredients.length > 0 ? ` (${haveIngredients.length})` : ""}
+                {t("home.haveHead")}
+                {haveIngredients.length > 0 ? ` (${haveIngredients.length})` : ""}
               </Text>
             </Pressable>
             <IngredientInputChips
@@ -117,13 +120,14 @@ export function HomeScreen() {
               onSubmit={addHave}
               ingredients={haveIngredients}
               onRemove={(ing) => setHaveIngredients(haveIngredients.filter((i) => i !== ing))}
-              placeholder="e.g. chicken, rice..."
-              emptyHint="1. Type an ingredient → 2. Press + → 3. Spin"
+              placeholder={t("home.havePlaceholder")}
+              emptyHint={t("home.haveGuide")}
               hint={
                 haveIngredients.length > 0
-                  ? `🎡 ${filteredRecipes.length} recipe${
-                      filteredRecipes.length === 1 ? "" : "s"
-                    } available with: ${haveIngredients.join(", ")}`
+                  ? t("home.haveHint", {
+                      count: filteredRecipes.length,
+                      list: haveIngredients.join(", "),
+                    })
                   : undefined
               }
             />
@@ -142,12 +146,12 @@ export function HomeScreen() {
           <MealMomentPicker selected={moment} onSelect={setMoment} />
 
           {filteredRecipes.length === 0 && (
-            <Text style={styles.limit}>No recipes in this category.</Text>
+            <Text style={styles.limit}>{t("home.noRecipes")}</Text>
           )}
 
           {!isPremium && spinsLeft !== null && (
             <Text style={styles.limit}>
-              Spins left today: {spinsLeft}
+              {t("home.spinsLeftToday", { count: spinsLeft })}
             </Text>
           )}
 
@@ -156,34 +160,34 @@ export function HomeScreen() {
               onPress={() => nav.navigate("RecipeDetail", { id: lastSpunRecipeId })}
               style={styles.last}
             >
-              <Text style={styles.lastText}>👀 See the last pick</Text>
+              <Text style={styles.lastText}>{t("home.lastPick")}</Text>
             </Pressable>
           ) : null}
 
           <View style={styles.shortcuts}>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("CalorieLog")}>
               <MaterialCommunityIcons name="food-apple-outline" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>Calorie tracker</Text>
+              <Text style={styles.shortcutLabel}>{t("home.shortcutTracker")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("MyRecipes")}>
               <MaterialCommunityIcons name="chef-hat" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>My recipes</Text>
+              <Text style={styles.shortcutLabel}>{t("home.shortcutRecipes")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("Planer")}>
               <MaterialCommunityIcons name="calendar-month" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>Planer</Text>
+              <Text style={styles.shortcutLabel}>{t("home.shortcutPlaner")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("History")}>
               <MaterialCommunityIcons name="history" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>Cooked</Text>
+              <Text style={styles.shortcutLabel}>{t("home.shortcutCooked")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("Stats")}>
               <MaterialCommunityIcons name="chart-bar" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>Stats</Text>
+              <Text style={styles.shortcutLabel}>{t("home.shortcutStats")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("About")}>
               <MaterialCommunityIcons name="information-outline" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>About</Text>
+              <Text style={styles.shortcutLabel}>{t("home.shortcutAbout")}</Text>
             </Pressable>
           </View>
         </View>
