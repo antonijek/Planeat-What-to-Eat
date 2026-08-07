@@ -280,8 +280,8 @@ export default {
     privacyText:
       "Alles wird lokal auf deinem Gerät gespeichert. Kein Konto, keine Cloud-Synchronisierung, keine Daten verlassen dein Telefon.",
     dataSources: "Datenquellen",
-    dataSourcesText:
-      "Rezeptdaten stammen von <themealdb>TheMealDB</themealdb>. Nährwerte stammen vom USDA FoodData Central und sind Näherungswerte (±15–25%).",
+    dataFrom: "Rezeptdaten stammen von ",
+    dataSuffix: ". Nährwerte stammen vom USDA FoodData Central und sind Näherungswerte (±15–25%).",
     disclaimer:
       "Nährwertinformationen in dieser App dienen nur der Information und ersetzen keinen professionellen Ernährungsratschlag.",
     footer: "Mit ❤ gemacht · v1.0.0",

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, SafeAreaView, Linking, Pressable } from "react-native";
-import { useTranslation, Trans } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 export function AboutScreen() {
@@ -18,16 +18,13 @@ export function AboutScreen() {
         <Text style={styles.body}>{t("about.privacyText")}</Text>
 
         <Text style={styles.section}>{t("about.dataSources")}</Text>
-        <Trans
-          i18nKey="about.dataSourcesText"
-          components={{
-            themealdb: (
-              <Text style={styles.link} onPress={() => Linking.openURL("https://www.themealdb.com")}>
-                TheMealDB
-              </Text>
-            ),
-          }}
-        />
+        <Text style={styles.body}>
+          <Text>{t("about.dataFrom")}</Text>{" "}
+          <Text style={styles.link} onPress={() => Linking.openURL("https://www.themealdb.com")}>
+            TheMealDB
+          </Text>
+          <Text>{t("about.dataSuffix")}</Text>
+        </Text>
 
         <Text style={styles.disclaimer}>{t("about.disclaimer")}</Text>
 

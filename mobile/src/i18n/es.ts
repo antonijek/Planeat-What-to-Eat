@@ -273,8 +273,8 @@ export default {
     privacyText:
       "Todo se guarda localmente en tu dispositivo. Sin cuenta, sin nube, ningún dato sale de tu teléfono.",
     dataSources: "Fuentes de datos",
-    dataSourcesText:
-      "Las recetas provienen de <themealdb>TheMealDB</themealdb>. Los valores nutricionales provienen del USDA FoodData Central y son aproximados (±15–25%).",
+    dataFrom: "Las recetas provienen de ",
+    dataSuffix: ". Los valores nutricionales provienen del USDA FoodData Central y son aproximados (±15–25%).",
     disclaimer:
       "La información nutricional de esta app se ofrece solo con fines informativos y no sustituye el consejo médico profesional.",
     footer: "Hecho con ❤ · v1.0.0",

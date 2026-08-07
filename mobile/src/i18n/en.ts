@@ -297,8 +297,8 @@ export default {
     privacy: "Privacy",
     privacyText: "Everything is stored locally on your device. No account, no cloud sync, no data leaves your phone.",
     dataSources: "Data sources",
-    dataSourcesText:
-      "Recipe data is sourced from <themealdb>TheMealDB</themealdb>. Nutrition values are estimated from the USDA FoodData Central and are approximate (±15–25%).",
+    dataFrom: "Recipe data is sourced from ",
+    dataSuffix: ". Nutrition values are estimated from the USDA FoodData Central and are approximate (±15–25%).",
     disclaimer:
       "Nutritional information on this app is provided for informational purposes only and is not a substitute for professional dietary advice.",
     footer: "Made with ❤ · v1.0.0",
