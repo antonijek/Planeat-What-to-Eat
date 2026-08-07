@@ -18,6 +18,16 @@ export function scaleIngredients(
   }));
 }
 
+/** Vrednost po porciji iz ukupne vrednosti recepta (servings||1). */
+export function perServing(value: number, servings?: number): number {
+  return value / Math.max(1, servings ?? 1);
+}
+
+/** perServing zaokruženo na ceo broj (za kcal/makroe u prikazu). */
+export function perServingRound(value: number, servings?: number): number {
+  return Math.round(perServing(value, servings));
+}
+
 /**
  * Parsira vodeći broj iz mere ("2 cups", "800g", "1 tsp").
  * Vraća { number | null, rest } — rest je ostatak teksta posle broja.

@@ -17,6 +17,7 @@ import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
 import { useRecipeStore } from "../store/recipeStore";
 import { useRecipesFilterStore, RecipesFilters } from "../store/recipesFilterStore";
+import { parseIngredientInput } from "../utils/ingredients";
 import { colors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -128,13 +129,7 @@ export function RecipesScreen() {
   const compact = !!query.trim();
 
   function addIngredient() {
-    const clean = (s: string) =>
-      s
-        .replace(/[\u200B-\u200D\uFEFF\u00A0\u034F]/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .toLowerCase();
-    const parts = ingredientInput.split(/[,;]/).map(clean).filter(Boolean);
+    const parts = parseIngredientInput(ingredientInput);
     if (parts.length === 0) return;
     addIngredients(parts);
   }

@@ -23,7 +23,7 @@ import { calorieLogService } from "../services/calorieLogService";
 import { useUserStore } from "../store/userStore";
 import { useRecipeStore } from "../store/recipeStore";
 import { Recipe } from "../types";
-import { formatDuration } from "../utils/helpers";
+import { formatDuration, perServing, perServingRound } from "../utils/helpers";
 import { DIFFICULTY_LABELS } from "../constants/categories";
 import { colors } from "../constants/theme";
 
@@ -209,7 +209,7 @@ export function RecipeDetailScreen() {
             {recipe.calories ? (
               <Text style={styles.nutritionTotal}>
                 Whole recipe: ~{recipe.calories.toLocaleString()} kcal · per serving: ~
-                {Math.round(recipe.calories / (recipe.servings || 1))} kcal
+                {perServingRound(recipe.calories, recipe.servings)} kcal
               </Text>
             ) : null}
 
@@ -217,43 +217,43 @@ export function RecipeDetailScreen() {
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionName}>Energy</Text>
               <Text style={styles.nutritionValue}>
-                {recipe.calories ? `~${Math.round(recipe.calories / (recipe.servings || 1))} kcal` : "—"}
+                {recipe.calories ? `~${perServingRound(recipe.calories, recipe.servings)} kcal` : "—"}
               </Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionName}>Fat</Text>
               <Text style={styles.nutritionValue}>
-                {recipe.fats ? `~${Math.round(recipe.fats / (recipe.servings || 1))}g` : "—"}
+                {recipe.fats ? `~${perServingRound(recipe.fats, recipe.servings)}g` : "—"}
               </Text>
             </View>
             <View style={[styles.nutritionRow, styles.nutritionRowSub]}>
               <Text style={styles.nutritionNameSub}>of which saturates</Text>
               <Text style={styles.nutritionValueSub}>
-                {recipe.saturatedFat ? `~${Math.round(recipe.saturatedFat / (recipe.servings || 1))}g` : "—"}
+                {recipe.saturatedFat ? `~${perServingRound(recipe.saturatedFat, recipe.servings)}g` : "—"}
               </Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionName}>Carbohydrate</Text>
               <Text style={styles.nutritionValue}>
-                {recipe.carbs ? `~${Math.round(recipe.carbs / (recipe.servings || 1))}g` : "—"}
+                {recipe.carbs ? `~${perServingRound(recipe.carbs, recipe.servings)}g` : "—"}
               </Text>
             </View>
             <View style={[styles.nutritionRow, styles.nutritionRowSub]}>
               <Text style={styles.nutritionNameSub}>of which sugars (added)</Text>
               <Text style={styles.nutritionValueSub}>
-                {recipe.addedSugar ? `~${Math.round(recipe.addedSugar / (recipe.servings || 1))}g` : "—"}
+                {recipe.addedSugar ? `~${perServingRound(recipe.addedSugar, recipe.servings)}g` : "—"}
               </Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionName}>Protein</Text>
               <Text style={styles.nutritionValue}>
-                {recipe.protein ? `~${Math.round(recipe.protein / (recipe.servings || 1))}g` : "—"}
+                {recipe.protein ? `~${perServingRound(recipe.protein, recipe.servings)}g` : "—"}
               </Text>
             </View>
             <View style={styles.nutritionRow}>
               <Text style={styles.nutritionName}>Fiber</Text>
               <Text style={styles.nutritionValue}>
-                {recipe.fiber ? `~${Math.round(recipe.fiber / (recipe.servings || 1))}g` : "—"}
+                {recipe.fiber ? `~${perServingRound(recipe.fiber, recipe.servings)}g` : "—"}
               </Text>
             </View>
 
@@ -266,19 +266,19 @@ export function RecipeDetailScreen() {
                 <View style={styles.nutritionRow}>
                   <Text style={styles.nutritionName}>Salt</Text>
                   <Text style={styles.nutritionValue}>
-                    {recipe.sodium ? `~${(recipe.sodium / 1000 / (recipe.servings || 1)).toFixed(1)}g` : "—"}
+                    {recipe.sodium ? `~${(perServing(recipe.sodium, recipe.servings) / 1000).toFixed(1)}g` : "—"}
                   </Text>
                 </View>
                 <View style={styles.nutritionRow}>
                   <Text style={styles.nutritionName}>Cholesterol</Text>
                   <Text style={styles.nutritionValue}>
-                    {recipe.cholesterol ? `~${Math.round(recipe.cholesterol / (recipe.servings || 1))}mg` : "—"}
+                    {recipe.cholesterol ? `~${perServingRound(recipe.cholesterol, recipe.servings)}mg` : "—"}
                   </Text>
                 </View>
                 <View style={styles.nutritionRow}>
                   <Text style={styles.nutritionName}>Sodium</Text>
                   <Text style={styles.nutritionValue}>
-                    {recipe.sodium ? `~${Math.round(recipe.sodium / (recipe.servings || 1))}mg` : "—"}
+                    {recipe.sodium ? `~${perServingRound(recipe.sodium, recipe.servings)}mg` : "—"}
                   </Text>
                 </View>
               </View>
@@ -341,7 +341,7 @@ export function RecipeDetailScreen() {
                     <Text style={styles.similarMeta}>
                       ⏱️ {formatDuration(r.prepTime)}
                       {r.calories
-                        ? ` · ~${Math.round(r.calories / (r.servings || 1))} kcal`
+                        ? ` · ~${perServingRound(r.calories, r.servings)} kcal`
                         : ""}
                     </Text>
                   </View>

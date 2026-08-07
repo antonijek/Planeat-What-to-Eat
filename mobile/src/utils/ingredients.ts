@@ -34,3 +34,18 @@ export function textToLines(text: string): string[] {
     .map((s) => s.trim())
     .filter(Boolean);
 }
+
+/**
+ * Parsira korisnički unos sastojaka (npr. "chicken,potatoes; rice") u niz
+ * čistih, malim slovima napisanih imena. Uklanja nevidljive/zamrače karaktere.
+ */
+export function parseIngredientInput(text: string): string[] {
+  const clean = (s: string) =>
+    s
+      .replace(/[\u200B-\u200D\uFEFF\u00A0\u034F]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  const parts = text.split(/[,;]/).map(clean).filter(Boolean);
+  return Array.from(new Set(parts));
+}

@@ -21,6 +21,7 @@ import { MealMomentPicker } from "../components/MealMomentPicker";
 import { WheelResultModal } from "../components/WheelResultModal";
 import { recipesForMoment } from "../constants/mealMoments";
 import { Recipe } from "../types";
+import { parseIngredientInput } from "../utils/ingredients";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../constants/theme";
 
@@ -51,16 +52,7 @@ export function HomeScreen() {
   }, [recipes, moment, haveIngredients]);
 
   function addHave() {
-    const clean = (s: string) =>
-      s
-        .replace(/[\u200B-\u200D\uFEFF\u00A0\u034F]/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-        .toLowerCase();
-    const parts = haveInput
-      .split(/[,;]/)
-      .map(clean)
-      .filter(Boolean);
+    const parts = parseIngredientInput(haveInput);
     if (parts.length === 0) return;
     const next = [...haveIngredients];
     for (const p of parts) {

@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Recipe } from "../types";
-import { formatDuration } from "../utils/helpers";
+import { formatDuration, perServingRound } from "../utils/helpers";
 import { DIFFICULTY_LABELS } from "../constants/categories";
 import { colors } from "../constants/theme";
 
@@ -43,7 +43,7 @@ export function RecipeCard({ recipe, onPress, modified }: Props) {
           <View style={styles.metaItem}>
             <MaterialCommunityIcons name="fire" size={14} color={colors.textMuted} />
             <Text style={styles.metaText}>
-              {recipe.calories ? `~${Math.round(recipe.calories / (recipe.servings || 1))} kcal` : "— kcal"}
+              {recipe.calories ? `~${perServingRound(recipe.calories, recipe.servings)} kcal` : "— kcal"}
             </Text>
           </View>
           <Text style={styles.metaText}>{DIFFICULTY_LABELS[recipe.difficulty] ?? recipe.difficulty}</Text>
