@@ -9,6 +9,7 @@
 
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config();
 
 const CACHE_PATH = path.resolve(__dirname, "../data/nutrition_cache.json");
 const BAD_PATH = path.resolve(__dirname, "../data/badmap.json");

@@ -19,6 +19,7 @@
 
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config();
 
 const DATA_PATH = path.resolve(__dirname, "../data/recipes.json");
 const CACHE_PATH = path.resolve(__dirname, "../data/nutrition_cache.json");
