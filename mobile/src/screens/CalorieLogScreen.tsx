@@ -14,10 +14,10 @@ import {
   dateKeyOffset,
   dateKeyForToday,
 } from "../services/calorieLogService";
-import { suggestIngredients, calculateMifflinGoal, ActivityLevel, CalorieGoal } from "../services/calorieCalculator";
+import { suggestIngredients } from "../services/calorieCalculator";
 import { useUserStore } from "../store/userStore";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
-import { AppModal, appModalStyles } from "../components/AppModal";
+import { CalorieGoalModal } from "../components/CalorieGoalModal";
 import { colors } from "../constants/theme";
 
 function dayTitle(offset: number): string {
@@ -59,14 +59,6 @@ export function CalorieLogScreen() {
   const [manualKcal, setManualKcal] = useState("");
   const gramsRef = useRef<TextInput>(null);
   const [goalModal, setGoalModal] = useState(false);
-  const [manualGoal, setManualGoal] = useState("");
-  const [genPreference, setGenPreference] = useState<"male" | "female">("male");
-  const [pKg, setPKg] = useState("");
-  const [pCm, setPCm] = useState("");
-  const [pAge, setPAge] = useState("");
-  const [pActivity, setPActivity] = useState<ActivityLevel>("moderate");
-  const [pGoal, setPGoal] = useState<CalorieGoal>("maintain");
-  const [mifflinResult, setMifflinResult] = useState<number | null>(null);
   const { isPremium, calorieGoal, setCalorieGoal } = useUserStore();
 
   const dateKey = dateKeyOffset(offset);
@@ -97,31 +89,12 @@ export function CalorieLogScreen() {
   }
 
   function openGoalModal() {
-    setManualGoal(String(calorieGoal));
-    setMifflinResult(null);
     setGoalModal(true);
   }
 
-  async function saveManualGoal() {
-    const g = parseInt(manualGoal, 10);
-    if (!Number.isFinite(g) || g <= 0) return;
-    await setCalorieGoal(Math.round(g));
+  async function saveGoal(kcal: number) {
+    await setCalorieGoal(kcal);
     setGoalModal(false);
-  }
-
-  async function saveCalculatedGoal() {
-    if (mifflinResult === null) return;
-    await setCalorieGoal(mifflinResult);
-    setGoalModal(false);
-  }
-
-  function computeMifflin() {
-    const kg = parseFloat(pKg);
-    const cm = parseFloat(pCm);
-    const age = parseFloat(pAge);
-    if (!Number.isFinite(kg) || !Number.isFinite(cm) || !Number.isFinite(age)) return;
-    if (kg <= 0 || cm <= 0 || age <= 0) return;
-    setMifflinResult(calculateMifflinGoal({ gender: genPreference, kg, cm, age, activity: pActivity, goal: pGoal }));
   }
 
   function onNameChange(text: string) {
@@ -340,119 +313,12 @@ export function CalorieLogScreen() {
         )}
       />
 
-      <AppModal
+      <CalorieGoalModal
         visible={goalModal}
-        title="Daily calorie goal"
+        initialGoal={calorieGoal}
         onClose={() => setGoalModal(false)}
-        onCancel={() => setGoalModal(false)}
-        onSave={mifflinResult !== null ? saveCalculatedGoal : saveManualGoal}
-        saveLabel={mifflinResult !== null ? "Use calculated" : "Save"}
-      >
-        <Text style={appModalStyles.label}>My daily target (kcal)</Text>
-        <TextInput
-          style={appModalStyles.input}
-          value={manualGoal}
-          onChangeText={setManualGoal}
-          keyboardType="numeric"
-          placeholder="e.g. 2000"
-          placeholderTextColor={colors.textFaint}
-        />
-
-        <Text style={styles.goalSection}>Calculate from your profile</Text>
-        <View style={styles.genderRow}>
-          {(["male", "female"] as const).map((g) => (
-            <Pressable
-              key={g}
-              style={[styles.genderBtn, genPreference === g && styles.genderBtnActive]}
-              onPress={() => setGenPreference(g)}
-            >
-              <Text style={[styles.genderText, genPreference === g && styles.genderTextActive]}>
-                {g === "male" ? "Male" : "Female"}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <Text style={appModalStyles.label}>Weight (kg)</Text>
-        <TextInput
-          style={appModalStyles.input}
-          value={pKg}
-          onChangeText={setPKg}
-          keyboardType="numeric"
-          placeholder="e.g. 75"
-          placeholderTextColor={colors.textFaint}
-        />
-        <Text style={appModalStyles.label}>Height (cm)</Text>
-        <TextInput
-          style={appModalStyles.input}
-          value={pCm}
-          onChangeText={setPCm}
-          keyboardType="numeric"
-          placeholder="e.g. 178"
-          placeholderTextColor={colors.textFaint}
-        />
-        <Text style={appModalStyles.label}>Age</Text>
-        <TextInput
-          style={appModalStyles.input}
-          value={pAge}
-          onChangeText={setPAge}
-          keyboardType="numeric"
-          placeholder="e.g. 30"
-          placeholderTextColor={colors.textFaint}
-        />
-        <Text style={appModalStyles.label}>Activity</Text>
-        {(
-          [
-            ["sedentary", "Sedentary"],
-            ["light", "Light"],
-            ["moderate", "Moderate"],
-            ["active", "Active"],
-            ["very_active", "Very active"],
-          ] as [ActivityLevel, string][]
-        ).map(([val, label]) => (
-          <Pressable
-            key={val}
-            style={[
-              styles.activityRow,
-              pActivity === val && { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-            ]}
-            onPress={() => setPActivity(val)}
-          >
-            <Text style={[styles.activityText, pActivity === val && { color: colors.primary, fontWeight: "700" }]}>
-              {label}
-            </Text>
-          </Pressable>
-        ))}
-
-        <Text style={appModalStyles.label}>Goal</Text>
-        {(
-          [
-            ["lose", "Lose weight (−500)"],
-            ["maintain", "Maintain"],
-            ["gain", "Gain weight (+500)"],
-          ] as [CalorieGoal, string][]
-        ).map(([val, label]) => (
-          <Pressable
-            key={val}
-            style={[
-              styles.activityRow,
-              pGoal === val && { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-            ]}
-            onPress={() => setPGoal(val)}
-          >
-            <Text style={[styles.activityText, pGoal === val && { color: colors.primary, fontWeight: "700" }]}>
-              {label}
-            </Text>
-          </Pressable>
-        ))}
-
-        <Pressable style={styles.calcBtn} onPress={computeMifflin}>
-          <Text style={styles.calcBtnText}>Calculate</Text>
-        </Pressable>
-        {mifflinResult !== null && (
-          <Text style={styles.mifflinResult}>Recommended: ~{mifflinResult} kcal/day</Text>
-        )}
-      </AppModal>
+        onSave={saveGoal}
+      />
     </SafeAreaView>
   );
 }
@@ -587,41 +453,4 @@ const styles = StyleSheet.create({
   rowMeta: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
   rowKcal: { color: colors.primary, fontWeight: "700", marginRight: 14 },
   remove: { color: colors.danger, fontSize: 18 },
-  goalSection: { fontSize: 15, fontWeight: "700", color: colors.text, marginTop: 20, marginBottom: 4 },
-  genderRow: { flexDirection: "row", gap: 8, marginTop: 6 },
-  genderBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-  },
-  genderBtnActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  genderText: { color: colors.text, fontWeight: "600" },
-  genderTextActive: { color: colors.primary, fontWeight: "700" },
-  activityRow: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: 6,
-  },
-  activityText: { color: colors.text, fontSize: 14 },
-  calcBtn: {
-    marginTop: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  calcBtnText: { color: "#fff", fontWeight: "700" },
-  mifflinResult: {
-    marginTop: 10,
-    color: colors.success,
-    fontSize: 14,
-    fontWeight: "700",
-    textAlign: "center",
-  },
 });
