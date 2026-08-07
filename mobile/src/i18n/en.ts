@@ -295,6 +295,7 @@ export default {
     what: "What's inside",
     features: "• Wheel to decide what to eat\n• 789 recipes (database)\n• \"What do I have at home\" filter\n• Weekly meal planner\n• Shopping list\n• Calorie tracker & macronutrients\n• Your own recipes and statistics",
     privacy: "Privacy",
+    language: "Language",
     privacyText: "Everything is stored locally on your device. No account, no cloud sync, no data leaves your phone.",
     dataSources: "Data sources",
     dataFrom: "Recipe data is sourced from ",

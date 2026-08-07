@@ -270,6 +270,7 @@ export default {
     features:
       "• Rueda para decidir qué comer\n• 789 recetas (base de datos)\n• Filtro \"Qué tengo en casa\"\n• Planificador semanal\n• Lista de la compra\n• Contador de calorías y macronutrientes\n• Tus recetas y estadísticas",
     privacy: "Privacidad",
+    language: "Idioma",
     privacyText:
       "Todo se guarda localmente en tu dispositivo. Sin cuenta, sin nube, ningún dato sale de tu teléfono.",
     dataSources: "Fuentes de datos",

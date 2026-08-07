@@ -270,6 +270,7 @@ export default {
     features:
       "• Ruota per decidere cosa mangiare\n• 789 ricette (database)\n• Filtro \"Cosa ho in casa\"\n• Pianificatore settimanale\n• Lista della spesa\n• Contatore calorie & macronutrienti\n• Le tue ricette e statistiche",
     privacy: "Privacy",
+    language: "Lingua",
     privacyText:
       "Tutto è memorizzato localmente. Nessun account, nessuna sincronizzazione cloud, nessun dato lascia il telefono.",
     dataSources: "Fonti dei dati",

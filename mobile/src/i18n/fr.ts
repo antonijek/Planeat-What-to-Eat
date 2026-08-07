@@ -270,6 +270,7 @@ export default {
     features:
       "• Roue pour décider quoi manger\n• 789 recettes (base de données)\n• Filtre \"Qu'est-ce que j'ai à la maison\"\n• Planificateur hebdomadaire\n• Liste de courses\n• Suivi calorique & macronutriments\n• Vos recettes et statistiques",
     privacy: "Confidentialité",
+    language: "Langue",
     privacyText:
       "Tout est stocké localement. Pas de compte, pas de synchronisation cloud, aucune donnée ne quitte votre téléphone.",
     dataSources: "Sources de données",

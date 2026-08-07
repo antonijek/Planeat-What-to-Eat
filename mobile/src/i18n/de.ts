@@ -277,6 +277,7 @@ export default {
     features:
       "• Rad zum Entscheiden, was du isst\n• 789 Rezepte (Datenbank)\n• \"Was habe ich zu Hause\"-Filter\n• Wochenplaner\n• Einkaufsliste\n• Kalorientracker & Makronährstoffe\n• Eigene Rezepte und Statistik",
     privacy: "Datenschutz",
+    language: "Sprache",
     privacyText:
       "Alles wird lokal auf deinem Gerät gespeichert. Kein Konto, keine Cloud-Synchronisierung, keine Daten verlassen dein Telefon.",
     dataSources: "Datenquellen",
