@@ -19,6 +19,7 @@ import { MealPlanEntry } from "../types";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -31,6 +32,7 @@ const MEAL_TYPES: { key: "lunch" | "dinner"; labelKey: string }[] = [
 export function PlanerScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { translate } = useTranslatedRecipe();
   const { isPremium } = useUserStore();
   const [plan, setPlan] = useState<MealPlanEntry[]>([]);
   const [pickerDay, setPickerDay] = useState<number | null>(null);
@@ -208,7 +210,7 @@ export function PlanerScreen() {
                   }}
                 >
                   <Text style={styles.recipeRowName} numberOfLines={1}>
-                    {item.name}
+                    {translate(item).name}
                   </Text>
                   <Text style={styles.recipeRowMeta}>{item.prepTime} min</Text>
                 </Pressable>

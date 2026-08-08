@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Recipe } from "../types";
 import { formatDuration, perServingRound } from "../utils/helpers";
 import { colors } from "../constants/theme";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 interface Props {
   recipe: Recipe;
@@ -14,6 +15,8 @@ interface Props {
 
 export function RecipeCard({ recipe, onPress, modified }: Props) {
   const { t } = useTranslation();
+  const { translate } = useTranslatedRecipe();
+  const r = translate(recipe);
   return (
     <Pressable style={styles.card} onPress={onPress}>
       {recipe.imageUrl ? (
@@ -34,7 +37,7 @@ export function RecipeCard({ recipe, onPress, modified }: Props) {
           </View>
         )}
         <Text style={styles.title} numberOfLines={1}>
-          {recipe.name}
+          {r.name}
         </Text>
         <View style={styles.meta}>
           <View style={styles.metaItem}>

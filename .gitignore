@@ -29,3 +29,10 @@ Thumbs.db
 
 # Generated data artifacts (regenerisani skriptama)
 data/badmap.json
+
+# Python venv (lokalni prevodioci: Argos Translate + OPUS-MT)
+.venv/
+
+# Generisani prevodi baze (regenerisani sa scripts/translate_db.js)
+data/translations/
+mobile/src/data/translations/

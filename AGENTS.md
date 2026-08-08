@@ -248,9 +248,32 @@ Izbegni veb (`--platform web`) osim ako nisu instalirani `react-dom` + `react-na
 
 ---
 
-## Sledeći mogući koraci
+## 🈺 Višejezičnost (UI + sadržaj baze)
 
-### Fokus: testiranje i dorada (trenutno)
+Dve odvojene stvari:
+
+### 1. UI prevodi — `mobile/src/i18n/`
+- `en.ts` (izvor) + `de/es/fr/it/pt/sr.ts` — svaki importuje `en` i overriduje ključeve (fallback na en).
+- `index.ts` registruje jezike u `resources` + `supported`. Dodaj novi jezik: napravi `xx.ts`, dodaš u `resources` i `supported`, i u listu `LANGUAGES` u `AboutScreen.tsx`.
+- Prevod sadržaja baze je **odvojen** od UI prevoda.
+
+### 2. Prevod sadržaja baze (recepti, sastojci, kuhinje, instrukcije)
+- **Original `recipes.json` se NIKAD ne menja** (čuva pretragu/filtere). Prevod se prikazuje kao **kopija** recepta.
+- Ručno (mali, fiksni skupovi): `mobile/src/i18n/baza/categories.ts` (14 kategorija) i `areas.ts` (37 kuhinja) → prevodi za sve jezike.
+- Generisano (offline MT): `data/translations/<lang>.json` + kopija u `mobile/src/data/translations/`. Struktura:
+  ```json
+  { "ingredients": { "plain flour": "Farine", ... },
+    "recipes": { "53483": { "name": "...", "instructions": ["..."] }, ... } }
+  ```
+- Generiše `scripts/translate_db.js` pomoću **lokalnog offline prevodioca, BEZ API ključa/kartice**:
+  - Argos Translate (`argostranslate`) za `fr/es/de/it/pt`
+  - OPUS-MT (`perkan/shortL-opus-mt-tc-base-en-sr`) za `sr`
+  - Zahteva Python venv sa paketima; postavi `MEALMATE_PYTHON` na `.../venv/Scripts/python.exe`.
+- Prikaz: `utils/translateRecipe.ts` + `utils/useTranslatedRecipe.ts` — ekrani pozivaju hook i dobijaju prevedenu kopiju (`r.name`, `r.ingredients`, `r.instructions`, `r.category`, `r.area`). Fallback na engleski ako prevod ne postoji.
+- ⚠️ **Pretraga/filteri rade na engleskim vrednostima** — ne prevoditi `name`/`ingredients` u `recipeService` (search/filter), samo u prikazu.
+- ⚠️ **Instrukcije se prevode po rečenicama** (Argos je ~3× brži na kratkim rečenicama nego na dugom paragrafu).
+
+## Sledeći mogući koraci
 - **Testirati celu app na telefonu** (Expo Go, SDK 54) — točak, ekrani, premium
 - **Provjeriti prikaz količina** posle skaliranja `persons/servings` (da nema više "12 cups")
 - **Provjeriti nutricioni prikaz** — redosled kao na proizvodima, "More values" expand

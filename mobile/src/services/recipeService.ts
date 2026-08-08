@@ -1,6 +1,7 @@
 import { Recipe } from "../types";
 import recipesData from "../data/recipes.json";
 import { myRecipesService } from "./myRecipesService";
+import { toEnglishIngredient, englishAliases } from "../utils/ingredientTranslation";
 
 const RECIPES: Recipe[] = (recipesData as { recipes: Recipe[] }).recipes;
 
@@ -45,10 +46,16 @@ export const recipeService = {
   search(query: string): Recipe[] {
     const q = query.trim().toLowerCase();
     if (!q) return RECIPES;
+    // Pretraga radi na engleskim vrednostima originala. Ako korisnik upiše
+    // sastojak na svom jeziku, prevedi ga na engleski preko reverzne mape.
+    const needles = englishAliases(q);
     return RECIPES.filter(
       (r) =>
-        r.name.toLowerCase().includes(q) ||
-        r.ingredients.some((i) => i.name.toLowerCase().includes(q))
+        needles.some((n) => r.name.toLowerCase().includes(n)) ||
+        r.ingredients.some((i) => {
+          const ingName = cleanIngredient(i.name);
+          return needles.some((n) => ingName.includes(n));
+        })
     );
   },
 
@@ -60,6 +67,7 @@ export const recipeService = {
   findByIngredients(ingredients: string[]): Recipe[] {
     const input = ingredients
       .map((i) => cleanIngredient(i))
+      .map((i) => toEnglishIngredient(i)) // "poulet" -> "chicken"
       .filter(Boolean);
     // ako korisnik želi filter ali je sve prazno, ne prikazuj sve — vrati prazno
     if (ingredients.some((i) => i.trim()) && input.length === 0) return [];

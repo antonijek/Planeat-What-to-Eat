@@ -15,9 +15,11 @@ import { planService } from "../services/planService";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 export function ShoppingScreen() {
   const { t } = useTranslation();
+  const { ingredient: ingredientLabel } = useTranslatedRecipe();
   const { items, load, toggle, remove, addManual, replaceMany, clearChecked } = useShoppingStore();
   const { isPremium } = useUserStore();
   const [name, setName] = useState("");
@@ -112,7 +114,7 @@ export function ShoppingScreen() {
                 <Text style={styles.checkText}>{item.isChecked ? "✓" : ""}</Text>
               </View>
               <Text style={styles.itemName} numberOfLines={2}>
-                {item.name}
+                {ingredientLabel(item.name)}
               </Text>
               {item.amount > 0 && (
                 <Text style={styles.itemAmount}>

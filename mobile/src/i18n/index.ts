@@ -7,6 +7,7 @@ import fr from "./fr";
 import it from "./it";
 import es from "./es";
 import pt from "./pt";
+import sr from "./sr";
 
 export const resources = {
   en: { translation: en },
@@ -15,13 +16,14 @@ export const resources = {
   it: { translation: it },
   es: { translation: es },
   pt: { translation: pt },
+  sr: { translation: sr },
 } as const;
 
 export type LanguageCode = keyof typeof resources;
 export type TranslationKey = typeof en;
 
 const native = getLocales()[0]?.languageCode;
-const supported: LanguageCode[] = ["en", "de", "fr", "it", "es", "pt"];
+const supported: LanguageCode[] = ["en", "de", "fr", "it", "es", "pt", "sr"];
 
 i18n.use(initReactI18next).init({
   resources,

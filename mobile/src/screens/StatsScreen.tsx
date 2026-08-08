@@ -6,6 +6,7 @@ import { useUserStore } from "../store/userStore";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 interface RankItem {
   name: string;
@@ -16,6 +17,7 @@ interface RankItem {
 
 export function StatsScreen() {
   const { t } = useTranslation();
+  const { category: categoryLabel } = useTranslatedRecipe();
   const { isPremium } = useUserStore();
   const [totalCooked, setTotalCooked] = useState(0);
   const [thisWeek, setThisWeek] = useState(0);
@@ -146,7 +148,7 @@ export function StatsScreen() {
             <View key={c.name} style={styles.listRow}>
               <Text style={styles.rank}>{i + 1}.</Text>
               <Text style={styles.listName} numberOfLines={1}>
-                {c.name}
+                {categoryLabel(c.name)}
               </Text>
               <Text style={styles.listCount}>{c.count}×</Text>
             </View>

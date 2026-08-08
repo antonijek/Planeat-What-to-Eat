@@ -12,6 +12,7 @@ import { formatDuration } from "../utils/helpers";
 import { getRecipeEmoji } from "../utils/emoji";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 interface Props {
   recipe: Recipe | null;
@@ -21,6 +22,8 @@ interface Props {
 
 export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
   const { t } = useTranslation();
+  const { translate } = useTranslatedRecipe();
+  const r = recipe ? translate(recipe) : null;
   return (
     <Modal
       visible={recipe != null}
@@ -28,16 +31,16 @@ export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
       transparent
       onRequestClose={onView}
     >
-      {recipe && (
+      {recipe && r && (
         <View style={styles.backdrop}>
           <View style={styles.card}>
             <Text style={styles.emoji}>{getRecipeEmoji(recipe.name)}</Text>
             <Text style={styles.title}>🎉 {t("wheelResult.yourMeal")}:</Text>
-            <Text style={styles.name}>{recipe.name}</Text>
+            <Text style={styles.name}>{r.name}</Text>
 
             <View style={styles.metaRow}>
-              <Text style={styles.meta}>{recipe.category}</Text>
-              <Text style={styles.meta}>{formatDuration(recipe.prepTime)}</Text>
+              <Text style={styles.meta}>{r.category}</Text>
+              <Text style={styles.meta}>{formatDuration(r.prepTime)}</Text>
               {recipe.imageUrl ? (
                 <Image source={{ uri: recipe.imageUrl }} style={styles.thumb} />
               ) : null}

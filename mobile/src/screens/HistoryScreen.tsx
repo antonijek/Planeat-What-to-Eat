@@ -8,6 +8,7 @@ import { useUserStore } from "../store/userStore";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -27,6 +28,7 @@ function dayLabel(day: string): string {
 export function HistoryScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { recipeName } = useTranslatedRecipe();
   const { isPremium } = useUserStore();
   const [days, setDays] = useState<CookedDay[]>([]);
 
@@ -83,9 +85,9 @@ export function HistoryScreen() {
                   <View style={[styles.thumb, styles.thumbPlaceholder]} />
                 )}
                 <View style={styles.rowBody}>
-                  <Text style={styles.rowTitle} numberOfLines={1}>
-                    {c.name}
-                  </Text>
+                    <Text style={styles.rowTitle} numberOfLines={1}>
+                      {recipeName(c.recipeId, c.name)}
+                    </Text>
                   <Text style={styles.rowSub}>{t("history.cookedAt", { time: c.time })}</Text>
                 </View>
               </Pressable>

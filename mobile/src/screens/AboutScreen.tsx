@@ -11,6 +11,7 @@ const LANGUAGES: { code: string; label: string }[] = [
   { code: "it", label: "Italiano" },
   { code: "es", label: "Español" },
   { code: "pt", label: "Português" },
+  { code: "sr", label: "Srpski" },
 ];
 
 export function AboutScreen() {

@@ -28,6 +28,7 @@ import { formatDuration, perServingRound } from "../utils/helpers";
 import { DIFFICULTY_LABELS } from "../constants/categories";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 type Route = RouteProp<RootStackParamList, "RecipeDetail">;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -38,6 +39,7 @@ export function RecipeDetailScreen() {
   const { t } = useTranslation();
   const { id } = route.params;
   const { isPremium, toggleFavorite, favorites } = useUserStore();
+  const { translate } = useTranslatedRecipe();
   const recipeStoreGetById = useRecipeStore((s) => s.getById);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [modified, setModified] = useState(false);
@@ -112,9 +114,10 @@ export function RecipeDetailScreen() {
     );
   }
 
+  const r = translate(recipe);
   const similar = recipeService
     .getAll()
-    .filter((r) => r.id !== id && r.category === recipe.category)
+    .filter((x) => x.id !== id && x.category === recipe.category)
     .sort(
       (a, b) =>
         Math.abs(a.prepTime - recipe.prepTime) - Math.abs(b.prepTime - recipe.prepTime)
@@ -133,7 +136,7 @@ export function RecipeDetailScreen() {
         )}
         <View style={styles.body}>
           <View style={styles.titleRow}>
-            <Text style={styles.title}>{recipe.name}</Text>
+            <Text style={styles.title}>{r.name}</Text>
             {isPremium && (
               <Pressable onPress={() => setEditOpen(true)} hitSlop={8} style={styles.editBtn}>
                 <Text style={styles.editBtnText}>✏️</Text>
@@ -149,10 +152,10 @@ export function RecipeDetailScreen() {
 
           <View style={styles.metaRow}>
             <View style={styles.chip}>
-              <Text style={styles.chipText}>{recipe.category}</Text>
+              <Text style={styles.chipText}>{r.category}</Text>
             </View>
             <View style={styles.chip}>
-              <Text style={styles.chipText}>{recipe.area || "General"}</Text>
+              <Text style={styles.chipText}>{r.area || "General"}</Text>
             </View>
             <View style={styles.chip}>
               <Text style={styles.chipText}>{formatDuration(recipe.prepTime)}</Text>
@@ -209,10 +212,10 @@ export function RecipeDetailScreen() {
           <PersonStepper value={persons} onChange={setPersons} />
 
           <Text style={styles.section}>{t("recipeDetail.ingredients")}</Text>
-          <IngredientList ingredients={recipe.ingredients} persons={persons} servings={recipe.servings} />
+          <IngredientList ingredients={r.ingredients} persons={persons} servings={recipe.servings} />
 
           <Text style={styles.section}>{t("recipeDetail.instructions")}</Text>
-          {recipe.instructions.map((step, i) => (
+          {r.instructions.map((step, i) => (
             <View key={i} style={styles.step}>
               <View style={styles.stepNum}>
                 <Text style={styles.stepNumText}>{i + 1}</Text>

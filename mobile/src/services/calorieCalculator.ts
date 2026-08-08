@@ -1,6 +1,7 @@
 import { Ingredient } from "../types";
 import ingredientMap from "../data/ingredient_map.json";
 import dishMap from "../data/dish_map.json";
+import { toEnglishIngredient, localizedIngredient } from "../utils/ingredientTranslation";
 
 export interface Macros {
   kcal: number;
@@ -84,7 +85,10 @@ const SYNONYMS: Record<string, string> = {
 
 function translateSynonym(rawName: string): string {
   const key = rawName.trim().toLowerCase();
-  return SYNONYMS[key] ?? key;
+  if (SYNONYMS[key]) return SYNONYMS[key];
+  // Pokušaj reverznu mapu trenutnog jezika (npr. "farine" -> "flour").
+  const fromLang = toEnglishIngredient(key);
+  return fromLang && fromLang !== key ? fromLang : key;
 }
 
 /** Pronađi stavku (namirnicu ili jelo) najpreciznije moguće. */
@@ -344,19 +348,20 @@ function pushIngredientSuggestion(
   partial: boolean
 ) {
   const cooked = COOKED_OVERRIDE[key] ?? COOKED_OVERRIDE[singular(key)] ?? null;
+  const localized = (k: string) => capitalize(localizedIngredient(k));
   if (cooked) {
     if (!seen.has("cooked:" + key)) {
       seen.add("cooked:" + key);
-      out.push({ key: `${key}:cooked`, label: `${capitalize(key)} (cooked)`, per100: cooked, grams, type: "ingredient", partial });
+      out.push({ key: `${key}:cooked`, label: `${localized(key)} (cooked)`, per100: cooked, grams, type: "ingredient", partial });
     }
     if (!seen.has(key)) {
       seen.add(key);
-      out.push({ key: `${key}:raw`, label: `${capitalize(key)} (raw)`, per100, grams, type: "ingredient", partial });
+      out.push({ key: `${key}:raw`, label: `${localized(key)} (raw)`, per100, grams, type: "ingredient", partial });
     }
   } else {
     if (!seen.has(key)) {
       seen.add(key);
-      out.push({ key, label: capitalize(key), per100, grams, type: "ingredient", partial });
+      out.push({ key, label: localized(key), per100, grams, type: "ingredient", partial });
     }
   }
 }
