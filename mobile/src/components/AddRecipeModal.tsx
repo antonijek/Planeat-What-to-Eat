@@ -69,6 +69,10 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
       setMessage(t("addRecipe.nameRequired"));
       return;
     }
+    if (!calories.trim() || parseInt(calories) <= 0) {
+      setMessage(t("addRecipe.caloriesRequired"));
+      return;
+    }
     const data = {
       name: name.trim(),
       category: category.trim() || "Other",

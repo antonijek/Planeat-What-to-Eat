@@ -43,7 +43,11 @@ export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
               <Text style={styles.meta}>{formatDuration(r.prepTime)}</Text>
               {recipe.imageUrl ? (
                 <Image source={{ uri: recipe.imageUrl }} style={styles.thumb} />
-              ) : null}
+              ) : (
+                <View style={[styles.thumb, styles.noImg]}>
+                  <Text style={styles.noImgText}>🍽️</Text>
+                </View>
+              )}
             </View>
 
             <Pressable style={styles.primaryBtn} onPress={onView}>
@@ -101,6 +105,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   thumb: { width: 40, height: 40, borderRadius: 8 },
+  noImg: { backgroundColor: colors.primaryLight, alignItems: "center", justifyContent: "center" },
+  noImgText: { fontSize: 22 },
   primaryBtn: {
     marginTop: 22,
     alignSelf: "stretch",

@@ -39,7 +39,7 @@ export function FavoritesScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 16 },
+  content: { padding: 16, paddingBottom: 40 },
   title: { fontSize: 24, fontWeight: "800", color: colors.text, marginBottom: 8 },
   empty: { color: colors.textMuted, fontSize: 15, marginTop: 24, textAlign: "center" },
 });

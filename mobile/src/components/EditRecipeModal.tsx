@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Text, TextInput } from "react-native";
+import { Text, TextInput, View, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Recipe } from "../types";
 import { overrideService } from "../services/overrideService";
-import { ingredientsToText, textToIngredients, textToLines } from "../utils/ingredients";
+import { textToLines } from "../utils/ingredients";
 import { AppModal, appModalStyles } from "./AppModal";
+import { IngredientEditor } from "./IngredientEditor";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -19,16 +20,18 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
   const [name, setName] = useState(recipe.name);
   const [category, setCategory] = useState(recipe.category);
   const [prepTime, setPrepTime] = useState(String(recipe.prepTime));
-  const [ingredients, setIngredients] = useState("");
+  const [ingredients, setIngredients] = useState(recipe.ingredients);
   const [instructions, setInstructions] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (visible) {
       setName(recipe.name);
       setCategory(recipe.category);
       setPrepTime(String(recipe.prepTime));
-      setIngredients(ingredientsToText(recipe.ingredients));
+      setIngredients(recipe.ingredients);
       setInstructions(recipe.instructions.join("\n"));
+      setMessage(null);
     }
   }, [visible, recipe]);
 
@@ -37,7 +40,7 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
       name: name.trim() || undefined,
       category: category.trim() || undefined,
       prepTime: parseInt(prepTime) || recipe.prepTime,
-      ingredients: textToIngredients(ingredients),
+      ingredients,
       instructions: textToLines(instructions),
     });
     onSaved();
@@ -58,22 +61,23 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
       <Text style={appModalStyles.label}>{t("addRecipe.category")}</Text>
       <TextInput style={appModalStyles.input} value={category} onChangeText={setCategory} />
 
-      <Text style={appModalStyles.label}>{t("addRecipe.timeMinutes")}</Text>
-      <TextInput
-        style={appModalStyles.input}
-        value={prepTime}
-        onChangeText={setPrepTime}
-        keyboardType="numeric"
-      />
+      <View style={styles.row}>
+        <View style={styles.col}>
+          <Text style={appModalStyles.label}>{t("addRecipe.timeMinutes")}</Text>
+          <TextInput
+            style={appModalStyles.input}
+            value={prepTime}
+            onChangeText={setPrepTime}
+            keyboardType="numeric"
+          />
+        </View>
+      </View>
 
-      <Text style={appModalStyles.label}>{t("addRecipe.ingredients")}</Text>
-      <TextInput
-        style={[appModalStyles.input, appModalStyles.multiline]}
-        value={ingredients}
-        onChangeText={setIngredients}
-        multiline
-        placeholder={"chicken | 2 | pcs\nrice | 200 | g"}
-        placeholderTextColor={colors.textFaint}
+      <IngredientEditor
+        ingredients={ingredients}
+        onChangeIngredients={setIngredients}
+        onCompute={() => {}}
+        onMessage={setMessage}
       />
 
       <Text style={appModalStyles.label}>{t("addRecipe.instructions")}</Text>
@@ -85,6 +89,21 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
         placeholder="Wash the meat..."
         placeholderTextColor={colors.textFaint}
       />
+
+      <AppModal
+        visible={message !== null}
+        title={t("addRecipe.headsUp")}
+        onClose={() => setMessage(null)}
+        onSave={() => setMessage(null)}
+        saveLabel={t("common.ok")}
+      >
+        <Text style={{ color: colors.text }}>{message}</Text>
+      </AppModal>
     </AppModal>
   );
 }
+
+const styles = StyleSheet.create({
+  row: { flexDirection: "row", gap: 10 },
+  col: { flex: 1 },
+});

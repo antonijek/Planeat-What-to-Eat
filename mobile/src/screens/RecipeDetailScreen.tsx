@@ -125,7 +125,7 @@ export function RecipeDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         {recipe.imageUrl ? (
           <Image source={{ uri: recipe.imageUrl }} style={styles.image} />
         ) : (

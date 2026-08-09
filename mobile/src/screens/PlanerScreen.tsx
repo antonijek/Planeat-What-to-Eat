@@ -228,7 +228,7 @@ export function PlanerScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 16 },
+  content: { padding: 16, paddingBottom: 40 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",

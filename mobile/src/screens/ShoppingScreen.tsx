@@ -144,7 +144,7 @@ export function ShoppingScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
-  content: { padding: 16 },
+  content: { padding: 16, paddingBottom: 40 },
   title: { fontSize: 24, fontWeight: "800", color: colors.text },
   headerRow: {
     flexDirection: "row",

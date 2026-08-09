@@ -207,7 +207,7 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { flexGrow: 1, padding: 16, paddingTop: 28 },
+  content: { flexGrow: 1, padding: 16, paddingTop: 28, paddingBottom: 40 },
   header: { marginBottom: 8 },
   titleRow: {
     flexDirection: "row",

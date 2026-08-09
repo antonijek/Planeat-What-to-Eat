@@ -101,7 +101,7 @@ export function HistoryScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
-  content: { padding: 16 },
+  content: { padding: 16, paddingBottom: 40 },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
   title: { fontSize: 24, fontWeight: "800", color: colors.text },
   clearBtn: { color: colors.danger, fontWeight: "600" },

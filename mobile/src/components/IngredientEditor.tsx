@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Ingredient } from "../types";
 import { suggestIngredients, matchIngredient } from "../services/calorieCalculator";
 import { gramsFromAmountAndUnit, pieceApproxGrams } from "../utils/helpers";
+import { translateUnit } from "../utils/ingredientTranslation";
 import { AppModal, appModalStyles } from "./AppModal";
 import { colors } from "../constants/theme";
 
@@ -112,12 +113,11 @@ export function IngredientEditor({
           placeholder={t("addRecipe.ingredientName")}
           placeholderTextColor={colors.textFaint}
         />
-      </View>
-      {ingSug.length > 0 && ingName.trim() && (
+      </View>      {ingSug.length > 0 && ingName.trim() && (
         <View style={styles.ingSugBox}>
-          {ingSug.map((s) => (
+          {ingSug.map((s, i) => (
             <Pressable
-              key={s.label}
+              key={`${i}-${s.label}`}
               style={styles.ingSugRow}
               onPress={() => {
                 setIngName(s.label);
@@ -129,6 +129,7 @@ export function IngredientEditor({
           ))}
         </View>
       )}
+      <Text style={styles.ingHint}>{t("addRecipe.ingredientsHint")}</Text>
       <View style={styles.ingAddRow}>
         <TextInput
           style={[appModalStyles.input, styles.ingAmountInput]}
@@ -149,7 +150,7 @@ export function IngredientEditor({
             style={[styles.unitChip, ingUnit === u && styles.unitChipActive]}
             onPress={() => setIngUnit(u)}
           >
-            <Text style={[styles.unitChipText, ingUnit === u && styles.unitChipTextActive]}>{u}</Text>
+            <Text style={[styles.unitChipText, ingUnit === u && styles.unitChipTextActive]}>{translateUnit(u)}</Text>
           </Pressable>
         ))}
       </View>
@@ -177,6 +178,7 @@ export function IngredientEditor({
 
 const styles = StyleSheet.create({
   ingAddRow: { flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center", flexWrap: "wrap" },
+  ingHint: { color: colors.textMuted, fontSize: 12, marginTop: 6 },
   ingNameInput: { flex: 1 },
   ingAmountInput: { width: 90 },
   unitChips: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
@@ -189,7 +191,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
   },
   unitChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  unitChipText: { color: colors.textMuted, fontSize: 12 },
+  unitChipText: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
   unitChipTextActive: { color: "#fff", fontWeight: "700" },
   ingAddBtn: {
     height: 48,

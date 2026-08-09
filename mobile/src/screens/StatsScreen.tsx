@@ -164,7 +164,7 @@ export function StatsScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 20 },
+  content: { padding: 20, paddingBottom: 40 },
   title: { fontSize: 24, fontWeight: "800", color: colors.text },
   cardsRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 16 },
   card: {
