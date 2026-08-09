@@ -51,6 +51,13 @@ export interface RecipeOverride {
   instructions?: string[];
   ingredients?: Ingredient[];
   prepTime?: number;
+  imageUrl?: string;
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fats?: number;
+  difficulty?: Difficulty;
+  servings?: number;
   updatedAt: string;
 }
 
