@@ -64,6 +64,28 @@ export function IngredientEditor({
     setIngUnit("g");
   }
 
+  function addWithManual() {
+    if (!ingName.trim()) {
+      onMessage(t("addRecipe.addIngredientName"));
+      return;
+    }
+    const amount = parseFloat(ingAmount) || 100;
+    const ing: Ingredient = {
+      name: ingName.trim(),
+      amount,
+      unit: ingUnit.trim() || "g",
+      measure: "",
+      grams: gramsFromAmountAndUnit(amount, ingUnit),
+    };
+    const idx = ingredients.length;
+    onChangeIngredients([...ingredients, ing]);
+    setEditIdx(idx);
+    setMkcal("");
+    setMp("");
+    setMc("");
+    setMf("");
+  }
+
   function removeIngredient(idx: number) {
     onChangeIngredients(ingredients.filter((_, i) => i !== idx));
   }
@@ -193,6 +215,9 @@ export function IngredientEditor({
         <Pressable style={styles.ingAddBtn} onPress={addIngredient}>
           <Text style={styles.ingAddBtnText}>+</Text>
         </Pressable>
+        <Pressable style={[styles.ingAddBtn, styles.ingKcalBtn]} onPress={addWithManual}>
+          <Text style={styles.ingKcalBtnText}>kcal</Text>
+        </Pressable>
       </View>
       <View style={styles.unitChips}>
         {UNITS.map((u) => (
@@ -275,6 +300,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   ingAddBtnText: { color: "#fff", fontSize: 26, lineHeight: 30, fontWeight: "700" },
+  ingKcalBtn: { backgroundColor: colors.success, paddingHorizontal: 12 },
+  ingKcalBtnText: { color: "#fff", fontSize: 13, fontWeight: "700" },
   ingList: { marginTop: 10 },
   ingRow: {
     flexDirection: "row",

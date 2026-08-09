@@ -257,7 +257,7 @@ export function suggestIngredients(query: string): Suggestion[] {
   //    pa sortiramo: prefiks (startsWith) pred svima, zatim kraće prvo.
   //    Tako "mi" → "Milk" dolazi pre "Milkshake", a "panc" → "Pancakes" ostaje ispred
   //    "Rice flour pancakes" (koji je tek podstring).
-  const candidates: { key: string; type: "dish" | "ingredient" }[] = [];
+  const candidates: { key: string; type: "dish" | "ingredient"; priority?: number }[] = [];
   for (const key of dishKeys) {
     if (key !== q && (key.startsWith(q) || q.startsWith(key) || key.includes(q))) {
       candidates.push({ key, type: "dish" });
@@ -276,16 +276,22 @@ export function suggestIngredients(query: string): Suggestion[] {
     }
   }
 
-  // 3) Delimični unos na trenutnom jeziku (npr. srpski "mle" -> "milk"/"mleko").
-  //    Tražimo sastojke čiji PREVOD sadrži unos, pa dodajemo njihove engleske ključeve.
+  // 3) Delimični unos na trenutnom jeziku (npr. srpski "ovseno" -> "oat flour").
+  //    Tražimo sastojke čiji PREVOD sadrži unos, pa dodajemo njihove engleske ključeve
+  //    sa VISOKIM prioritetom (skor 0) — jer unos je na srpskom, a engleske sugestije
+  //    su nebitne dok korisnik kuca na svom jeziku.
   if (name.trim()) {
     for (const enKey of englishKeysByLocalizedPartial(name)) {
       if (!seen.has(enKey) && mapKeys.includes(enKey)) {
-        candidates.push({ key: enKey, type: "ingredient" });
+        candidates.push({ key: enKey, type: "ingredient", priority: 0 });
       }
     }
   }
+
   candidates.sort((a, b) => {
+    const pa = a.priority ?? 9;
+    const pb = b.priority ?? 9;
+    if (pa !== pb) return pa - pb;
     const sa = scorePartial(q, a.key);
     const sb = scorePartial(q, b.key);
     if (sa !== sb) return sa - sb;
