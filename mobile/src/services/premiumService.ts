@@ -2,8 +2,8 @@ import { PremiumType } from "../types";
 import { getItem, setItem, STORAGE_KEYS } from "../storage/storage";
 
 export const PREMIUM_PRICES = {
-  monthly: "2.99€/mesec",
-  lifetime: "49.99€ jednokratno",
+  monthly: "2.99€",
+  lifetime: "49.99€",
 };
 
 export interface PremiumState {

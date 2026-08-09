@@ -17,11 +17,6 @@ interface Props {
 }
 
 const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  easy: "Easy",
-  medium: "Medium",
-  hard: "Hard",
-};
 
 export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   const { t } = useTranslation();

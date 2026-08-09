@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   container: { alignItems: "center", justifyContent: "center" },
   pointerHolder: {
     position: "absolute",
-    top: -44,
+    top: -24,
     zIndex: 10,
     alignItems: "center",
     justifyContent: "flex-start",
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     borderRightColor: "transparent",
     borderTopColor: "#FFFFFF",
   },
-  wheel: { width: SIZE, height: SIZE },
+  wheel: { width: SIZE, height: SIZE, marginTop: 12 },
   emoji: {
     position: "absolute",
     left: 0,

@@ -167,27 +167,27 @@ export function HomeScreen() {
           <View style={styles.shortcuts}>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("CalorieLog")}>
               <MaterialCommunityIcons name="food-apple-outline" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>{t("home.shortcutTracker")}</Text>
+              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutTracker")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("MyRecipes")}>
               <MaterialCommunityIcons name="chef-hat" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>{t("home.shortcutRecipes")}</Text>
+              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutRecipes")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("Planer")}>
               <MaterialCommunityIcons name="calendar-month" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>{t("home.shortcutPlaner")}</Text>
+              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutPlaner")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("History")}>
               <MaterialCommunityIcons name="history" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>{t("home.shortcutCooked")}</Text>
+              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutCooked")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("Stats")}>
               <MaterialCommunityIcons name="chart-bar" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>{t("home.shortcutStats")}</Text>
+              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutStats")}</Text>
             </Pressable>
             <Pressable style={styles.shortcut} onPress={() => nav.navigate("About")}>
               <MaterialCommunityIcons name="information-outline" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel}>{t("home.shortcutAbout")}</Text>
+              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutAbout")}</Text>
             </Pressable>
           </View>
         </View>
@@ -294,5 +294,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  shortcutLabel: { color: colors.textMuted, fontSize: 11, fontWeight: "600", marginTop: 4 },
+  shortcutLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: "600",
+    marginTop: 4,
+    textAlign: "center",
+    paddingHorizontal: 4,
+  },
 });
+

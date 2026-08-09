@@ -30,12 +30,15 @@ function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown
 }
 
 /** Prikaz makroa za stavku — samo vrednosti >0, da se ne vide "0g · Protein 0g · …". */
-function rowMetaText(item: { grams: number; protein: number; fat: number; carbs: number }): string {
+function rowMetaText(
+  item: { grams: number; protein: number; fat: number; carbs: number },
+  t: (key: string, opts?: Record<string, unknown>) => string
+): string {
   const parts: string[] = [];
   if (item.grams > 0) parts.push(`${item.grams}g`);
-  if (item.protein > 0) parts.push(`Protein ${item.protein}g`);
-  if (item.fat > 0) parts.push(`Fat ${item.fat}g`);
-  if (item.carbs > 0) parts.push(`Carbs ${item.carbs}g`);
+  if (item.protein > 0) parts.push(`${t("tracker.protein", { count: item.protein })}`);
+  if (item.fat > 0) parts.push(`${t("tracker.fat", { count: item.fat })}`);
+  if (item.carbs > 0) parts.push(`${t("tracker.carbs", { count: item.carbs })}`);
   return parts.join(" · ");
 }
 
@@ -78,8 +81,8 @@ export function CalorieLogScreen() {
     return (
       <PremiumLockScreen
         emoji="🥗"
-        title="Calorie log"
-        description="Premium feature. Track your daily calories and macros."
+        title={t("tracker.premiumTitle")}
+        description={t("tracker.premiumDesc")}
       />
     );
   }
@@ -300,7 +303,7 @@ export function CalorieLogScreen() {
               <Text style={styles.rowName} numberOfLines={1}>
                 {item.name}
               </Text>
-              <Text style={styles.rowMeta}>{rowMetaText(item)}</Text>
+              <Text style={styles.rowMeta}>{rowMetaText(item, t)}</Text>
             </View>
             <Text style={styles.rowKcal}>{item.kcal} kcal</Text>
             <Pressable onPress={() => remove(item.id)} hitSlop={8}>

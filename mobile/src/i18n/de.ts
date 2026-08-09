@@ -190,6 +190,7 @@ export default {
     protein: "{{count}}g Protein",
     fat: "{{count}}g Fett",
     carbs: "{{count}}g Kohlenhydrate",
+    sugar: "{{count}}g Zucker",
     foodPlaceholder: "Lebensmittel (z. B. Huhn)",
     foodLabel: "Was hast du gegessen?",
     gram: "Gramm",

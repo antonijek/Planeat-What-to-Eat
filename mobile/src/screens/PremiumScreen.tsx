@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useUserStore } from "../store/userStore";
+import { PREMIUM_PRICES } from "../services/premiumService";
 import { colors } from "../constants/theme";
 
 export function PremiumScreen() {
@@ -51,13 +52,13 @@ export function PremiumScreen() {
           style={styles.button}
           onPress={() => setPremium("monthly")}
         >
-          <Text style={styles.buttonText}>{t("premium.monthly", { price: "2.99€" })}</Text>
+          <Text style={styles.buttonText}>{t("premium.monthly", { price: PREMIUM_PRICES.monthly })}</Text>
         </Pressable>
         <Pressable
           style={[styles.button, styles.buttonAlt]}
           onPress={() => setPremium("lifetime")}
         >
-          <Text style={[styles.buttonText, styles.buttonTextAlt]}>{t("premium.lifetime", { price: "49.99€" })}</Text>
+          <Text style={[styles.buttonText, styles.buttonTextAlt]}>{t("premium.lifetime", { price: PREMIUM_PRICES.lifetime })}</Text>
         </Pressable>
 
         <Pressable onPress={() => nav.goBack()}>

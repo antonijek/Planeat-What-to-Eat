@@ -204,6 +204,7 @@ export default {
     protein: "{{count}}g protein",
     fat: "{{count}}g fat",
     carbs: "{{count}}g carbs",
+    sugar: "{{count}}g sugar",
     foodPlaceholder: "Food (e.g. chicken)",
     foodLabel: "What did you eat?",
     gram: "Gram",

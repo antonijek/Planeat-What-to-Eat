@@ -183,6 +183,7 @@ export default {
     protein: "{{count}}g proteína",
     fat: "{{count}}g grasas",
     carbs: "{{count}}g hidratos",
+    sugar: "{{count}}g azúcar",
     foodPlaceholder: "Alimento (ej. pollo)",
     foodLabel: "¿Qué comiste?",
     gram: "Gramos",

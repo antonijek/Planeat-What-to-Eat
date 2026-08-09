@@ -25,7 +25,6 @@ import { useUserStore } from "../store/userStore";
 import { useRecipeStore } from "../store/recipeStore";
 import { Recipe } from "../types";
 import { formatDuration, perServingRound } from "../utils/helpers";
-import { DIFFICULTY_LABELS } from "../constants/categories";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
@@ -162,7 +161,7 @@ export function RecipeDetailScreen() {
             </View>
             <View style={styles.chip}>
               <Text style={styles.chipText}>
-                {DIFFICULTY_LABELS[recipe.difficulty] ?? recipe.difficulty}
+                {t(`difficulty.${recipe.difficulty}`)}
               </Text>
             </View>
           </View>

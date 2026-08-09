@@ -183,6 +183,7 @@ export default {
     protein: "{{count}}g proteína",
     fat: "{{count}}g gorduras",
     carbs: "{{count}}g carboidratos",
+    sugar: "{{count}}g açúcar",
     foodPlaceholder: "Alimento (ex. frango)",
     foodLabel: "O que você comeu?",
     gram: "Gramas",

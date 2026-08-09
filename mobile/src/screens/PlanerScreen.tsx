@@ -106,20 +106,20 @@ export function PlanerScreen() {
                   </View>
                   <View style={styles.summaryStat}>
                     <Text style={styles.summaryValue}>
-                      ~{summary.protein.toLocaleString()}g protein
+                      ~{t("tracker.protein", { count: summary.protein.toLocaleString() })}
                     </Text>
                   </View>
                   <View style={styles.summaryStat}>
-                    <Text style={styles.summaryValue}>~{summary.fat.toLocaleString()}g fat</Text>
+                    <Text style={styles.summaryValue}>~{t("tracker.fat", { count: summary.fat.toLocaleString() })}</Text>
                   </View>
                   <View style={styles.summaryStat}>
                     <Text style={styles.summaryValue}>
-                      ~{summary.carbs.toLocaleString()}g carbs
+                      ~{t("tracker.carbs", { count: summary.carbs.toLocaleString() })}
                     </Text>
                   </View>
                   <View style={styles.summaryStat}>
                     <Text style={styles.summaryValue}>
-                      ~{summary.sugar.toLocaleString()}g sugar
+                      ~{t("tracker.sugar", { count: summary.sugar.toLocaleString() })}
                     </Text>
                   </View>
                 </View>
@@ -149,7 +149,7 @@ export function PlanerScreen() {
                   {entry && recipe ? (
                     <View style={styles.mealAssigned}>
                       <Text style={styles.mealRecipeName} numberOfLines={1}>
-                        {recipe.name}
+                        {translate(recipe).name}
                       </Text>
                       <Text style={styles.mealPersons}>{t("planer.persons", { count: entry.persons })}</Text>
                       <Pressable

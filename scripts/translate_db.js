@@ -34,14 +34,14 @@ if (!process.env.MEALMATE_PYTHON && !fs.existsSync(PY)) {
 const ARGOS_BATCH = path.join(__dirname, "..", ".venv", "argos_batch.py");
 const OPUS_BATCH = path.join(__dirname, "..", ".venv", "opus_batch.py");
 
-// jezik -> (batch skripta, py arg)
+// jezik -> (batch skripta, py arg). Gemini za sve (uklj. srpski).
 const BACKENDS = {
-  fr: { script: "argos_batch.py", arg: "fr" },
-  es: { script: "argos_batch.py", arg: "es" },
-  de: { script: "argos_batch.py", arg: "de" },
-  it: { script: "argos_batch.py", arg: "it" },
-  pt: { script: "argos_batch.py", arg: "pt" },
-  sr: { script: "opus_batch.py", arg: "sr" },
+  fr: { script: "gemini_batch.py", arg: "French" },
+  es: { script: "gemini_batch.py", arg: "Spanish" },
+  de: { script: "gemini_batch.py", arg: "German" },
+  it: { script: "gemini_batch.py", arg: "Italian" },
+  pt: { script: "gemini_batch.py", arg: "Portuguese" },
+  sr: { script: "gemini_batch.py", arg: "Serbian" },
 };
 
 const BATCH = 200;
@@ -60,8 +60,8 @@ function runPython(script, arg, payload) {
 
 // Prevede više listova u JEDNOM pozivu (model se učitava jednom).
 // lists: { name: string[] }. Vraća { name: string[] }.
-function translateAll(script, arg, lists) {
-  return runPython(script, arg, { keys: Object.keys(lists), lists });
+function translateAll(script, arg, lists, batchSize) {
+  return runPython(script, arg, { keys: Object.keys(lists), lists, batch_size: batchSize });
 }
 
 function main() {
@@ -139,24 +139,33 @@ function main() {
       continue;
     }
 
-    // Jedan poziv: svi listovi odjednom (model se učitava jednom).
-    console.log(`  batches: ingredients ${ingredientKeys.length}, names ${recipeNames.length}, instructions ${instructionsFlat.length}`);
-    const out = translateAll(script, arg, {
+    // Faza 1: sastojci + imena (brzo). Učitavamo model jednom.
+    console.log(`  phase1: ingredients ${ingredientKeys.length} + names ${recipeNames.length}`);
+    const out1 = translateAll(script, arg, {
       ingredients: ingredientKeys,
       names: recipeNames,
-      instructions: instructionsFlat,
-    });
+    }, 10);
 
     const ingredients = {};
     ingredientKeys.forEach((k, i) => {
-      const tr = (out.ingredients[i] || "").trim();
+      const tr = (out1.ingredients[i] || "").trim();
       ingredients[k] = tr && tr !== k ? tr : undefined;
     });
 
+    // Checkpoint: sačuvaj sastojke+imena ODMAH (da se ne izgube ako padne).
+    writeCheckpoint(lang, { ingredients, recipesPartial: {} });
+    console.log(`  checkpoint saved: ingredients done for ${lang}`);
+
+    // Faza 2: instrukcije (duge — mali batch da ne zaglavi).
+    console.log(`  phase2: instructions ${instructionsFlat.length}`);
+    const out2 = translateAll(script, arg, {
+      instructions: instructionsFlat,
+    }, 3);
+
     const recipesOut = {};
-    const instrMap = new Map(instrIndex.map(([rri, ssi], fi) => [`${rri}:${ssi}`, out.instructions[fi]]));
+    const instrMap = new Map(instrIndex.map(([rri, ssi], fi) => [`${rri}:${ssi}`, out2.instructions[fi]]));
     recipes.forEach((r, ri) => {
-      const name = (out.names[ri] || "").trim();
+      const name = (out1.names[ri] || "").trim();
       const originalSteps = r.instructions || [];
       const steps = originalSteps.map((orig, si) => {
         const tr = (instrMap.get(`${ri}:${si}`) || "").trim();
@@ -171,6 +180,12 @@ function main() {
     writeOut(lang, { ingredients, recipes: recipesOut });
   }
   console.log("\nDone.");
+}
+
+function writeCheckpoint(lang, result) {
+  const outPath = path.join(OUT_DIR, `${lang}.checkpoint.json`);
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(result, null, 2), "utf-8");
 }
 
 function writeOut(lang, result) {

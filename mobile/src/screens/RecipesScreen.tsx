@@ -126,6 +126,7 @@ export function RecipesScreen() {
     filters.treat ||
     filters.rich ||
     filters.vegetarian ||
+    filters.areas.length > 0 ||
     filters.maxPrep != null ||
     filters.maxKcal != null;
 

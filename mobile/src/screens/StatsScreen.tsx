@@ -9,6 +9,7 @@ import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 interface RankItem {
+  id?: string;
   name: string;
   count: number;
   kcal?: number;
@@ -17,7 +18,7 @@ interface RankItem {
 
 export function StatsScreen() {
   const { t } = useTranslation();
-  const { category: categoryLabel } = useTranslatedRecipe();
+  const { category: categoryLabel, recipeName } = useTranslatedRecipe();
   const { isPremium } = useUserStore();
   const [totalCooked, setTotalCooked] = useState(0);
   const [thisWeek, setThisWeek] = useState(0);
@@ -45,7 +46,7 @@ export function StatsScreen() {
       const now = Date.now();
       const weekAgo = now - 7 * 24 * 3600 * 1000;
       const catCount = new Map<string, number>();
-      const recCount = new Map<string, number>();
+      const recCount = new Map<string, { count: number; name: string }>();
       let kcalSum = 0;
       let protSum = 0;
       let sugarSum = 0;
@@ -62,7 +63,9 @@ export function StatsScreen() {
           protSum += protP;
           sugarSum += sugP;
           catCount.set(r.category, (catCount.get(r.category) ?? 0) + 1);
-          recCount.set(r.name, (recCount.get(r.name) ?? 0) + 1);
+          const curRec = recCount.get(r.id) ?? { count: 0, name: r.name };
+          curRec.count += 1;
+          recCount.set(r.id, curRec);
         }
         if (new Date(e.cookedAt).getTime() >= weekAgo) week++;
       }
@@ -75,9 +78,9 @@ export function StatsScreen() {
 
       setTop(
         Array.from(recCount.entries())
-          .sort((a, b) => b[1] - a[1])
+          .sort((a, b) => b[1].count - a[1].count)
           .slice(0, 5)
-          .map(([name, count]) => ({ name, count }))
+          .map(([id, { count, name }]) => ({ id, name, count }))
       );
       setTopCategories(
         Array.from(catCount.entries())
@@ -133,7 +136,7 @@ export function StatsScreen() {
             <View key={t.name} style={styles.listRow}>
               <Text style={styles.rank}>{i + 1}.</Text>
               <Text style={styles.listName} numberOfLines={1}>
-                {t.name}
+                {t.id ? recipeName(t.id, t.name) : t.name}
               </Text>
               <Text style={styles.listCount}>{t.count}×</Text>
             </View>

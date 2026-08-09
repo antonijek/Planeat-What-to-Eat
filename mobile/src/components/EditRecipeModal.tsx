@@ -47,7 +47,7 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
   return (
     <AppModal
       visible={visible}
-      title="Edit recipe"
+      title={t("addRecipe.titleEdit")}
       onClose={onClose}
       onSave={save}
       saveLabel={t("common.save")}
@@ -72,7 +72,7 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
         value={ingredients}
         onChangeText={setIngredients}
         multiline
-        placeholder="chicken | 2 | pcs&#10;rice | 200 | g"
+        placeholder={"chicken | 2 | pcs\nrice | 200 | g"}
         placeholderTextColor={colors.textFaint}
       />
 

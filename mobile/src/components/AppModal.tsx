@@ -7,7 +7,6 @@ import {
   ScrollView,
   StyleSheet,
   KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import { colors } from "../constants/theme";
 
@@ -42,7 +41,7 @@ export function AppModal({
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <KeyboardAvoidingView
         style={styles.backdrop}
-        behavior={Platform.OS === "ios" ? "padding" : "padding"}
+        behavior="padding"
       >
         <View style={styles.modal}>
           <Text style={styles.title}>{title}</Text>

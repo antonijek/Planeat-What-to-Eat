@@ -54,7 +54,7 @@ export const historyService = {
         const r = recipeService.getById(recipeId);
         return {
           recipeId,
-          name: r?.name ?? "Nepoznat recept",
+          name: r?.name ?? "Unknown recipe",
           imageUrl: r?.imageUrl ?? "",
           lastSpun,
           count,
@@ -105,7 +105,7 @@ export const historyService = {
         const r = recipeService.getById(recipeId);
         return {
           recipeId,
-          name: r?.name ?? "Nepoznat recept",
+          name: r?.name ?? "Unknown recipe",
           imageUrl: r?.imageUrl ?? "",
           lastSpun: last,
           count,
@@ -138,7 +138,7 @@ export const historyService = {
       const r = recipeService.getById(e.recipeId);
       cur.items.push({
         recipeId: e.recipeId,
-        name: r?.name ?? "Nepoznat recept",
+        name: r?.name ?? "Unknown recipe",
         imageUrl: r?.imageUrl ?? "",
         time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       });

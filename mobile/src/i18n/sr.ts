@@ -183,6 +183,7 @@ export default {
     protein: "{{count}}g proteina",
     fat: "{{count}}g masti",
     carbs: "{{count}}g ugljenih hidrata",
+    sugar: "{{count}}g šećera",
     foodPlaceholder: "Hrana (npr. piletina)",
     foodLabel: "Šta si pojeo/la?",
     gram: "Gram",
