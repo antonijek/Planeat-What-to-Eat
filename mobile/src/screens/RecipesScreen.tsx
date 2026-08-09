@@ -275,7 +275,7 @@ export function RecipesScreen() {
                             onPress={() => toggleArea(area.value)}
                           >
                             <Text style={[styles.filterChipText, compact && styles.filterChipTextCompact, active && styles.filterChipTextOn]}>
-                              {areaLabel(area.label)}
+                              {areaLabel(area.value)}
                             </Text>
                           </Pressable>
                         );

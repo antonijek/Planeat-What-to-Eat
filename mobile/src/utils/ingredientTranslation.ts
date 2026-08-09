@@ -74,18 +74,16 @@ export function translateUnit(word: string, lang?: string): string {
 
 /**
  * Prevede celu meru ("2 cups" -> "2 šolje", "1 tbsp chopped" -> "1 kašika seckano").
- * Prevodi jedinice i uobičajene deskriptore; brojevi ostaju.
+ * Prevodi jedinice i deskriptore po rečima; brojevi i nepoznate reči ostaju.
  */
 export function translateMeasure(measure: string, lang?: string): string {
   const l = (lang || currentLang()).toLowerCase();
   if (l === "en" || !measure) return measure;
-  // razdvoji na reči, prevedi svaku koja je poznata jedinica/deskriptor
   return measure
     .split(/(\s+)/)
     .map((tok) => {
       if (/^\s+$/.test(tok)) return tok;
-      const tr = translateUnit(tok, l);
-      return tr;
+      return translateUnit(tok, l);
     })
     .join("");
 }
