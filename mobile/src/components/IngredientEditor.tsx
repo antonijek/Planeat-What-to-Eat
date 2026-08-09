@@ -63,8 +63,9 @@ export function IngredientEditor({
     setIngName("");
     setIngAmount("");
     setIngUnit("g");
-    // Ako sastojak nije u bazi (nema sugestiju ni per100), ponudi ručni unos makroa.
-    if (!ingSug.length && !ing.per100) {
+    // Ako sastojak STVARNO nije u bazi (matchIngredient ne nađe) i nema ručne makroe,
+    // ponudi ručni unos. (ingSug se čisti pri odabiru sugestije, pa se ne koristi.)
+    if (!matchIngredient(ing.name) && !ing.per100) {
       const idx = ingredients.length;
       setEditIdx(idx);
       setMkcal("");
