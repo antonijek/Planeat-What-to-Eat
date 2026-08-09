@@ -1,5 +1,6 @@
 import i18n from "../i18n";
 import { translationContentFor } from "./translationContent";
+import { UNIT_LABELS } from "../i18n/baza/units";
 
 // Reverzna mapa: prevedeni sastojak -> engleski kanonski naziv (ključ u bazi).
 // Gradi se iz generisanih prevoda i kešira po jeziku.
@@ -60,4 +61,33 @@ export function localizedIngredient(englishKey: string, lang?: string): string {
   const tr = content.ingredients?.[englishKey.trim().toLowerCase()];
   return (tr && tr.trim()) ? tr : englishKey;
 }
+
+/**
+ * Prevede pojedinačnu jedinicu/deskriptor na trenutni jezik. Fallback na engleski.
+ */
+export function translateUnit(word: string, lang?: string): string {
+  const l = (lang || currentLang()).toLowerCase();
+  if (l === "en") return word;
+  const key = word.trim().toLowerCase();
+  return UNIT_LABELS[key]?.[l as keyof typeof UNIT_LABELS[keyof typeof UNIT_LABELS]] || word;
+}
+
+/**
+ * Prevede celu meru ("2 cups" -> "2 šolje", "1 tbsp chopped" -> "1 kašika seckano").
+ * Prevodi jedinice i uobičajene deskriptore; brojevi ostaju.
+ */
+export function translateMeasure(measure: string, lang?: string): string {
+  const l = (lang || currentLang()).toLowerCase();
+  if (l === "en" || !measure) return measure;
+  // razdvoji na reči, prevedi svaku koja je poznata jedinica/deskriptor
+  return measure
+    .split(/(\s+)/)
+    .map((tok) => {
+      if (/^\s+$/.test(tok)) return tok;
+      const tr = translateUnit(tok, l);
+      return tr;
+    })
+    .join("");
+}
+
 

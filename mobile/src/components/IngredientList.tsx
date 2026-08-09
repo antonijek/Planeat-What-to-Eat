@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ingredient } from "../types";
 import { formatAmount } from "../utils/helpers";
+import { translateMeasure } from "../utils/ingredientTranslation";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -19,7 +20,7 @@ export function IngredientList({ ingredients, persons, servings }: Props) {
             style={[styles.dot, { backgroundColor: colors.wheel[i % colors.wheel.length] }]}
           />
           <Text style={styles.left}>{ing.name}</Text>
-          <Text style={styles.right}>{formatAmount(ing, persons, servings)}</Text>
+          <Text style={styles.right}>{translateMeasure(formatAmount(ing, persons, servings))}</Text>
         </View>
       ))}
     </View>

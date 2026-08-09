@@ -13,6 +13,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { RecipeCard } from "../components/RecipeCard";
 import { IngredientInputChips } from "../components/IngredientInputChips";
+import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Recipe } from "../types";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
@@ -58,6 +59,7 @@ export const AREA_OPTIONS: { label: string; value: string }[] = [
 export function RecipesScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { area: areaLabel } = useTranslatedRecipe();
   const { isPremium } = useUserStore();
   const allRecipes = useRecipeStore((s) => s.recipes);
   const userRecipes = allRecipes.filter((r) => r.id.startsWith("user-"));
@@ -168,6 +170,7 @@ export function RecipesScreen() {
                   onSubmit={addIngredient}
                   ingredients={haveIngredients}
                   onRemove={removeIngredient}
+                  placeholder={t("recipes.havePlaceholder")}
                   hint={
                     haveIngredients.length > 0
                       ? t("recipes.haveHint", { list: haveIngredients.join(", ") })
@@ -272,7 +275,7 @@ export function RecipesScreen() {
                             onPress={() => toggleArea(area.value)}
                           >
                             <Text style={[styles.filterChipText, compact && styles.filterChipTextCompact, active && styles.filterChipTextOn]}>
-                              {area.label}
+                              {areaLabel(area.label)}
                             </Text>
                           </Pressable>
                         );

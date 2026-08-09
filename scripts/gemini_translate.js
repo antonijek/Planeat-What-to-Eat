@@ -51,7 +51,7 @@ function getIntArg(name, def) {
 const LIMIT = getIntArg("limit", null);
 
 const TARGET_LANG = {
-  es: "Spanish", de: "German", it: "Italian", pt: "Portuguese", sr: "Serbian",
+  es: "Spanish", de: "German", it: "Italian", pt: "Portuguese", sr: "Serbian", fr: "French",
 };
 const MAX_RETRIES = 5;
 const ITEM_BATCH = 5; // instrukcija po pozivu
@@ -91,6 +91,7 @@ function parseJsonArray(text) {
   try { return JSON.parse(text.slice(start, end + 1)); }
   catch { return null; }
 }
+
 
 // Retry sa backoff; na 429 koristi RetryInfo. Auto-smanjuje concurrency pri 429.
 let rateLimited = false;
@@ -177,9 +178,11 @@ async function main() {
 
   const t0 = Date.now();
 
-  // FAZA 1: jedinstveni sastojci + imena (samo oni koji nisu gotovi)
-  // UVIJEK lowercase ključ — da nema case-duplikata (baza ima i "black eyed peas" i "Black Eyed Peas")
-  const allIngredients = [...new Set(recipes.flatMap((r) => r.ingredients.map((i) => i.name.toLowerCase())))];
+  // FAZA 1: sastojci + imena (samo oni koji nisu gotovi)
+  // Sastojci se prevode iz KANONSKE mape (ingredient_map.json) — deterministicki,
+  // bez duplih/case/akcent kljuceva. Tako se svih 947 pokrije.
+  const ingredientMap = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "ingredient_map.json"), "utf-8"));
+  const allIngredients = Object.keys(ingredientMap).sort();
   const missingIngredients = allIngredients.filter((n) => !doneIngredients.has(n));
   const names = recipes.map((r) => r.name);
   const missingNames = recipes.filter((r) => !existing.recipes[r.id]?.name).map((r) => r.name);
@@ -259,6 +262,13 @@ async function main() {
   };
   const workers = Array.from({ length: Math.min(CONCURRENCY, queue.length || 1) }, () => worker());
   await Promise.all(workers);
+
+  // Finalni zapis — pokriva slučaj kada su svi recepti već gotovi (faza 2 prazna),
+  // ali su u fazi 1 dodati novi sastojci.
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(existing), "utf-8");
+  fs.mkdirSync(MOBILE_DIR, { recursive: true });
+  fs.writeFileSync(path.join(MOBILE_DIR, `${lang}.json`), JSON.stringify(existing), "utf-8");
 
   const elapsed = (Date.now() - t0) / 1000;
   const totalTokens = usage2.promptTokens + usage2.completionTokens;

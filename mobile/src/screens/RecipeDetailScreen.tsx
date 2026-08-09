@@ -258,7 +258,7 @@ export function RecipeDetailScreen() {
                   )}
                   <View style={styles.similarBody}>
                     <Text style={styles.similarName} numberOfLines={1}>
-                      {r.name}
+                      {translate(r).name}
                     </Text>
                     <Text style={styles.similarMeta}>
                       ⏱️ {formatDuration(r.prepTime)}
