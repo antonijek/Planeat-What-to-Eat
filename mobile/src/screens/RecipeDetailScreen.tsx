@@ -182,7 +182,7 @@ export function RecipeDetailScreen() {
             </Text>
           </Pressable>
 
-          {id.startsWith("user-") && (
+          {(recipe.calories > 0 || (recipe.protein ?? 0) > 0 || (recipe.carbs ?? 0) > 0) && (
             <Pressable
               style={styles.calorieLogBtn}
               onPress={async () => {
