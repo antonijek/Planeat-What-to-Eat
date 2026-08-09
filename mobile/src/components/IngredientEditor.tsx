@@ -170,7 +170,7 @@ export function IngredientEditor({
       )}
 
       <Pressable style={styles.computeBtn} onPress={computeNutrition}>
-        <Text style={styles.computeBtnText}>🧮 {t("addRecipe.compute")}</Text>
+        <Text style={styles.computeBtnText}>{t("addRecipe.compute")}</Text>
       </Pressable>
     </>
   );
