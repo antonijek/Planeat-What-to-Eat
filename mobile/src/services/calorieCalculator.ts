@@ -1,7 +1,7 @@
 import { Ingredient } from "../types";
 import ingredientMap from "../data/ingredient_map.json";
 import dishMap from "../data/dish_map.json";
-import { toEnglishIngredient, localizedIngredient } from "../utils/ingredientTranslation";
+import { toEnglishIngredient, localizedIngredient, englishKeysByLocalizedPartial } from "../utils/ingredientTranslation";
 
 export interface Macros {
   kcal: number;
@@ -272,6 +272,16 @@ export function suggestIngredients(query: string): Suggestion[] {
       const matchedWords = kw.filter((w) => qWords.includes(w)).length;
       if (matchedWords === qWords.length && matchedWords > 0) {
         candidates.push({ key, type: "ingredient" });
+      }
+    }
+  }
+
+  // 3) Delimični unos na trenutnom jeziku (npr. srpski "mle" -> "milk"/"mleko").
+  //    Tražimo sastojke čiji PREVOD sadrži unos, pa dodajemo njihove engleske ključeve.
+  if (name.trim()) {
+    for (const enKey of englishKeysByLocalizedPartial(name)) {
+      if (!seen.has(enKey) && mapKeys.includes(enKey)) {
+        candidates.push({ key: enKey, type: "ingredient" });
       }
     }
   }

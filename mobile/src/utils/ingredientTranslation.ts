@@ -63,6 +63,24 @@ export function localizedIngredient(englishKey: string, lang?: string): string {
 }
 
 /**
+ * Vrati engleske ključeve sastojaka čiji prevod na trenutnom jeziku SADRŽI dati unos
+ * (za delimične sugestije). Npr. unos "mle" na srpskom -> "milk" (mleko), "mleveno meso"...
+ */
+export function englishKeysByLocalizedPartial(input: string, lang?: string): string[] {
+  const l = (lang || currentLang()).toLowerCase();
+  const q = input.trim().toLowerCase();
+  if (!q || l === "en") return [];
+  const content = translationContentFor(l as never);
+  const ing = content.ingredients || {};
+  const out: string[] = [];
+  for (const enKey of Object.keys(ing)) {
+    const tr = ing[enKey];
+    if (tr && tr.trim().toLowerCase().includes(q)) out.push(enKey);
+  }
+  return out;
+}
+
+/**
  * Prevede pojedinačnu jedinicu/deskriptor na trenutni jezik. Fallback na engleski.
  */
 export function translateUnit(word: string, lang?: string): string {
