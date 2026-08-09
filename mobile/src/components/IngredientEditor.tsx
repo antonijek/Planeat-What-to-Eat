@@ -163,7 +163,8 @@ export function IngredientEditor({
           placeholder={t("addRecipe.ingredientName")}
           placeholderTextColor={colors.textFaint}
         />
-      </View>      {ingSug.length > 0 && ingName.trim() && (
+      </View>
+      {!!(ingSug.length > 0 && ingName.trim()) && (
         <View style={styles.ingSugBox}>
           {ingSug.map((s, i) => (
             <Pressable
