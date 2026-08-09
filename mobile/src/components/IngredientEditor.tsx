@@ -29,6 +29,11 @@ export function IngredientEditor({
   const [ingAmount, setIngAmount] = useState("");
   const [ingUnit, setIngUnit] = useState("g");
   const [ingSug, setIngSug] = useState<{ label: string; type: string }[]>([]);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [mkcal, setMkcal] = useState("");
+  const [mp, setMp] = useState("");
+  const [mc, setMc] = useState("");
+  const [mf, setMf] = useState("");
 
   function onIngNameChange(text: string) {
     setIngName(text);
@@ -63,6 +68,38 @@ export function IngredientEditor({
     onChangeIngredients(ingredients.filter((_, i) => i !== idx));
   }
 
+  function openManual(idx: number) {
+    const ing = ingredients[idx];
+    setEditIdx(idx);
+    setMkcal(ing?.per100?.kcal ? String(ing.per100.kcal) : "");
+    setMp(ing?.per100?.protein ? String(ing.per100.protein) : "");
+    setMc(ing?.per100?.carbs ? String(ing.per100.carbs) : "");
+    setMf(ing?.per100?.fats ? String(ing.per100.fats) : "");
+  }
+
+  function saveManual() {
+    if (editIdx == null) return;
+    const kcal = parseFloat(mkcal);
+    const protein = parseFloat(mp);
+    const carbs = parseFloat(mc);
+    const fats = parseFloat(mf);
+    const updated = ingredients.map((ing, i) =>
+      i === editIdx
+        ? {
+            ...ing,
+            per100: {
+              kcal: Number.isFinite(kcal) ? kcal : 0,
+              protein: Number.isFinite(protein) ? protein : 0,
+              carbs: Number.isFinite(carbs) ? carbs : 0,
+              fats: Number.isFinite(fats) ? fats : 0,
+            },
+          }
+        : ing
+    );
+    onChangeIngredients(updated);
+    setEditIdx(null);
+  }
+
   function computeNutrition() {
     if (ingredients.length === 0) {
       onMessage(t("addRecipe.computeEmpty"));
@@ -74,6 +111,19 @@ export function IngredientEditor({
       let g = ing.grams ?? 0;
       if (!g || g <= 0) g = gramsFromAmountAndUnit(ing.amount, ing.unit);
       if (!g || g <= 0) g = pieceApproxGrams(ing.name, ing.unit) * ing.amount;
+      // Ako korisnik ručno unese makroe za ovaj sastojak (van baze), koristi njih.
+      const manual = ing.per100 && (ing.per100.kcal > 0 || ing.per100.protein > 0 || ing.per100.carbs > 0 || ing.per100.fats > 0) ? ing.per100 : null;
+      if (manual) {
+        if (!g || g <= 0) {
+          unknown.push(`${ing.name} (${ing.amount} ${ing.unit})`);
+          continue;
+        }
+        kcal += (manual.kcal * g) / 100;
+        p += (manual.protein * g) / 100;
+        c += (manual.carbs * g) / 100;
+        f += (manual.fats * g) / 100;
+        continue;
+      }
       const m = matchIngredient(ing.name);
       if (!m) {
         unknown.push(ing.name);
@@ -157,17 +207,38 @@ export function IngredientEditor({
       {ingredients.length > 0 && (
         <View style={styles.ingList}>
           {ingredients.map((ing, idx) => (
-            <View key={idx} style={styles.ingRow}>
+            <Pressable key={idx} style={styles.ingRow} onPress={() => openManual(idx)}>
               <Text style={styles.ingRowText} numberOfLines={1}>
                 {ing.name} — {ing.amount} {ing.unit}
+                {ing.per100?.kcal ? " ✏️" : ""}
               </Text>
               <Pressable onPress={() => removeIngredient(idx)} hitSlop={8}>
                 <Text style={styles.ingDel}>✕</Text>
               </Pressable>
-            </View>
+            </Pressable>
           ))}
         </View>
       )}
+
+      <AppModal
+        visible={editIdx != null}
+        title={t("addRecipe.manualMacros")}
+        onClose={() => setEditIdx(null)}
+        onSave={saveManual}
+        saveLabel={t("common.save")}
+      >
+        <Text style={appModalStyles.label}>{t("addRecipe.macrosPer100")}</Text>
+        <View style={styles.ingAddRow}>
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mkcal} onChangeText={setMkcal} keyboardType="numeric" placeholder="kcal/100g" placeholderTextColor={colors.textFaint} />
+        </View>
+        <View style={styles.ingAddRow}>
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mp} onChangeText={setMp} keyboardType="numeric" placeholder="protein/100g" placeholderTextColor={colors.textFaint} />
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mc} onChangeText={setMc} keyboardType="numeric" placeholder="carbs/100g" placeholderTextColor={colors.textFaint} />
+        </View>
+        <View style={styles.ingAddRow}>
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mf} onChangeText={setMf} keyboardType="numeric" placeholder="fats/100g" placeholderTextColor={colors.textFaint} />
+        </View>
+      </AppModal>
 
       <Pressable style={styles.computeBtn} onPress={computeNutrition}>
         <Text style={styles.computeBtnText}>{t("addRecipe.compute")}</Text>

@@ -8,6 +8,13 @@ export interface Ingredient {
   unit: string;
   /** Približna gramaža (iz USDA / procene) — dodaje skripta enrich_nutrition. */
   grams?: number | null;
+  /** Ručno uneti makroi na 100g (za sastojke koji nisu u bazi). */
+  per100?: {
+    kcal: number;
+    protein: number;
+    carbs: number;
+    fats: number;
+  } | null;
 }
 
 export interface Recipe {

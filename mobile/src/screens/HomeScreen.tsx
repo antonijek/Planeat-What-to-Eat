@@ -11,6 +11,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
+import { Screen } from "../components/Screen";
 import { Wheel } from "../components/Wheel";
 import { useRecipeStore } from "../store/recipeStore";
 import { useUserStore } from "../store/userStore";
@@ -84,13 +85,8 @@ export function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets={true}
-      >
-        <View style={styles.header}>
+    <Screen>
+      <View style={styles.header}>
           <View style={styles.titleRow}>
             <View style={styles.titleWrap}>
               <Text style={styles.title} numberOfLines={1}>
@@ -191,7 +187,6 @@ export function HomeScreen() {
             </Pressable>
           </View>
         </View>
-        </ScrollView>
 
       <WheelResultModal
         recipe={result}
@@ -201,7 +196,7 @@ export function HomeScreen() {
         }}
         onSpinAgain={() => setResult(null)}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 

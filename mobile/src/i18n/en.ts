@@ -175,6 +175,8 @@ export default {
     ingredientName: "Name (e.g. milk)",
     amount: "Amount",
     compute: "🧮 Compute nutrition from ingredients",
+    manualMacros: "Manual macros",
+    macrosPer100: "Enter nutrition per 100g (for ingredients not in our database):",
     imageUrl: "Image URL (optional)",
     instructions: "Instructions (one step per line)",
     paste: "📋 Paste a recipe",

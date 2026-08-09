@@ -154,6 +154,8 @@ export default {
     ingredientName: "Nome (es. latte)",
     amount: "Quantità",
     compute: "🧮 Calcola valori nutri. dagli ingredienti",
+    manualMacros: "Macro manuali",
+    macrosPer100: "Inserisci i valori per 100g (per ingredienti non presenti nel nostro database):",
     imageUrl: "URL immagine (facoltativo)",
     instructions: "Preparazione (un passaggio per riga)",
     paste: "📋 Incolla una ricetta",

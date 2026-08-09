@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  ScrollView,
   Image,
   StyleSheet,
   SafeAreaView,
@@ -17,6 +16,7 @@ import { IngredientList } from "../components/IngredientList";
 import { NutritionTable } from "../components/NutritionTable";
 import { EditRecipeModal } from "../components/EditRecipeModal";
 import { AppModal } from "../components/AppModal";
+import { Screen } from "../components/Screen";
 import { overrideService } from "../services/overrideService";
 import { historyService } from "../services/historyService";
 import { recipeService } from "../services/recipeService";
@@ -124,9 +124,8 @@ export function RecipeDetailScreen() {
     .slice(0, 3);
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        {recipe.imageUrl ? (
+    <Screen>
+      {recipe.imageUrl ? (
           <Image source={{ uri: recipe.imageUrl }} style={styles.image} />
         ) : (
           <View style={[styles.image, styles.noImg]}>
@@ -272,7 +271,6 @@ export function RecipeDetailScreen() {
             </View>
           )}
         </View>
-      </ScrollView>
 
       {recipe && (
         <EditRecipeModal
@@ -295,7 +293,7 @@ export function RecipeDetailScreen() {
       >
         <Text style={{ color: colors.text }}>{trackerMsg}</Text>
       </AppModal>
-    </SafeAreaView>
+    </Screen>
   );
 }
 

@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, SafeAreaView, Linking, Pressable } from "react-native";
+import { View, Text, StyleSheet, Linking, Pressable } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Screen } from "../components/Screen";
 import i18n from "../i18n";
 import { colors } from "../constants/theme";
 
@@ -18,8 +19,7 @@ export function AboutScreen() {
   const { t, i18n: i18nHook } = useTranslation();
   const current = i18nHook.language.slice(0, 2);
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
+    <Screen>
         <Text style={styles.title}>{t("about.title")}</Text>
         <Text style={styles.subtitle}>{t("about.subtitle")}</Text>
 
@@ -57,8 +57,7 @@ export function AboutScreen() {
         <Text style={styles.disclaimer}>{t("about.disclaimer")}</Text>
 
         <Text style={styles.footer}>{t("about.footer")}</Text>
-      </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 

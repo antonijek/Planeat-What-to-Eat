@@ -161,6 +161,8 @@ export default {
     ingredientName: "Name (z. B. Milch)",
     amount: "Menge",
     compute: "🧮 Nährwerte aus Zutaten berechnen",
+    manualMacros: "Manuelle Makros",
+    macrosPer100: "Nährwerte pro 100g eingeben (für Zutaten, die nicht in unserer Datenbank sind):",
     imageUrl: "Bild-URL (optional)",
     instructions: "Zubereitung (ein Schritt pro Zeile)",
     paste: "📋 Rezept einfügen",

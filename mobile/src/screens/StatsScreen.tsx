@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { Screen } from "../components/Screen";
 import { historyService } from "../services/historyService";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
@@ -109,8 +110,7 @@ export function StatsScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
+    <Screen>
         <Text style={styles.title}>{t("stats.title")}</Text>
 
         <View style={styles.cardsRow}>
@@ -157,8 +157,7 @@ export function StatsScreen() {
             </View>
           ))
         )}
-      </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 

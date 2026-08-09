@@ -154,6 +154,8 @@ export default {
     ingredientName: "Naziv (npr. mleko)",
     amount: "Količina",
     compute: "🧮 Izračunaj nutricione vrednosti iz sastojaka",
+    manualMacros: "Ručni makroi",
+    macrosPer100: "Unesi nutricione vrednosti na 100g (za sastojke koji nisu u našoj bazi):",
     imageUrl: "URL slike (opciono)",
     instructions: "Priprema (jedan korak po redu)",
     paste: "📋 Zalepi recept",
