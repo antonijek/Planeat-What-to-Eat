@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
+import { Screen } from "../components/Screen";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -47,7 +48,7 @@ export function HistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <FlatList
         data={days}
         keyExtractor={(d) => d.dateKey}
@@ -64,7 +65,6 @@ export function HistoryScreen() {
             </Pressable>
           </View>
         }
-        contentContainerStyle={styles.content}
         ListEmptyComponent={
           <Text style={styles.empty}>
             {t("history.empty")}
@@ -95,7 +95,7 @@ export function HistoryScreen() {
           </View>
         )}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 

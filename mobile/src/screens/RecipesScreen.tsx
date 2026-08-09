@@ -14,6 +14,7 @@ import { RootStackParamList } from "../navigation/types";
 import { RecipeCard } from "../components/RecipeCard";
 import { IngredientInputChips } from "../components/IngredientInputChips";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
+import { Screen } from "../components/Screen";
 import { Recipe } from "../types";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
@@ -141,11 +142,10 @@ export function RecipesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <FlatList
         data={recipes}
         keyExtractor={(r) => r.id}
-        contentContainerStyle={styles.content}
         ListHeaderComponent={
           <View>
             {!query.trim() && <Text style={styles.title}>{t("recipes.title")}</Text>}
@@ -290,7 +290,7 @@ export function RecipesScreen() {
           <RecipeCard recipe={item} onPress={() => nav.navigate("RecipeDetail", { id: item.id })} />
         )}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 

@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useUserStore } from "../store/userStore";
+import { Screen } from "../components/Screen";
 import { PREMIUM_PRICES } from "../services/premiumService";
 import { colors } from "../constants/theme";
 
@@ -24,18 +25,18 @@ export function PremiumScreen() {
 
   if (isPremium) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <Screen scroll={false}>
         <View style={styles.center}>
           <Text style={styles.doneEmoji}>💎</Text>
           <Text style={styles.doneTitle}>{t("premium.alreadyPremium")}</Text>
           <Text style={styles.doneText}>{t("premium.enjoy")}</Text>
         </View>
-      </SafeAreaView>
+      </Screen>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <View style={styles.content}>
         <Text style={styles.badge}>{t("premium.badge")}</Text>
         <Text style={styles.title}>{t("premium.title")}</Text>
@@ -65,7 +66,7 @@ export function PremiumScreen() {
           <Text style={styles.back}>{t("premium.back")}</Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
 

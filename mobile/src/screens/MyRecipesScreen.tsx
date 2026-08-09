@@ -20,6 +20,7 @@ import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { AppModal } from "../components/AppModal";
 import { useTranslation } from "react-i18next";
+import { Screen } from "../components/Screen";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -73,7 +74,7 @@ export function MyRecipesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <FlatList
         data={filtered}
         keyExtractor={(r) => r.id}
@@ -100,7 +101,6 @@ export function MyRecipesScreen() {
             />
           </View>
         }
-        contentContainerStyle={styles.content}
         ListEmptyComponent={
           <Text style={styles.empty}>
             {query.trim() ? t("myRecipes.emptySearch") : t("myRecipes.empty")}
@@ -154,7 +154,7 @@ export function MyRecipesScreen() {
           {t("myRecipes.deleteConfirm", { name: deleteTarget?.name ?? "" })}
         </Text>
       </AppModal>
-    </SafeAreaView>
+    </Screen>
   );
 }
 

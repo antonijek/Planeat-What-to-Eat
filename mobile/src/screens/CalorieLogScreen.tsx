@@ -20,6 +20,7 @@ import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { CalorieGoalModal } from "../components/CalorieGoalModal";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
+import { Screen } from "../components/Screen";
 
 function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown>) => string): string {
   if (offset === 0) return t("tracker.today");
@@ -167,7 +168,7 @@ export function CalorieLogScreen() {
   const manualMode = !!name.trim() && !selectedSug && !lookup.found && suggestions.length === 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <FlatList
         data={totals.entries}
         keyExtractor={(e) => e.id}
@@ -294,7 +295,6 @@ export function CalorieLogScreen() {
             </Text>
           </View>
         }
-        contentContainerStyle={styles.content}
         contentInset={{ bottom: 40 }}
         ListEmptyComponent={<Text style={styles.empty}>{t("tracker.noEntries")}</Text>}
         renderItem={({ item }) => (
@@ -319,7 +319,7 @@ export function CalorieLogScreen() {
         onClose={() => setGoalModal(false)}
         onSave={saveGoal}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 

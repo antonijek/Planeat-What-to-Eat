@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, FlatList, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
+import { Screen } from "../components/Screen";
 import { RecipeCard } from "../components/RecipeCard";
 import { useUserStore } from "../store/userStore";
 import { recipeService } from "../services/recipeService";
@@ -20,12 +21,11 @@ export function FavoritesScreen() {
     .filter((r): r is NonNullable<typeof r> => Boolean(r));
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <FlatList
         data={recipes}
         keyExtractor={(r) => r.id}
         ListHeaderComponent={<Text style={styles.title}>{t("favorites.title", { count: recipes.length })}</Text>}
-        contentContainerStyle={styles.content}
         ListEmptyComponent={
           <Text style={styles.empty}>{t("favorites.empty")}</Text>
         }
@@ -33,13 +33,11 @@ export function FavoritesScreen() {
           <RecipeCard recipe={item} onPress={() => nav.navigate("RecipeDetail", { id: item.id })} />
         )}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 16, paddingBottom: 40 },
   title: { fontSize: 24, fontWeight: "800", color: colors.text, marginBottom: 8 },
   empty: { color: colors.textMuted, fontSize: 15, marginTop: 24, textAlign: "center" },
 });

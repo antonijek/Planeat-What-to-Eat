@@ -4,14 +4,14 @@ import { colors } from "../constants/theme";
 
 interface Props {
   children: React.ReactNode;
-  /** Da li je unutrašnjost skrolabilna (default true). */
+  /** true = ScrollView omotač; false = samo SafeAreaView + View (za FlatList ekrane). */
   scroll?: boolean;
-  /** Bonus stil na content kontejner. */
+  /** Bonus stil na sadržaj kontejner. */
   contentStyle?: object;
 }
 
 /**
- * Zajednički "screen" wrapper: SafeAreaView + (opciono) ScrollView sa
+ * Zajednički "screen" wrapper: SafeAreaView + (opciono) ScrollView/View sa
  * konzistentnim paddingom, bojom pozadine i razmakom na dnu.
  * Svi ekrani ga koriste da izgled bude isti.
  */

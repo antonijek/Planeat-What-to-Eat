@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
+import { Screen } from "../components/Screen";
 
 export function ShoppingScreen() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export function ShoppingScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <FlatList
           data={items}
           keyExtractor={(i) => i.id}
@@ -103,7 +104,6 @@ export function ShoppingScreen() {
               </View>
             </View>
           }
-          contentContainerStyle={styles.content}
           renderItem={({ item }) => (
             <Pressable
               style={[styles.item, item.isChecked && styles.itemDone]}
@@ -138,7 +138,7 @@ export function ShoppingScreen() {
           </View>
         </Modal>
       )}
-    </SafeAreaView>
+    </Screen>
   );
 }
 

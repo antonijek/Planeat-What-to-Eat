@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
+import { Screen } from "../components/Screen";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -84,7 +85,7 @@ export function PlanerScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <Screen scroll={false}>
       <FlatList
         data={DAYS}
         keyExtractor={(d, i) => String(i)}
@@ -127,7 +128,6 @@ export function PlanerScreen() {
             )}
           </View>
         }
-        contentContainerStyle={styles.content}
         renderItem={({ item, index }) => (
           <View style={styles.dayCard}>
             <Text style={styles.dayTitle}>{item}</Text>
@@ -222,7 +222,7 @@ export function PlanerScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
