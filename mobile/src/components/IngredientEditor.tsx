@@ -34,6 +34,7 @@ export function IngredientEditor({
   const [mp, setMp] = useState("");
   const [mc, setMc] = useState("");
   const [mf, setMf] = useState("");
+  const [manualReason, setManualReason] = useState<string | null>(null);
 
   function onIngNameChange(text: string) {
     setIngName(text);
@@ -62,28 +63,16 @@ export function IngredientEditor({
     setIngName("");
     setIngAmount("");
     setIngUnit("g");
-  }
-
-  function addWithManual() {
-    if (!ingName.trim()) {
-      onMessage(t("addRecipe.addIngredientName"));
-      return;
+    // Ako sastojak nije u bazi (nema sugestiju ni per100), ponudi ručni unos makroa.
+    if (!ingSug.length && !ing.per100) {
+      const idx = ingredients.length;
+      setEditIdx(idx);
+      setMkcal("");
+      setMp("");
+      setMc("");
+      setMf("");
+      setManualReason(t("addRecipe.notInDbManual"));
     }
-    const amount = parseFloat(ingAmount) || 100;
-    const ing: Ingredient = {
-      name: ingName.trim(),
-      amount,
-      unit: ingUnit.trim() || "g",
-      measure: "",
-      grams: gramsFromAmountAndUnit(amount, ingUnit),
-    };
-    const idx = ingredients.length;
-    onChangeIngredients([...ingredients, ing]);
-    setEditIdx(idx);
-    setMkcal("");
-    setMp("");
-    setMc("");
-    setMf("");
   }
 
   function removeIngredient(idx: number) {
@@ -215,9 +204,6 @@ export function IngredientEditor({
         <Pressable style={styles.ingAddBtn} onPress={addIngredient}>
           <Text style={styles.ingAddBtnText}>+</Text>
         </Pressable>
-        <Pressable style={[styles.ingAddBtn, styles.ingKcalBtn]} onPress={addWithManual}>
-          <Text style={styles.ingKcalBtnText}>kcal</Text>
-        </Pressable>
       </View>
       <View style={styles.unitChips}>
         {UNITS.map((u) => (
@@ -249,10 +235,11 @@ export function IngredientEditor({
       <AppModal
         visible={editIdx != null}
         title={t("addRecipe.manualMacros")}
-        onClose={() => setEditIdx(null)}
+        onClose={() => { setEditIdx(null); setManualReason(null); }}
         onSave={saveManual}
         saveLabel={t("common.save")}
       >
+        {manualReason ? <Text style={styles.manualReason}>{manualReason}</Text> : null}
         <Text style={appModalStyles.label}>{t("addRecipe.macrosPer100")}</Text>
         <View style={styles.ingAddRow}>
           <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mkcal} onChangeText={setMkcal} keyboardType="numeric" placeholder="kcal/100g" placeholderTextColor={colors.textFaint} />
@@ -276,6 +263,7 @@ export function IngredientEditor({
 const styles = StyleSheet.create({
   ingAddRow: { flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center", flexWrap: "wrap" },
   ingHint: { color: colors.textMuted, fontSize: 12, marginTop: 6 },
+  manualReason: { color: colors.textMuted, fontSize: 14, lineHeight: 20, marginBottom: 4 },
   ingNameInput: { flex: 1 },
   ingAmountInput: { width: 90 },
   unitChips: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
@@ -300,8 +288,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   ingAddBtnText: { color: "#fff", fontSize: 26, lineHeight: 30, fontWeight: "700" },
-  ingKcalBtn: { backgroundColor: colors.success, paddingHorizontal: 12 },
-  ingKcalBtnText: { color: "#fff", fontSize: 13, fontWeight: "700" },
   ingList: { marginTop: 10 },
   ingRow: {
     flexDirection: "row",

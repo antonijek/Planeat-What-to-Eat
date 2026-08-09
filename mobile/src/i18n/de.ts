@@ -162,6 +162,7 @@ export default {
     amount: "Menge",
     compute: "🧮 Nährwerte aus Zutaten berechnen",
     manualMacros: "Manuelle Makros",
+    notInDbManual: "Diese Zutat ist nicht in unserer Datenbank. Gib ihre Nährwerte pro 100g ein, damit sie berechnet werden kann:",
     macrosPer100: "Nährwerte pro 100g eingeben (für Zutaten, die nicht in unserer Datenbank sind):",
     imageUrl: "Bild-URL (optional)",
     instructions: "Zubereitung (ein Schritt pro Zeile)",

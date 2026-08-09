@@ -155,6 +155,7 @@ export default {
     amount: "Količina",
     compute: "🧮 Izračunaj nutricione vrednosti iz sastojaka",
     manualMacros: "Ručni makroi",
+    notInDbManual: "Ovaj sastojak nije u našoj bazi. Unesi njegove nutritivne vrednosti na 100g da bi se mogao izračunati:",
     macrosPer100: "Unesi nutricione vrednosti na 100g (za sastojke koji nisu u našoj bazi):",
     imageUrl: "URL slike (opciono)",
     instructions: "Priprema (jedan korak po redu)",

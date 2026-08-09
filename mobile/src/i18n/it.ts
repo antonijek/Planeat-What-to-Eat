@@ -155,6 +155,7 @@ export default {
     amount: "Quantità",
     compute: "🧮 Calcola valori nutri. dagli ingredienti",
     manualMacros: "Macro manuali",
+    notInDbManual: "Questo ingrediente non è nel nostro database. Inserisci i suoi valori per 100g affinché possa essere calcolato:",
     macrosPer100: "Inserisci i valori per 100g (per ingredienti non presenti nel nostro database):",
     imageUrl: "URL immagine (facoltativo)",
     instructions: "Preparazione (un passaggio per riga)",

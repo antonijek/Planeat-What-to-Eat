@@ -176,6 +176,7 @@ export default {
     amount: "Amount",
     compute: "🧮 Compute nutrition from ingredients",
     manualMacros: "Manual macros",
+    notInDbManual: "This ingredient isn't in our database. Enter its nutrition per 100g so it can be calculated:",
     macrosPer100: "Enter nutrition per 100g (for ingredients not in our database):",
     imageUrl: "Image URL (optional)",
     instructions: "Instructions (one step per line)",
