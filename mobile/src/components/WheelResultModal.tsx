@@ -44,6 +44,7 @@ export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
 
             <View style={styles.metaRow}>
               <Text style={styles.meta}>{r.category}</Text>
+              <Text style={styles.metaDivider}>·</Text>
               <Text style={styles.meta}>{formatDuration(r.prepTime)}</Text>
               {recipe.imageUrl ? (
                 <Image source={{ uri: recipe.imageUrl }} style={styles.thumb} />
@@ -108,17 +109,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 6,
   },
-  metaRow: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 14 },
+  metaRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 14 },
   meta: {
-    backgroundColor: colors.primaryLight,
-    color: colors.primary,
+    color: colors.textMuted,
     fontSize: 13,
     fontWeight: "600",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    overflow: "hidden",
   },
+  metaDivider: { color: colors.textFaint, fontSize: 13 },
   thumb: { width: 40, height: 40, borderRadius: 8 },
   noImg: { backgroundColor: colors.primaryLight, alignItems: "center", justifyContent: "center" },
   noImgText: { fontSize: 22 },

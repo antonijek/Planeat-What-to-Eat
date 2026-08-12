@@ -9,16 +9,21 @@ import {
   SafeAreaView,
   Modal,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../navigation/types";
 import { useShoppingStore } from "../store/shoppingStore";
 import { useUserStore } from "../store/userStore";
 import { planService } from "../services/planService";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
+import { ScreenMenu } from "../components/ScreenMenu";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
 
 export function ShoppingScreen() {
+  const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
   const { ingredient: ingredientLabel } = useTranslatedRecipe();
   const { items, load, toggle, remove, addManual, replaceMany, clearChecked } = useShoppingStore();
@@ -49,6 +54,9 @@ export function ShoppingScreen() {
             <View>
               <View style={styles.headerRow}>
                 <Text style={styles.title}>{t("shopping.title")}</Text>
+                <ScreenMenu navigate={nav.navigate} />
+              </View>
+              <View style={styles.planRow}>
                 <Pressable
                   style={styles.planBtn}
                   onPress={async () => {
@@ -151,6 +159,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: 8,
+  },
+  planRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 12,
   },
   planBtn: {
     backgroundColor: colors.primary,

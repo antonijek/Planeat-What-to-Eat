@@ -15,6 +15,7 @@ import { RecipeCard } from "../components/RecipeCard";
 import { IngredientInputChips } from "../components/IngredientInputChips";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
+import { ScreenMenu } from "../components/ScreenMenu";
 import { Recipe } from "../types";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
@@ -148,7 +149,12 @@ export function RecipesScreen() {
         keyExtractor={(r) => r.id}
         ListHeaderComponent={
           <View>
-            {!query.trim() && <Text style={styles.title}>{t("recipes.title")}</Text>}
+            {!query.trim() && (
+              <View style={styles.titleRow}>
+                <Text style={styles.title}>{t("recipes.title")}</Text>
+                <ScreenMenu navigate={nav.navigate} />
+              </View>
+            )}
             <View style={[styles.searchRow, compact && styles.searchRowCompact]}>
               <TextInput
                 style={styles.search}
@@ -318,6 +324,12 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   title: { fontSize: 24, fontWeight: "800", color: colors.text, marginBottom: 12 },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 4,
+  },
   count: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
   searchRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   searchRowCompact: { marginTop: 12 },

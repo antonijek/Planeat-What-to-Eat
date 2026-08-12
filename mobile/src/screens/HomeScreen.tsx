@@ -21,12 +21,11 @@ import { premiumService } from "../services/premiumService";
 import { recipeService } from "../services/recipeService";
 import { MealMomentPicker } from "../components/MealMomentPicker";
 import { WheelResultModal } from "../components/WheelResultModal";
-import { HomeMenu } from "../components/HomeMenu";
+import { ScreenMenu } from "../components/ScreenMenu";
 import { recipesForMoment } from "../constants/mealMoments";
 import { Recipe } from "../types";
 import { parseIngredientInput } from "../utils/ingredients";
 import { IngredientInputChips } from "../components/IngredientInputChips";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -42,7 +41,6 @@ export function HomeScreen() {
   const [result, setResult] = useState<Recipe | null>(null);
   const [haveIngredients, setHaveIngredients] = useState<string[]>([]);
   const [haveInput, setHaveInput] = useState("");
-  const [menuVisible, setMenuVisible] = useState(false);
 
   const filteredRecipes = useMemo(() => {
     let list = recipesForMoment(recipes, moment) as Recipe[];
@@ -99,9 +97,7 @@ export function HomeScreen() {
               </Text>
             </View>
             <Text style={styles.spinCount}>{t("home.spinLeft", { count: spinCount })}</Text>
-            <Pressable style={styles.menuBtn} onPress={() => setMenuVisible(true)} hitSlop={8}>
-              <MaterialCommunityIcons name="menu" size={24} color={colors.text} />
-            </Pressable>
+            <ScreenMenu navigate={nav.navigate} style={styles.menuBtn} />
           </View>
 
           <View style={styles.haveWrap}>
@@ -173,11 +169,6 @@ export function HomeScreen() {
           setResult(null);
         }}
         onSpinAgain={() => setResult(null)}
-      />
-      <HomeMenu
-        visible={menuVisible}
-        onClose={() => setMenuVisible(false)}
-        navigate={nav.navigate}
       />
     </Screen>
   );
