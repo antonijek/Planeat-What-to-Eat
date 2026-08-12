@@ -38,6 +38,7 @@ export default {
     spinLeft: "{{count}}× 🎡",
     noRecipes: "Nessuna ricetta in questa categoria.",
     spinsLeftToday: "Giri rimasti oggi: {{count}}",
+    menuTitle: "Menu",
   },
   mealMoment: { all: "Tutti", breakfast: "Colazione", lunch: "Pranzo", dinner: "Cena", dessert: "Dessert", snack: "Spuntino" },
   recipes: {

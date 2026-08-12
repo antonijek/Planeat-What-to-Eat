@@ -22,8 +22,19 @@ export const resources = {
 export type LanguageCode = keyof typeof resources;
 export type TranslationKey = typeof en;
 
+/** Jezici koji su dostupni u UI (kod + prikazni naziv). Jedini izvor istine. */
+export const LANGUAGES: { code: LanguageCode; label: string }[] = [
+  { code: "en", label: "English" },
+  { code: "de", label: "Deutsch" },
+  { code: "fr", label: "Français" },
+  { code: "it", label: "Italiano" },
+  { code: "es", label: "Español" },
+  { code: "pt", label: "Português" },
+  { code: "sr", label: "Srpski" },
+];
+
 const native = getLocales()[0]?.languageCode;
-const supported: LanguageCode[] = ["en", "de", "fr", "it", "es", "pt", "sr"];
+const supported: LanguageCode[] = LANGUAGES.map((l) => l.code);
 
 i18n.use(initReactI18next).init({
   resources,

@@ -21,6 +21,7 @@ import { premiumService } from "../services/premiumService";
 import { recipeService } from "../services/recipeService";
 import { MealMomentPicker } from "../components/MealMomentPicker";
 import { WheelResultModal } from "../components/WheelResultModal";
+import { HomeMenu } from "../components/HomeMenu";
 import { recipesForMoment } from "../constants/mealMoments";
 import { Recipe } from "../types";
 import { parseIngredientInput } from "../utils/ingredients";
@@ -41,6 +42,7 @@ export function HomeScreen() {
   const [result, setResult] = useState<Recipe | null>(null);
   const [haveIngredients, setHaveIngredients] = useState<string[]>([]);
   const [haveInput, setHaveInput] = useState("");
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const filteredRecipes = useMemo(() => {
     let list = recipesForMoment(recipes, moment) as Recipe[];
@@ -97,6 +99,9 @@ export function HomeScreen() {
               </Text>
             </View>
             <Text style={styles.spinCount}>{t("home.spinLeft", { count: spinCount })}</Text>
+            <Pressable style={styles.menuBtn} onPress={() => setMenuVisible(true)} hitSlop={8}>
+              <MaterialCommunityIcons name="menu" size={24} color={colors.text} />
+            </Pressable>
           </View>
 
           <View style={styles.haveWrap}>
@@ -159,33 +164,6 @@ export function HomeScreen() {
               <Text style={styles.lastText}>{t("home.lastPick")}</Text>
             </Pressable>
           ) : null}
-
-          <View style={styles.shortcuts}>
-            <Pressable style={styles.shortcut} onPress={() => nav.navigate("CalorieLog")}>
-              <MaterialCommunityIcons name="food-apple-outline" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutTracker")}</Text>
-            </Pressable>
-            <Pressable style={styles.shortcut} onPress={() => nav.navigate("MyRecipes")}>
-              <MaterialCommunityIcons name="chef-hat" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutRecipes")}</Text>
-            </Pressable>
-            <Pressable style={styles.shortcut} onPress={() => nav.navigate("Planer")}>
-              <MaterialCommunityIcons name="calendar-month" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutPlaner")}</Text>
-            </Pressable>
-            <Pressable style={styles.shortcut} onPress={() => nav.navigate("History")}>
-              <MaterialCommunityIcons name="history" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutCooked")}</Text>
-            </Pressable>
-            <Pressable style={styles.shortcut} onPress={() => nav.navigate("Stats")}>
-              <MaterialCommunityIcons name="chart-bar" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutStats")}</Text>
-            </Pressable>
-            <Pressable style={styles.shortcut} onPress={() => nav.navigate("About")}>
-              <MaterialCommunityIcons name="information-outline" size={26} color={colors.primary} />
-              <Text style={styles.shortcutLabel} numberOfLines={2}>{t("home.shortcutAbout")}</Text>
-            </Pressable>
-          </View>
         </View>
 
       <WheelResultModal
@@ -195,6 +173,11 @@ export function HomeScreen() {
           setResult(null);
         }}
         onSpinAgain={() => setResult(null)}
+      />
+      <HomeMenu
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        navigate={nav.navigate}
       />
     </Screen>
   );
@@ -214,6 +197,16 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: "800", color: colors.text },
   sub: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
   spinCount: { fontSize: 13, fontWeight: "600", color: colors.primary },
+  menuBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   wheelArea: {
     flex: 1,
     minHeight: 280,
@@ -271,31 +264,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginTop: 8,
     textAlign: "center",
-  },
-  shortcuts: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "center",
-    marginTop: 16,
-    alignSelf: "stretch",
-  },
-  shortcut: {
-    width: 86,
-    paddingVertical: 10,
-    borderRadius: 14,
-    backgroundColor: colors.card,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  shortcutLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: "600",
-    marginTop: 4,
-    textAlign: "center",
-    paddingHorizontal: 4,
   },
 });
 

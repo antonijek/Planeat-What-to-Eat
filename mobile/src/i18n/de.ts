@@ -38,6 +38,7 @@ export default {
     spinLeft: "{{count}}× 🎡",
     noRecipes: "Keine Rezepte in dieser Kategorie.",
     spinsLeftToday: "Verbleibende Drehungen heute: {{count}}",
+    menuTitle: "Menü",
   },
   mealMoment: {
     all: "Alle",

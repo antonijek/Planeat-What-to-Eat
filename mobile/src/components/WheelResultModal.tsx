@@ -13,6 +13,7 @@ import { getRecipeEmoji } from "../utils/emoji";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 interface Props {
   recipe: Recipe | null;
@@ -34,6 +35,9 @@ export function WheelResultModal({ recipe, onView, onSpinAgain }: Props) {
       {recipe && r && (
         <View style={styles.backdrop}>
           <View style={styles.card}>
+            <Pressable style={styles.closeBtn} onPress={onSpinAgain} hitSlop={8}>
+              <MaterialCommunityIcons name="close" size={22} color={colors.textMuted} />
+            </Pressable>
             <Text style={styles.emoji}>{getRecipeEmoji(recipe.name)}</Text>
             <Text style={styles.title}>🎉 {t("wheelResult.yourMeal")}:</Text>
             <Text style={styles.name}>{r.name}</Text>
@@ -83,6 +87,17 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 8,
+  },
+  closeBtn: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
   },
   emoji: { fontSize: 56 },
   title: { fontSize: 15, color: colors.textMuted, marginTop: 12 },

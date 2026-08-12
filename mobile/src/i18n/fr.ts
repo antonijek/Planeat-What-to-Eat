@@ -38,6 +38,7 @@ export default {
     spinLeft: "{{count}}× 🎡",
     noRecipes: "Aucune recette dans cette catégorie.",
     spinsLeftToday: "Tours restants aujourd'hui : {{count}}",
+    menuTitle: "Menu",
   },
   mealMoment: { all: "Tout", breakfast: "Petit-déj", lunch: "Déjeuner", dinner: "Dîner", dessert: "Dessert", snack: "En-cas" },
   recipes: {

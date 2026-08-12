@@ -38,6 +38,7 @@ export default {
     spinLeft: "{{count}}× 🎡",
     noRecipes: "Nema recepata u ovoj kategoriji.",
     spinsLeftToday: "Preostalo okretanja danas: {{count}}",
+    menuTitle: "Meni",
   },
   mealMoment: { all: "Sve", breakfast: "Doručak", lunch: "Ručak", dinner: "Večera", dessert: "Desert", snack: "Užina" },
   recipes: {

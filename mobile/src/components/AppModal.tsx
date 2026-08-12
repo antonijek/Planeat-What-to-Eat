@@ -8,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -44,7 +45,12 @@ export function AppModal({
         behavior="padding"
       >
         <View style={styles.modal}>
-          <Text style={styles.title}>{title}</Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>{title}</Text>
+            <Pressable style={styles.closeBtn} onPress={onClose} hitSlop={8}>
+              <MaterialCommunityIcons name="close" size={22} color={colors.textMuted} />
+            </Pressable>
+          </View>
           <ScrollView
             keyboardShouldPersistTaps="handled"
             style={styles.scroll}
@@ -103,7 +109,22 @@ const styles = StyleSheet.create({
   },
   scroll: { flexGrow: 1, flexShrink: 1 },
   scrollContent: { paddingBottom: 24 },
-  title: { fontSize: 20, fontWeight: "800", color: colors.text, marginBottom: 16, flexShrink: 0 },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  title: { fontSize: 20, fontWeight: "800", color: colors.text, flexShrink: 1 },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
   btnRow: { flexDirection: "row", gap: 10, marginTop: 12, marginBottom: 4, flexShrink: 0 },
   deleteBtn: {
     width: 48,

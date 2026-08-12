@@ -46,6 +46,7 @@ export default {
     spinLeft: "{{count}}× 🎡",
     noRecipes: "No recipes in this category.",
     spinsLeftToday: "Spins left today: {{count}}",
+    menuTitle: "Menu",
   },
   mealMoment: {
     all: "All",
