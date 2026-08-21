@@ -17,7 +17,7 @@ import { myRecipesService } from "../services/myRecipesService";
 import { useUserStore } from "../store/userStore";
 import { isFeatureUnlocked } from "../services/premiumService";
 import { Recipe } from "../types";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { AppModal } from "../components/AppModal";
 import { useTranslation } from "react-i18next";
@@ -28,6 +28,8 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 export function MyRecipesScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { isPremium, trialActive } = useUserStore();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [addOpen, setAddOpen] = useState(false);
@@ -151,7 +153,7 @@ export function MyRecipesScreen() {
         onSave={doDelete}
         saveLabel={t("myRecipes.delete")}
       >
-        <Text style={{ color: colors.text }}>
+        <Text style={{ color: lightColors.text }}>
           {t("myRecipes.deleteConfirm", { name: deleteTarget?.name ?? "" })}
         </Text>
       </AppModal>
@@ -159,8 +161,9 @@ export function MyRecipesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
   content: { padding: 16, paddingBottom: 60 },
   headerRow: {
     flexDirection: "row",
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderWidth: 1,
     borderColor: colors.border,
+    color: colors.text,
     marginBottom: 6,
   },
   addBtn: {
@@ -207,4 +211,4 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   actionText: { fontSize: 15 },
-});
+  });

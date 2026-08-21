@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { RootStackParamList } from "../navigation/types";
 import { PersonStepper } from "../components/PersonStepper";
 import { IngredientList } from "../components/IngredientList";
 import { NutritionTable } from "../components/NutritionTable";
+import { RatingStars } from "../components/RatingStars";
 import { EditRecipeModal } from "../components/EditRecipeModal";
 import { AppModal } from "../components/AppModal";
 import { Screen } from "../components/Screen";
@@ -29,7 +30,7 @@ import { useRecipeStore } from "../store/recipeStore";
 import { Recipe } from "../types";
 import { formatDuration, perServingRound } from "../utils/helpers";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
 type Route = RouteProp<RootStackParamList, "RecipeDetail">;
@@ -39,8 +40,10 @@ export function RecipeDetailScreen() {
   const route = useRoute<Route>();
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { id } = route.params;
-  const { isPremium, trialActive, toggleFavorite, favorites } = useUserStore();
+  const { isPremium, trialActive, toggleFavorite, favorites, rate, ratings } = useUserStore();
   const { translate } = useTranslatedRecipe();
   const recipeStoreGetById = useRecipeStore((s) => s.getById);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -178,6 +181,8 @@ export function RecipeDetailScreen() {
               </Text>
             </View>
           </View>
+
+          <RatingStars value={ratings[id]} onRate={(score) => rate(id, score)} />
 
           <Pressable
             style={[styles.cookedBtn, cooked && styles.cookedBtnOn]}
@@ -324,7 +329,7 @@ export function RecipeDetailScreen() {
         onSave={() => setTrackerMsg(null)}
         saveLabel="OK"
       >
-        <Text style={{ color: colors.text }}>{trackerMsg}</Text>
+        <Text style={{ color: lightColors.text }}>{trackerMsg}</Text>
       </AppModal>
 
       <AppModal
@@ -334,7 +339,7 @@ export function RecipeDetailScreen() {
         onSave={() => setPlanMsg(null)}
         saveLabel="OK"
       >
-        <Text style={{ color: colors.text }}>{planMsg}</Text>
+        <Text style={{ color: lightColors.text }}>{planMsg}</Text>
       </AppModal>
 
       <AppModal
@@ -355,33 +360,33 @@ export function RecipeDetailScreen() {
         }}
         saveLabel={t("recipeDetail.planToAdd")}
       >
-        <Text style={styles.planSectionLabel}>{t("recipeDetail.planDay")}</Text>
-        <View style={styles.planDayRow}>
+        <Text style={modalStyles.planSectionLabel}>{t("recipeDetail.planDay")}</Text>
+        <View style={modalStyles.planDayRow}>
           {["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map((d, i) => (
             <Pressable
               key={d}
-              style={[styles.planDayChip, planDay === i && styles.planDayChipOn]}
+              style={[modalStyles.planDayChip, planDay === i && modalStyles.planDayChipOn]}
               onPress={() => setPlanDay(i)}
             >
-              <Text style={[styles.planDayText, planDay === i && styles.planDayTextOn]}>{t(`planer.${d}`)}</Text>
+              <Text style={[modalStyles.planDayText, planDay === i && modalStyles.planDayTextOn]}>{t(`planer.${d}`)}</Text>
             </Pressable>
           ))}
         </View>
-        <Text style={styles.planSectionLabel}>{t("recipeDetail.planMeal")}</Text>
-        <View style={styles.planDayRow}>
+        <Text style={modalStyles.planSectionLabel}>{t("recipeDetail.planMeal")}</Text>
+        <View style={modalStyles.planDayRow}>
           <Pressable
-            style={[styles.planMealBtn, planMeal === "lunch" && styles.planMealBtnOn]}
+            style={[modalStyles.planMealBtn, planMeal === "lunch" && modalStyles.planMealBtnOn]}
             onPress={() => setPlanMeal("lunch")}
           >
-            <Text style={[styles.planMealText, planMeal === "lunch" && styles.planMealTextOn]}>
+            <Text style={[modalStyles.planMealText, planMeal === "lunch" && modalStyles.planMealTextOn]}>
               {t("mealMoment.lunch")}
             </Text>
           </Pressable>
           <Pressable
-            style={[styles.planMealBtn, planMeal === "dinner" && styles.planMealBtnOn]}
+            style={[modalStyles.planMealBtn, planMeal === "dinner" && modalStyles.planMealBtnOn]}
             onPress={() => setPlanMeal("dinner")}
           >
-            <Text style={[styles.planMealText, planMeal === "dinner" && styles.planMealTextOn]}>
+            <Text style={[modalStyles.planMealText, planMeal === "dinner" && modalStyles.planMealTextOn]}>
               {t("mealMoment.dinner")}
             </Text>
           </Pressable>
@@ -394,8 +399,8 @@ export function RecipeDetailScreen() {
           if (!existing) return null;
           const existingRecipe = recipeService.getById(existing.recipeId);
           return (
-            <View style={styles.planOccupied}>
-              <Text style={styles.planOccupiedText}>
+            <View style={modalStyles.planOccupied}>
+              <Text style={modalStyles.planOccupiedText}>
                 {t("recipeDetail.planOccupied", {
                   name: existingRecipe ? translate(existingRecipe).name : "",
                 })}
@@ -408,137 +413,174 @@ export function RecipeDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  image: { width: "100%", height: 240, backgroundColor: colors.imageBg },
-  noImg: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.primaryLight,
-  },
-  noImgText: { fontSize: 72, opacity: 0.6 },
-  body: { padding: 20 },
-  titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  title: { fontSize: 24, fontWeight: "800", color: colors.text, flex: 1, marginRight: 8 },
-  editBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: colors.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  editBtnText: { fontSize: 16 },
-  metaRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 },
-  chip: { backgroundColor: colors.primaryLight, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 6 },
-  chipText: { color: colors.primary, fontSize: 12, fontWeight: "600" },
-  cookedBtn: {
-    marginTop: 14,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    backgroundColor: colors.card,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  cookedBtnOn: { backgroundColor: colors.primary },
-  cookedBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
-  cookedBtnTextOn: { color: "#fff" },
-  calorieLogBtn: {
-    marginTop: 10,
-    borderRadius: 12,
-    backgroundColor: colors.primaryLight,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  calorieLogBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
-  planBtn: {
-    marginTop: 10,
-    borderRadius: 12,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  planBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
-  planSectionLabel: { fontSize: 14, fontWeight: "700", color: colors.text, marginTop: 10, marginBottom: 6 },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    image: { width: "100%", height: 240, backgroundColor: colors.imageBg },
+    noImg: {
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.primaryLight,
+    },
+    noImgText: { fontSize: 72, opacity: 0.6 },
+    body: { padding: 20 },
+    titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+    title: { fontSize: 24, fontWeight: "800", color: colors.text, flex: 1, marginRight: 8 },
+    editBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: colors.primaryLight,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 10,
+    },
+    editBtnText: { fontSize: 16 },
+    metaRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 },
+    chip: { backgroundColor: colors.primaryLight, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 6 },
+    chipText: { color: colors.primary, fontSize: 12, fontWeight: "600" },
+    cookedBtn: {
+      marginTop: 14,
+      borderRadius: 12,
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      backgroundColor: colors.card,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    cookedBtnOn: { backgroundColor: colors.primary },
+    cookedBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
+    cookedBtnTextOn: { color: "#fff" },
+    calorieLogBtn: {
+      marginTop: 10,
+      borderRadius: 12,
+      backgroundColor: colors.primaryLight,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    calorieLogBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
+    planBtn: {
+      marginTop: 10,
+      borderRadius: 12,
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    planBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
+    planSectionLabel: { fontSize: 14, fontWeight: "700", color: colors.text, marginTop: 10, marginBottom: 6 },
+    planDayRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+    planDayChip: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    planDayChipOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+    planDayText: { fontSize: 13, fontWeight: "600", color: colors.text },
+    planDayTextOn: { color: "#fff" },
+    planMealBtn: {
+      flex: 1,
+      paddingVertical: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.card,
+      alignItems: "center",
+    },
+    planMealBtnOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+    planMealText: { fontSize: 14, fontWeight: "600", color: colors.text },
+    planMealTextOn: { color: "#fff" },
+    planOccupied: {
+      marginTop: 12,
+      backgroundColor: colors.primaryLight,
+      borderRadius: 10,
+      padding: 10,
+    },
+    planOccupiedText: { color: colors.text, fontSize: 13, lineHeight: 18 },
+    section: { fontSize: 18, fontWeight: "700", color: colors.text, marginTop: 20, marginBottom: 8 },
+    step: { flexDirection: "row", marginBottom: 12, alignItems: "flex-start" },
+    stepNum: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 10,
+    },
+    stepNumText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+    stepText: { flex: 1, color: colors.text, fontSize: 15, lineHeight: 22 },
+    resetBtn: {
+      marginTop: 24,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
+    resetText: { color: colors.primary, fontWeight: "700" },
+    premiumBtn: {
+      marginTop: 12,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
+    premiumText: { color: "#fff", fontWeight: "700" },
+    similarBlock: { marginTop: 8 },
+    similarRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 10,
+      marginTop: 8,
+    },
+    similarThumb: { width: 56, height: 56, borderRadius: 8, backgroundColor: colors.card },
+    similarPlaceholder: { backgroundColor: colors.placeholderBg },
+    similarBody: { flex: 1, marginLeft: 12 },
+    similarName: { fontSize: 15, fontWeight: "600", color: colors.text },
+    similarMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  });
+
+// Plan modal je uvek svetao (modali se ne prilagođavaju tamnoj temi).
+const modalStyles = StyleSheet.create({
+  planSectionLabel: { fontSize: 14, fontWeight: "700", color: lightColors.text, marginTop: 10, marginBottom: 6 },
   planDayRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   planDayChip: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
+    borderColor: lightColors.border,
+    backgroundColor: lightColors.card,
   },
-  planDayChipOn: { backgroundColor: colors.primary, borderColor: colors.primary },
-  planDayText: { fontSize: 13, fontWeight: "600", color: colors.text },
+  planDayChipOn: { backgroundColor: lightColors.primary, borderColor: lightColors.primary },
+  planDayText: { fontSize: 13, fontWeight: "600", color: lightColors.text },
   planDayTextOn: { color: "#fff" },
   planMealBtn: {
     flex: 1,
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
+    borderColor: lightColors.border,
+    backgroundColor: lightColors.card,
     alignItems: "center",
   },
-  planMealBtnOn: { backgroundColor: colors.primary, borderColor: colors.primary },
-  planMealText: { fontSize: 14, fontWeight: "600", color: colors.text },
+  planMealBtnOn: { backgroundColor: lightColors.primary, borderColor: lightColors.primary },
+  planMealText: { fontSize: 14, fontWeight: "600", color: lightColors.text },
   planMealTextOn: { color: "#fff" },
   planOccupied: {
     marginTop: 12,
-    backgroundColor: colors.primaryLight,
+    backgroundColor: lightColors.primaryLight,
     borderRadius: 10,
     padding: 10,
   },
-  planOccupiedText: { color: colors.text, fontSize: 13, lineHeight: 18 },
-  section: { fontSize: 18, fontWeight: "700", color: colors.text, marginTop: 20, marginBottom: 8 },
-  step: { flexDirection: "row", marginBottom: 12, alignItems: "flex-start" },
-  stepNum: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  stepNumText: { color: "#fff", fontWeight: "700", fontSize: 13 },
-  stepText: { flex: 1, color: colors.text, fontSize: 15, lineHeight: 22 },
-  resetBtn: {
-    marginTop: 24,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  resetText: { color: colors.primary, fontWeight: "700" },
-  premiumBtn: {
-    marginTop: 12,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  premiumText: { color: "#fff", fontWeight: "700" },
-  similarBlock: { marginTop: 8 },
-  similarRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 10,
-    marginTop: 8,
-  },
-  similarThumb: { width: 56, height: 56, borderRadius: 8, backgroundColor: colors.card },
-  similarPlaceholder: { backgroundColor: colors.placeholderBg },
-  similarBody: { flex: 1, marginLeft: 12 },
-  similarName: { fontSize: 15, fontWeight: "600", color: colors.text },
-  similarMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  planOccupiedText: { color: lightColors.text, fontSize: 13, lineHeight: 18 },
 });

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { RootStackParamList } from "../navigation/types";
 import { HomeMenu } from "./HomeMenu";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -19,6 +19,8 @@ interface Props {
  * Čuva interno stanje otvorenosti da ga svaki ekran ne mora ponavljati.
  */
 export function ScreenMenu({ navigate, style }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -30,15 +32,16 @@ export function ScreenMenu({ navigate, style }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  btn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    btn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  });

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 interface Props {
   value: string;
@@ -26,6 +26,8 @@ export function IngredientInputChips({
   emptyHint,
 }: Props) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const ph = placeholder ?? t("recipes.havePlaceholder");
   return (
     <View style={styles.container}>
@@ -59,34 +61,36 @@ export function IngredientInputChips({
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  inputRow: { flexDirection: "row", gap: 8, marginTop: 10 },
-  input: {
-    flex: 1,
-    backgroundColor: colors.card,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  add: {
-    width: 44,
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addText: { color: "#fff", fontSize: 22, lineHeight: 26 },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 },
-  chip: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  chipText: { color: colors.text, fontWeight: "600" },
-  hint: { fontSize: 12, color: colors.textMuted, marginTop: 8 },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    inputRow: { flexDirection: "row", gap: 8, marginTop: 10 },
+    input: {
+      flex: 1,
+      backgroundColor: colors.card,
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      color: colors.text,
+    },
+    add: {
+      width: 44,
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    addText: { color: "#fff", fontSize: 22, lineHeight: 26 },
+    chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 },
+    chip: {
+      backgroundColor: colors.primaryLight,
+      borderRadius: 14,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    chipText: { color: colors.text, fontWeight: "600" },
+    hint: { fontSize: 12, color: colors.textMuted, marginTop: 8 },
+  });

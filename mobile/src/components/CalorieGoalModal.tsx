@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { calculateMifflinGoal, ActivityLevel, CalorieGoal } from "../services/calorieCalculator";
-import { AppModal, appModalStyles } from "./AppModal";
-import { colors } from "../constants/theme";
+import { AppModal, makeAppModalStyles } from "./AppModal";
+import { lightColors, ThemeColors } from "../constants/theme";
 
 interface Props {
   visible: boolean;
@@ -29,6 +29,9 @@ const GOALS: [CalorieGoal, string][] = [
 /** Modal za podešavanje dnevnog cilja kalorija (ručno ili Mifflin-St Jeor). */
 export function CalorieGoalModal({ visible, initialGoal, onClose, onSave }: Props) {
   const { t } = useTranslation();
+  const colors = lightColors;
+  const styles = useMemo(() => createStyles(colors), []);
+  const appModalStyles = useMemo(() => makeAppModalStyles(colors), []);
   const [manualGoal, setManualGoal] = useState("");
   const [genPreference, setGenPreference] = useState<"male" | "female">("male");
   const [pKg, setPKg] = useState("");
@@ -135,37 +138,38 @@ export function CalorieGoalModal({ visible, initialGoal, onClose, onSave }: Prop
   );
 }
 
-const styles = StyleSheet.create({
-  goalSection: { fontSize: 15, fontWeight: "700", color: colors.text, marginTop: 20, marginBottom: 4 },
-  genderRow: { flexDirection: "row", gap: 8, marginTop: 6 },
-  genderBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-  },
-  genderBtnActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  genderText: { color: colors.text, fontWeight: "600" },
-  genderTextActive: { color: colors.primary, fontWeight: "700" },
-  activityRow: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: 6,
-  },
-  activityText: { color: colors.text, fontSize: 14 },
-  activeText: { color: colors.primary, fontWeight: "700" },
-  calcBtn: {
-    marginTop: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  calcBtnText: { color: "#fff", fontWeight: "700" },
-  mifflinResult: { marginTop: 10, color: colors.success, fontSize: 14, fontWeight: "700", textAlign: "center" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    goalSection: { fontSize: 15, fontWeight: "700", color: colors.text, marginTop: 20, marginBottom: 4 },
+    genderRow: { flexDirection: "row", gap: 8, marginTop: 6 },
+    genderBtn: {
+      flex: 1,
+      paddingVertical: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+    },
+    genderBtnActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
+    genderText: { color: colors.text, fontWeight: "600" },
+    genderTextActive: { color: colors.primary, fontWeight: "700" },
+    activityRow: {
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginTop: 6,
+    },
+    activityText: { color: colors.text, fontSize: 14 },
+    activeText: { color: colors.primary, fontWeight: "700" },
+    calcBtn: {
+      marginTop: 16,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    calcBtnText: { color: "#fff", fontWeight: "700" },
+    mifflinResult: { marginTop: 10, color: colors.success, fontSize: 14, fontWeight: "700", textAlign: "center" },
+  });

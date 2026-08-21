@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { lightColors, ThemeColors } from "../constants/theme";
 
 interface Props {
   visible: boolean;
@@ -27,6 +27,7 @@ interface Props {
 /**
  * Zajednički modal šablon za celu aplikaciju.
  * Uvek isti izgled: pozadina, zaglavlje, sadržaj i red dugmadi.
+ * Modali su UVEK svetli (nezavisno od teme) — lakše za čitanje sadržaja.
  */
 export function AppModal({
   visible,
@@ -40,6 +41,8 @@ export function AppModal({
   children,
 }: Props) {
   const { t } = useTranslation();
+  const colors = lightColors;
+  const styles = useMemo(() => createStyles(colors), []);
   const save = saveLabel ?? t("common.save");
   const cancel = cancelLabel ?? t("common.cancel");
   return (
@@ -84,74 +87,78 @@ export function AppModal({
   );
 }
 
-export const appModalStyles = StyleSheet.create({
-  label: { fontSize: 13, color: colors.textMuted, fontWeight: "600", marginTop: 12 },
-  input: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: 6,
-  },
-  multiline: { minHeight: 80, textAlignVertical: "top" },
-});
+export function makeAppModalStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    label: { fontSize: 13, color: colors.textMuted, fontWeight: "600", marginTop: 12 },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      color: colors.text,
+      marginTop: 6,
+    },
+    multiline: { minHeight: 80, textAlignVertical: "top" },
+  });
+}
 
-const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
-  modal: {
-    backgroundColor: colors.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    alignSelf: "flex-end",
-    width: "100%",
-    maxHeight: "98%",
-    flexShrink: 1,
-  },
-  scroll: { flexGrow: 1, flexShrink: 1 },
-  scrollContent: { paddingBottom: 24 },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  title: { fontSize: 20, fontWeight: "800", color: colors.text, flexShrink: 1 },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
-  },
-  btnRow: { flexDirection: "row", gap: 10, marginTop: 12, marginBottom: 4, flexShrink: 0 },
-  deleteBtn: {
-    width: 48,
-    backgroundColor: colors.dangerLight,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deleteText: { fontSize: 18 },
-  cancelBtn: {
-    flex: 1,
-    backgroundColor: colors.border,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  cancelText: { color: colors.text, fontWeight: "600" },
-  saveBtn: {
-    flex: 2,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  saveText: { color: "#fff", fontWeight: "700" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+    modal: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      alignSelf: "flex-end",
+      width: "100%",
+      maxHeight: "98%",
+      flexShrink: 1,
+    },
+    scroll: { flexGrow: 1, flexShrink: 1 },
+    scrollContent: { paddingBottom: 24 },
+    titleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 16,
+    },
+    title: { fontSize: 20, fontWeight: "800", color: colors.text, flexShrink: 1 },
+    closeBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+      marginLeft: 12,
+    },
+    btnRow: { flexDirection: "row", gap: 10, marginTop: 12, marginBottom: 4, flexShrink: 0 },
+    deleteBtn: {
+      width: 48,
+      backgroundColor: colors.dangerLight,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    deleteText: { fontSize: 18 },
+    cancelBtn: {
+      flex: 1,
+      backgroundColor: colors.border,
+      borderRadius: 12,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    cancelText: { color: colors.text, fontWeight: "600" },
+    saveBtn: {
+      flex: 2,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    saveText: { color: "#fff", fontWeight: "700" },
+  });

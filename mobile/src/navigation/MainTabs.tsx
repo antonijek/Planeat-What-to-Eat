@@ -7,12 +7,13 @@ import { RecipesScreen } from "../screens/RecipesScreen";
 import { FavoritesScreen } from "../screens/FavoritesScreen";
 import { ShoppingScreen } from "../screens/ShoppingScreen";
 import { MainTabParamList } from "./types";
-import { colors } from "../constants/theme";
+import { useTheme } from "../constants/theme";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export function MainTabs() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

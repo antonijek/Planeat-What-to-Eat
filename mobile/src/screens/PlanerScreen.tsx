@@ -18,7 +18,7 @@ import { useUserStore } from "../store/userStore";
 import { isFeatureUnlocked } from "../services/premiumService";
 import { MealPlanEntry } from "../types";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
@@ -33,6 +33,8 @@ const MEAL_TYPES: { key: "lunch" | "dinner"; labelKey: string }[] = [
 export function PlanerScreen() {
   const nav = useNavigation<Nav>();
   const { t, i18n } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { translate } = useTranslatedRecipe();
   const { isPremium, trialActive } = useUserStore();
   const [plan, setPlan] = useState<MealPlanEntry[]>([]);
@@ -185,17 +187,17 @@ export function PlanerScreen() {
         transparent
         onRequestClose={() => setPickerDay(null)}
       >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modal}>
-            <Text style={styles.modalTitle}>
+        <View style={modalStyles.backdrop}>
+          <View style={modalStyles.modal}>
+            <Text style={modalStyles.modalTitle}>
               {dayNames[pickerDay ?? 0]} · {MEAL_TYPES.find((m) => m.key === pickerMeal)?.labelKey ? t(MEAL_TYPES.find((m) => m.key === pickerMeal)!.labelKey) : ""}
             </Text>
             <TextInput
-              style={styles.searchInput}
+              style={modalStyles.searchInput}
               placeholder={t("planer.searchPlaceholder")}
               value={search}
               onChangeText={setSearch}
-              placeholderTextColor={colors.textFaint}
+              placeholderTextColor={lightColors.textFaint}
             />
             <FlatList
               data={recipes}
@@ -203,7 +205,7 @@ export function PlanerScreen() {
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
                 <Pressable
-                  style={styles.recipeRow}
+                  style={modalStyles.recipeRow}
                   onPress={async () => {
                     const entry: MealPlanEntry = {
                       id: `${pickerDay}-${pickerMeal}`,
@@ -216,15 +218,15 @@ export function PlanerScreen() {
                     setPickerDay(null);
                   }}
                 >
-                  <Text style={styles.recipeRowName} numberOfLines={1}>
+                  <Text style={modalStyles.recipeRowName} numberOfLines={1}>
                     {translate(item).name}
                   </Text>
-                  <Text style={styles.recipeRowMeta}>{item.prepTime} min</Text>
+                  <Text style={modalStyles.recipeRowMeta}>{item.prepTime} min</Text>
                 </Pressable>
               )}
             />
-            <Pressable style={styles.cancelBtn} onPress={() => setPickerDay(null)}>
-              <Text style={styles.cancelText}>{t("common.close")}</Text>
+            <Pressable style={modalStyles.cancelBtn} onPress={() => setPickerDay(null)}>
+              <Text style={modalStyles.cancelText}>{t("common.close")}</Text>
             </Pressable>
           </View>
         </View>
@@ -233,90 +235,136 @@ export function PlanerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 16, paddingBottom: 40 },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  title: { fontSize: 24, fontWeight: "800", color: colors.text },
-  summaryCard: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  summaryTitle: { color: "#fff", fontSize: 13, fontWeight: "700", marginBottom: 10 },
-  summaryRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  summaryStat: { flexBasis: "46%", flexGrow: 1 },
-  summaryValue: { color: "#fff", fontSize: 16, fontWeight: "800" },
-  dayCard: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 12,
-  },
-  dayTitle: { fontSize: 16, fontWeight: "700", color: colors.text, marginBottom: 8 },
-  mealRow: {
-    borderTopColor: colors.border,
-    borderTopWidth: 0.5,
-    paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  mealLabel: { fontSize: 14, color: colors.textMuted, width: 90 },
-  mealAssigned: {
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    content: { padding: 16, paddingBottom: 40 },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    title: { fontSize: 24, fontWeight: "800", color: colors.text },
+    summaryCard: {
+      backgroundColor: colors.primary,
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 12,
+    },
+    summaryTitle: { color: "#fff", fontSize: 13, fontWeight: "700", marginBottom: 10 },
+    summaryRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+    summaryStat: { flexBasis: "46%", flexGrow: 1 },
+    summaryValue: { color: "#fff", fontSize: 16, fontWeight: "800" },
+    dayCard: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 14,
+      marginBottom: 12,
+    },
+    dayTitle: { fontSize: 16, fontWeight: "700", color: colors.text, marginBottom: 8 },
+    mealRow: {
+      borderTopColor: colors.border,
+      borderTopWidth: 0.5,
+      paddingVertical: 10,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    mealLabel: { fontSize: 14, color: colors.textMuted, width: 90 },
+    mealAssigned: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    mealRecipeName: { flex: 1, color: colors.text, fontWeight: "600" },
+    mealPersons: { color: colors.textMuted, fontSize: 12 },
+    removeText: { color: colors.danger, fontSize: 18 },
+    mealEmpty: { color: colors.primary, fontWeight: "600" },
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: colors.overlay,
+      justifyContent: "flex-end",
+    },
+    modal: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+      maxHeight: "80%",
+    },
+    modalTitle: { fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 12 },
+    searchInput: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 12,
+    },
+    recipeRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 14,
+      borderBottomColor: colors.border,
+      borderBottomWidth: 0.5,
+    },
+    recipeRowName: { flex: 1, color: colors.text, fontSize: 15 },
+    recipeRowMeta: { color: colors.textMuted, fontSize: 13 },
+    cancelBtn: {
+      marginTop: 12,
+      backgroundColor: colors.border,
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
+    cancelText: { color: colors.text, fontWeight: "600" },
+  });
+
+// Modal za biranje recepta je uvek svetao (modali se ne prilagođavaju tamnoj temi).
+const modalStyles = StyleSheet.create({
+  backdrop: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  mealRecipeName: { flex: 1, color: colors.text, fontWeight: "600" },
-  mealPersons: { color: colors.textMuted, fontSize: 12 },
-  removeText: { color: colors.danger, fontSize: 18 },
-  mealEmpty: { color: colors.primary, fontWeight: "600" },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: colors.overlay,
+    backgroundColor: lightColors.overlay,
     justifyContent: "flex-end",
   },
   modal: {
-    backgroundColor: colors.background,
+    backgroundColor: lightColors.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
     maxHeight: "80%",
   },
-  modalTitle: { fontSize: 18, fontWeight: "700", color: colors.text, marginBottom: 12 },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: lightColors.text, marginBottom: 12 },
   searchInput: {
-    backgroundColor: colors.card,
+    backgroundColor: lightColors.card,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: lightColors.border,
+    color: lightColors.text,
     marginBottom: 12,
   },
   recipeRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 14,
-    borderBottomColor: colors.border,
+    borderBottomColor: lightColors.border,
     borderBottomWidth: 0.5,
   },
-  recipeRowName: { flex: 1, color: colors.text, fontSize: 15 },
-  recipeRowMeta: { color: colors.textMuted, fontSize: 13 },
+  recipeRowName: { flex: 1, color: lightColors.text, fontSize: 15 },
+  recipeRowMeta: { color: lightColors.textMuted, fontSize: 13 },
   cancelBtn: {
     marginTop: 12,
-    backgroundColor: colors.border,
+    backgroundColor: lightColors.border,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: "center",
   },
-  cancelText: { color: colors.text, fontWeight: "600" },
+  cancelText: { color: lightColors.text, fontWeight: "600" },
 });

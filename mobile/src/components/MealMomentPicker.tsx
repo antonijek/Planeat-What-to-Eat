@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { MEAL_MOMENTS } from "../constants/mealMoments";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 interface Props {
   selected: string | null;
@@ -11,6 +11,8 @@ interface Props {
 
 export function MealMomentPicker({ selected, onSelect }: Props) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <View style={styles.wrap}>
       <Pressable
@@ -36,30 +38,31 @@ export function MealMomentPicker({ selected, onSelect }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 20,
-    justifyContent: "center",
-  },
-  chip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: colors.card,
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  chipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  chipEmoji: { fontSize: 14 },
-  chipText: { fontSize: 13, color: colors.textMuted, fontWeight: "600" },
-  chipTextActive: { color: "#fff" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    wrap: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 8,
+      marginTop: 20,
+      justifyContent: "center",
+    },
+    chip: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    chipActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    chipEmoji: { fontSize: 14 },
+    chipText: { fontSize: 13, color: colors.textMuted, fontWeight: "600" },
+    chipTextActive: { color: "#fff" },
+  });

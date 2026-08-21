@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Text, TextInput, Pressable, View, StyleSheet, ScrollView } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Difficulty, Ingredient, Recipe } from "../types";
 import { myRecipesService } from "../services/myRecipesService";
 import { textToIngredients, textToLines } from "../utils/ingredients";
 import { parseRecipeText } from "../utils/importRecipe";
-import { AppModal, appModalStyles } from "./AppModal";
+import { AppModal, makeAppModalStyles } from "./AppModal";
 import { IngredientEditor } from "./IngredientEditor";
-import { colors } from "../constants/theme";
+import { lightColors, ThemeColors } from "../constants/theme";
 
 interface Props {
   visible: boolean;
@@ -20,6 +20,9 @@ const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
 
 export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   const { t } = useTranslation();
+  const colors = lightColors;
+  const styles = useMemo(() => createStyles(colors), []);
+  const appModalStyles = useMemo(() => makeAppModalStyles(colors), []);
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Other");
   const [prepTime, setPrepTime] = useState("30");
@@ -287,32 +290,33 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: 10 },
-  col: { flex: 1 },
-  diffRow: { flexDirection: "row", gap: 8, marginTop: 6 },
-  diffBtn: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  diffBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  diffText: { color: colors.textMuted, fontSize: 14 },
-  diffTextActive: { color: "#fff", fontWeight: "700" },
-  pasteToggle: { marginTop: 14, alignSelf: "flex-start" },
-  pasteToggleText: { color: colors.primary, fontWeight: "700", fontSize: 15 },
-  pasteBox: { marginTop: 12 },
-  pasteInput: { minHeight: 100, marginTop: 6 },
-  pasteImport: {
-    marginTop: 10,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  pasteImportText: { color: "#fff", fontWeight: "700" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: { flexDirection: "row", gap: 10 },
+    col: { flex: 1 },
+    diffRow: { flexDirection: "row", gap: 8, marginTop: 6 },
+    diffBtn: {
+      flex: 1,
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 10,
+      paddingVertical: 10,
+      alignItems: "center",
+    },
+    diffBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    diffText: { color: colors.textMuted, fontSize: 14 },
+    diffTextActive: { color: "#fff", fontWeight: "700" },
+    pasteToggle: { marginTop: 14, alignSelf: "flex-start" },
+    pasteToggleText: { color: colors.primary, fontWeight: "700", fontSize: 15 },
+    pasteBox: { marginTop: 12 },
+    pasteInput: { minHeight: 100, marginTop: 6 },
+    pasteImport: {
+      marginTop: 10,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    pasteImportText: { color: "#fff", fontWeight: "700" },
+  });

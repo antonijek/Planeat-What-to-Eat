@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, FlatList, Image, Pressable, StyleSheet, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -7,7 +7,7 @@ import { historyService, CookedDay } from "../services/historyService";
 import { useUserStore } from "../store/userStore";
 import { isFeatureUnlocked } from "../services/premiumService";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
@@ -30,6 +30,8 @@ function dayLabel(day: string, t: (key: string, opts?: Record<string, unknown>) 
 export function HistoryScreen() {
   const nav = useNavigation<Nav>();
   const { t, i18n } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { recipeName } = useTranslatedRecipe();
   const { isPremium, trialActive } = useUserStore();
   const [days, setDays] = useState<CookedDay[]>([]);
@@ -100,26 +102,27 @@ export function HistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
-  content: { padding: 16, paddingBottom: 40 },
-  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
-  title: { fontSize: 24, fontWeight: "800", color: colors.text },
-  clearBtn: { color: colors.danger, fontWeight: "600" },
-  section: { marginBottom: 16 },
-  sectionLabel: { fontSize: 16, fontWeight: "700", color: colors.textMuted, marginBottom: 8 },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 8,
-  },
-  thumb: { width: 52, height: 52, borderRadius: 8, backgroundColor: colors.imageBg },
-  thumbPlaceholder: { backgroundColor: colors.placeholderBg },
-  rowBody: { flex: 1, marginLeft: 12 },
-  rowTitle: { fontSize: 15, fontWeight: "600", color: colors.text },
-  rowSub: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
-  empty: { color: colors.textMuted, fontSize: 15, marginTop: 24, textAlign: "center", lineHeight: 22 },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
+    content: { padding: 16, paddingBottom: 40 },
+    headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
+    title: { fontSize: 24, fontWeight: "800", color: colors.text },
+    clearBtn: { color: colors.danger, fontWeight: "600" },
+    section: { marginBottom: 16 },
+    sectionLabel: { fontSize: 16, fontWeight: "700", color: colors.textMuted, marginBottom: 8 },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 10,
+      marginBottom: 8,
+    },
+    thumb: { width: 52, height: 52, borderRadius: 8, backgroundColor: colors.imageBg },
+    thumbPlaceholder: { backgroundColor: colors.placeholderBg },
+    rowBody: { flex: 1, marginLeft: 12 },
+    rowTitle: { fontSize: 15, fontWeight: "600", color: colors.text },
+    rowSub: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+    empty: { color: colors.textMuted, fontSize: 15, marginTop: 24, textAlign: "center", lineHeight: 22 },
+  });

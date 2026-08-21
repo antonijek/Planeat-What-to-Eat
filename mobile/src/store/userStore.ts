@@ -18,6 +18,8 @@ interface UserState {
   setPremium: (type: PremiumType) => Promise<void>;
   setCalorieGoal: (kcal: number) => Promise<void>;
   toggleFavorite: (recipeId: string, pinned?: boolean) => Promise<void>;
+  /** Pin/unpin recept u omiljenima (max 5 pinned). Ne briše iz omiljenih. */
+  pinFavorite: (recipeId: string) => Promise<boolean>;
   rate: (recipeId: string, score: number) => Promise<void>;
   /** Startuje probni period (ako još nije korišćen) i osvežava stanje. */
   startTrial: () => Promise<void>;
@@ -85,6 +87,31 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
     await favoritesService.saveFavorites(favorites);
     set({ favorites });
+  },
+
+  async pinFavorite(recipeId: string) {
+    const favorites = [...get().favorites];
+    const idx = favorites.findIndex((f) => f.recipeId === recipeId);
+    if (idx < 0) {
+      // nije u omiljenima — dodaj direktno kao pinned
+      const pinned = { recipeId, isPinned: true, addedAt: new Date().toISOString() };
+      favorites.push(pinned);
+      await favoritesService.saveFavorites(favorites);
+      set({ favorites });
+      return true;
+    }
+    const isPinned = !favorites[idx].isPinned;
+    // max 5 pinned: ne dozvoli preko limita
+    if (isPinned) {
+      const pinnedCount = favorites.filter((f) => f.isPinned).length;
+      if (pinnedCount >= 5) {
+        return false;
+      }
+    }
+    favorites[idx] = { ...favorites[idx], isPinned };
+    await favoritesService.saveFavorites(favorites);
+    set({ favorites });
+    return true;
   },
 
   async rate(recipeId: string, score: number) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { RootStackParamList } from "../navigation/types";
 import { useUserStore } from "../store/userStore";
 import { TRIAL_DAYS } from "../services/premiumService";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 interface Props {
   emoji: string;
@@ -23,6 +23,8 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 export function PremiumLockScreen({ emoji, title, description }: Props) {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { trialActive, startTrial } = useUserStore();
 
   return (
@@ -51,20 +53,21 @@ export function PremiumLockScreen({ emoji, title, description }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
-  emoji: { fontSize: 48 },
-  title: { fontSize: 20, fontWeight: "800", color: colors.text, marginTop: 12 },
-  description: { fontSize: 14, color: colors.textMuted, textAlign: "center", marginTop: 8 },
-  button: {
-    marginTop: 20,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-  },
-  buttonText: { color: colors.card, fontWeight: "700" },
-  trialButton: { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary },
-  trialButtonText: { color: colors.primary, fontWeight: "700" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
+    emoji: { fontSize: 48 },
+    title: { fontSize: 20, fontWeight: "800", color: colors.text, marginTop: 12 },
+    description: { fontSize: 14, color: colors.textMuted, textAlign: "center", marginTop: 8 },
+    button: {
+      marginTop: 20,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: 14,
+      paddingHorizontal: 32,
+    },
+    buttonText: { color: "#fff", fontWeight: "700" },
+    trialButton: { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary },
+    trialButtonText: { color: colors.primary, fontWeight: "700" },
+  });

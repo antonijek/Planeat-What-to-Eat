@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useUserStore } from "../store/userStore";
 import { Screen } from "../components/Screen";
 import { PREMIUM_PRICES, TRIAL_DAYS } from "../services/premiumService";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 export function PremiumScreen() {
   const nav = useNavigation();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { isPremium, trialActive, trialDaysLeft, setPremium, startTrial } = useUserStore();
 
   const features = [
@@ -93,8 +95,9 @@ export function PremiumScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.primary },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.primary },
   content: { flex: 1, padding: 24, justifyContent: "center" },
   badge: {
     alignSelf: "flex-start",
@@ -146,4 +149,4 @@ const styles = StyleSheet.create({
   doneEmoji: { fontSize: 64 },
   doneTitle: { fontSize: 22, fontWeight: "800", color: colors.text, marginTop: 12 },
   doneText: { color: colors.textMuted, marginTop: 6 },
-});
+  });

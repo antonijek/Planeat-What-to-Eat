@@ -87,6 +87,7 @@ export interface CalorieEntry {
   protein: number;
   fat: number;
   carbs: number;
+  fiber?: number;
   loggedAt: string;
 }
 

@@ -21,6 +21,7 @@ export const STORAGE_KEYS = {
   user: "mm_user",
   calorieGoal: "mm_calorie_goal",
   language: "mm_language",
+  darkMode: "mm_dark_mode",
 } as const;
 
 export async function getItem<T>(key: string): Promise<T | null> {

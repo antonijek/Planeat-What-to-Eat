@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ import { useRecipeStore } from "../store/recipeStore";
 import { useRecipesFilterStore, RecipesFilters } from "../store/recipesFilterStore";
 import { parseIngredientInput } from "../utils/ingredients";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -62,6 +62,8 @@ export const AREA_OPTIONS: { label: string; value: string }[] = [
 export function RecipesScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { area: areaLabel } = useTranslatedRecipe();
   const { isPremium, trialActive } = useUserStore();
   const allRecipes = useRecipeStore((s) => s.recipes);
@@ -301,55 +303,57 @@ export function RecipesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 16, paddingTop: 28 },
-  badgeRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 4 },
-  badge: {
-    minWidth: 34,
-    textAlign: "center",
-    backgroundColor: colors.primary,
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "800",
-    borderRadius: 17,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    overflow: "hidden",
-  },
-  badgeLabel: {
-    alignSelf: "flex-end",
-    marginTop: 2,
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.textMuted,
-  },
-  title: { fontSize: 24, fontWeight: "800", color: colors.text, marginBottom: 12 },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  count: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
-  searchRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  searchRowCompact: { marginTop: 12 },
-  search: {
-    flex: 1,
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  haveBox: {
-    marginTop: 16,
-    backgroundColor: colors.primaryLight,
-    borderRadius: 16,
-    padding: 14,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    content: { padding: 16, paddingTop: 28 },
+    badgeRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 4 },
+    badge: {
+      minWidth: 34,
+      textAlign: "center",
+      backgroundColor: colors.primary,
+      color: "#fff",
+      fontSize: 15,
+      fontWeight: "800",
+      borderRadius: 17,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      overflow: "hidden",
+    },
+    badgeLabel: {
+      alignSelf: "flex-end",
+      marginTop: 2,
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    title: { fontSize: 24, fontWeight: "800", color: colors.text, marginBottom: 12 },
+    titleRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: 4,
+    },
+    count: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
+    searchRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+    searchRowCompact: { marginTop: 12 },
+    search: {
+      flex: 1,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      color: colors.text,
+    },
+    haveBox: {
+      marginTop: 16,
+      backgroundColor: colors.primaryLight,
+      borderRadius: 16,
+      padding: 14,
+    },
   haveTitle: { fontSize: 15, fontWeight: "700", color: colors.text },
   haveInputRow: { flexDirection: "row", gap: 8, marginTop: 10 },
   haveInput: {
@@ -418,5 +422,5 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   filterChipTextCompact: { fontSize: 11 },
-  filterChipTextOn: { color: "#fff" },
-});
+    filterChipTextOn: { color: "#fff" },
+  });

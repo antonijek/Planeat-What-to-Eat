@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Text, TextInput, View, StyleSheet, Pressable } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Difficulty, Recipe } from "../types";
 import { overrideService } from "../services/overrideService";
 import { textToLines } from "../utils/ingredients";
-import { AppModal, appModalStyles } from "./AppModal";
+import { AppModal, makeAppModalStyles } from "./AppModal";
 import { IngredientEditor } from "./IngredientEditor";
-import { colors } from "../constants/theme";
+import { lightColors, ThemeColors } from "../constants/theme";
 
 interface Props {
   visible: boolean;
@@ -19,6 +19,9 @@ const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
 
 export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
   const { t } = useTranslation();
+  const colors = lightColors;
+  const styles = useMemo(() => createStyles(colors), []);
+  const appModalStyles = useMemo(() => makeAppModalStyles(colors), []);
   const [name, setName] = useState(recipe.name);
   const [category, setCategory] = useState(recipe.category);
   const [prepTime, setPrepTime] = useState(String(recipe.prepTime));
@@ -212,20 +215,21 @@ export function EditRecipeModal({ visible, recipe, onClose, onSaved }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: 10 },
-  col: { flex: 1 },
-  diffRow: { flexDirection: "row", gap: 8, marginTop: 6 },
-  diffBtn: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  diffBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  diffText: { color: colors.textMuted, fontSize: 14 },
-  diffTextActive: { color: "#fff", fontWeight: "700" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: { flexDirection: "row", gap: 10 },
+    col: { flex: 1 },
+    diffRow: { flexDirection: "row", gap: 8, marginTop: 6 },
+    diffBtn: {
+      flex: 1,
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 10,
+      paddingVertical: 10,
+      alignItems: "center",
+    },
+    diffBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    diffText: { color: colors.textMuted, fontSize: 14 },
+    diffTextActive: { color: "#fff", fontWeight: "700" },
+  });

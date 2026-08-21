@@ -118,6 +118,7 @@ export const UNIT_LABELS: Record<string, Partial<Record<ContentLang, string>>> =
   cold: { de: "kalt", es: "frío", fr: "froid", it: "freddo", pt: "frio", sr: "hladno" },
   boiling: { de: "kochend", es: "hirviendo", fr: "bouillant", it: "bollente", pt: "fervente", sr: "ključala" },
   raw: { de: "roh", es: "crudo", fr: "cru", it: "crudo", pt: "cru", sr: "sirovo" },
+  cooked: { de: "gekocht", es: "cocido", fr: "cuit", it: "cotto", pt: "cozido", sr: "kuvano" },
   skinned: { de: "gehäutet", es: "sin piel", fr: "pelé", it: "senza pelle", pt: "sem pele", sr: "oguljeno" },
   boneless: { de: "entbeint", es: "deshuesado", fr: "désossé", it: "disossato", pt: "desossado", sr: "bez kostiju" },
   // fraze i dodatni deskriptori

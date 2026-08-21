@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, ScrollView, StyleSheet, SafeAreaView } from "react-native";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 interface Props {
   children: React.ReactNode;
@@ -16,6 +16,8 @@ interface Props {
  * Svi ekrani ga koriste da izgled bude isti.
  */
 export function Screen({ children, scroll = true, contentStyle }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const content = [styles.content, contentStyle];
   if (!scroll) {
     return (
@@ -37,12 +39,13 @@ export function Screen({ children, scroll = true, contentStyle }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  content: {
-    flexGrow: 1,
-    paddingHorizontal: 16,
-    paddingTop: 28,
-    paddingBottom: 40,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    content: {
+      flexGrow: 1,
+      paddingHorizontal: 16,
+      paddingTop: 28,
+      paddingBottom: 40,
+    },
+  });

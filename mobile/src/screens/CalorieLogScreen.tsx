@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -14,13 +14,13 @@ import {
   dateKeyOffset,
   dateKeyForToday,
 } from "../services/calorieLogService";
-import { suggestIngredients } from "../services/calorieCalculator";
+import { suggestIngredients, parseNameAndGrams } from "../services/calorieCalculator";
 import { useUserStore } from "../store/userStore";
 import { isFeatureUnlocked } from "../services/premiumService";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { CalorieGoalModal } from "../components/CalorieGoalModal";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 import { Screen } from "../components/Screen";
 
 function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown>) => string, lang: string): string {
@@ -33,7 +33,7 @@ function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown
 
 /** Prikaz makroa za stavku — samo vrednosti >0, da se ne vide "0g · Protein 0g · …". */
 function rowMetaText(
-  item: { grams: number; protein: number; fat: number; carbs: number },
+  item: { grams: number; protein: number; fat: number; carbs: number; fiber?: number },
   t: (key: string, opts?: Record<string, unknown>) => string
 ): string {
   const parts: string[] = [];
@@ -41,6 +41,7 @@ function rowMetaText(
   if (item.protein > 0) parts.push(`${t("tracker.protein", { count: item.protein })}`);
   if (item.fat > 0) parts.push(`${t("tracker.fat", { count: item.fat })}`);
   if (item.carbs > 0) parts.push(`${t("tracker.carbs", { count: item.carbs })}`);
+  if ((item.fiber ?? 0) > 0) parts.push(`${t("tracker.fiber", { count: Math.round(item.fiber!) })}`);
   return parts.join(" · ");
 }
 
@@ -53,20 +54,23 @@ export function CalorieLogScreen() {
     protein: 0,
     fat: 0,
     carbs: 0,
+    fiber: 0,
     entries: [],
     count: 0,
   });
   const [suggestions, setSuggestions] = useState<
-    { key: string; label: string; per100: { kcal: number; protein: number; fat: number; carbs: number }; grams: number }[]
+    { key: string; label: string; per100: { kcal: number; protein: number; fat: number; carbs: number; fiber?: number }; grams: number }[]
   >([]);
   const [selectedSug, setSelectedSug] = useState<
-    { label: string; per100: { kcal: number; protein: number; fat: number; carbs: number } } | null
+    { label: string; per100: { kcal: number; protein: number; fat: number; carbs: number; fiber?: number } } | null
   >(null);
   const [manualKcal, setManualKcal] = useState("");
   const gramsRef = useRef<TextInput>(null);
   const [goalModal, setGoalModal] = useState(false);
   const { isPremium, trialActive, calorieGoal, setCalorieGoal } = useUserStore();
   const { t, i18n } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const dateKey = dateKeyOffset(offset);
   const todayKey = dateKeyForToday();
@@ -108,6 +112,11 @@ export function CalorieLogScreen() {
     setName(text);
     setSelectedSug(null);
     setManualKcal("");
+    // Ako je korisnik unio "piletina 200g", prenesi gramažu u grama polje
+    const parsed = parseNameAndGrams(text);
+    if (parsed.grams > 0 && !grams.trim()) {
+      setGrams(String(parsed.grams));
+    }
     const sug = suggestIngredients(text);
     setSuggestions(sug.slice(0, 4));
   }
@@ -115,7 +124,16 @@ export function CalorieLogScreen() {
   const lookup = calorieLogService.lookup(name);
 
   async function add() {
-    const g = parseFloat(grams);
+    // Gramaža može biti u zasebnom polju ILI u nazivu ("piletina 200g", "200g piletina").
+    let g = parseFloat(grams);
+    let foodName = name.trim();
+    if (!Number.isFinite(g) || g <= 0) {
+      const parsed = parseNameAndGrams(foodName);
+      if (parsed.grams > 0) {
+        foodName = parsed.name;
+        g = parsed.grams;
+      }
+    }
     const manual = parseFloat(manualKcal);
     // Ručni unos kalorija (jelo/sastojak nije u bazi)
     if (manualKcal.trim() && Number.isFinite(manual) && manual > 0) {
@@ -127,13 +145,13 @@ export function CalorieLogScreen() {
       setSelectedSug(null);
       return;
     }
-    if (!name.trim() || !Number.isFinite(g) || g <= 0) return;
+    if (!foodName || !Number.isFinite(g) || g <= 0) return;
     try {
       // ako je korisnik odabrao konkretnu sugestiju (kuvano/sirovo), koristi NJENE vrednosti
       if (selectedSug) {
         setTotals(await calorieLogService.addEntry(selectedSug.label, g, dateKey, selectedSug.per100));
       } else {
-        setTotals(await calorieLogService.addEntry(name, g, dateKey));
+        setTotals(await calorieLogService.addEntry(foodName, g, dateKey));
       }
       setName("");
       setGrams("");
@@ -148,10 +166,14 @@ export function CalorieLogScreen() {
   /** Klik na sugestiju samo OZNAČI izabranu varijantu — gramažu upiše korisnik pa klikne +. */
   function selectSuggestion(sug: {
     label: string;
-    per100: { kcal: number; protein: number; fat: number; carbs: number };
+    per100: { kcal: number; protein: number; fat: number; carbs: number; fiber?: number };
     grams: number;
   }) {
     setName(sug.label);
+    // Ako je gramaža izvučena iz naziva ("piletina 200g"), prenesi je u grams polje.
+    if (sug.grams > 0 && !grams.trim()) {
+      setGrams(String(sug.grams));
+    }
     setSelectedSug(sug);
     setSuggestions([]);
     gramsRef.current?.focus();
@@ -210,6 +232,7 @@ export function CalorieLogScreen() {
                 <Text style={styles.mac}>{t("tracker.protein", { count: totals.protein })}</Text>
                 <Text style={styles.mac}>{t("tracker.fat", { count: totals.fat })}</Text>
                 <Text style={styles.mac}>{t("tracker.carbs", { count: totals.carbs })}</Text>
+                <Text style={styles.mac}>{t("tracker.fiber", { count: totals.fiber })}</Text>
               </View>
               {isToday && overBudget && (
                 <Text style={styles.overBanner}>
@@ -324,8 +347,9 @@ export function CalorieLogScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
   content: { padding: 16, paddingBottom: 60 },
   title: { fontSize: 24, fontWeight: "800", color: colors.text },
   dayNav: {
@@ -390,6 +414,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderWidth: 1,
     borderColor: colors.border,
+    color: colors.text,
   },
   nameInput: { flex: 2 },
   gramsInput: { flex: 1 },
@@ -413,7 +438,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: colors.card,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 7,
@@ -454,4 +479,4 @@ const styles = StyleSheet.create({
   rowMeta: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
   rowKcal: { color: colors.primary, fontWeight: "700", marginRight: 14 },
   remove: { color: colors.danger, fontSize: 18 },
-});
+  });

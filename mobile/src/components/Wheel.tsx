@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import Animated, {
   useSharedValue,
@@ -13,7 +13,7 @@ import { useAudioPlayer } from "expo-audio";
 import Svg, { Path, G, Circle } from "react-native-svg";
 import { Recipe } from "../types";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 interface Props {
   recipes: Recipe[];
@@ -64,6 +64,7 @@ function nailPos(angleDeg: number) {
 
 interface NailProps {
   angle: number;
+  headColor: string;
 }
 
 interface EmojiLabelProps {
@@ -87,20 +88,20 @@ function EmojiLabel({ angle, emoji, rotation }: EmojiLabelProps) {
     };
   });
   return (
-    <Animated.View style={[styles.emoji, animatedStyle]} pointerEvents="none">
-      <Text style={styles.emojiText}>{emoji}</Text>
+    <Animated.View style={[stylesHelper.emoji, animatedStyle]} pointerEvents="none">
+      <Text style={stylesHelper.emojiText}>{emoji}</Text>
     </Animated.View>
   );
 }
 
 /** Glava eksera ukucanog pod 90° u polje točka — metalna, sa obodom. */
-function Nail({ angle }: NailProps) {
+function Nail({ angle, headColor }: NailProps) {
   const pos = nailPos(angle);
   return (
     <G>
       <Circle cx={pos.x} cy={pos.y + 2} r={7} fill="rgba(0,0,0,0.3)" />
       <Circle cx={pos.x} cy={pos.y} r={6} fill="#6B7280" />
-      <Circle cx={pos.x} cy={pos.y} r={4.6} fill={colors.text} />
+      <Circle cx={pos.x} cy={pos.y} r={4.6} fill={headColor} />
       <Circle cx={pos.x - 1.2} cy={pos.y - 1.5} r={2} fill="#A1A1AA" />
       <Circle cx={pos.x - 1.8} cy={pos.y - 2.2} r={0.9} fill="#fff" opacity={0.9} />
     </G>
@@ -108,6 +109,20 @@ function Nail({ angle }: NailProps) {
 }
 
 const MAX_SEGMENTS = 12;
+
+/** Statički stilovi za pomoćne komponente van točka (EmojiLabel). */
+const stylesHelper = StyleSheet.create({
+  emoji: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emojiText: { fontSize: 26, textAlign: "center" },
+});
 
 /** Nasumično bira do MAX_SEGMENTS recepata za točak. */
 function pickRandom(recipes: Recipe[], count: number): Recipe[] {
@@ -121,6 +136,8 @@ function pickRandom(recipes: Recipe[], count: number): Recipe[] {
 
 export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const rotation = useSharedValue(0);
   const spinning = useSharedValue(0); // 1 dok se vrti, 0 u mirovanju
   const [isSpinning, setIsSpinning] = useState(false);
@@ -334,7 +351,7 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
             })}
             {segments.map((recipe, i) => {
               const boundary = (360 / segments.length) * i;
-              return <Nail key={`nail-${recipe.id}`} angle={boundary} />;
+              return <Nail key={`nail-${recipe.id}`} angle={boundary} headColor={colors.text} />;
             })}
           </Svg>
           <View style={styles.centerDot}><Text style={styles.centerText}>🍽️</Text></View>
@@ -351,101 +368,102 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { alignItems: "center", justifyContent: "center" },
-  pointerHolder: {
-    position: "absolute",
-    top: -24,
-    zIndex: 10,
-    alignItems: "center",
-    justifyContent: "flex-start",
-    height: 70,
-  },
-  pointerMount: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.textMuted,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 6,
-    marginBottom: -4,
-  },
-  pointerMountInner: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
-  },
-  // Branik — jedan plastični trougao koji se rotira oko vrha.
-  pointerArm: {
-    alignItems: "center",
-  },
-  pointerArmShadow: {
-    position: "absolute",
-    top: 2,
-    width: 0,
-    height: 0,
-    borderLeftWidth: 6,
-    borderRightWidth: 6,
-    borderTopWidth: 46,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderTopColor: "rgba(0,0,0,0.3)",
-  },
-  pointerArmBody: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 4.5,
-    borderRightWidth: 4.5,
-    borderTopWidth: 44,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderTopColor: "#FFFFFF",
-  },
-  wheel: { width: SIZE, height: SIZE, marginTop: 12 },
-  emoji: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emojiText: { fontSize: 26, textAlign: "center" },
-  centerDot: {
-    position: "absolute",
-    top: CX - 28,
-    left: CY - 28,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  centerText: { fontSize: 26 },
-  spinBtn: {
-    marginTop: 24,
-    backgroundColor: colors.primary,
-    paddingHorizontal: 36,
-    paddingVertical: 14,
-    borderRadius: 30,
-    shadowColor: colors.primaryDark,
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-  spinBtnDisabled: { backgroundColor: colors.textMuted },
-  spinText: { color: "#fff", fontSize: 16, fontWeight: "700" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: { alignItems: "center", justifyContent: "center" },
+    pointerHolder: {
+      position: "absolute",
+      top: -24,
+      zIndex: 10,
+      alignItems: "center",
+      justifyContent: "flex-start",
+      height: 70,
+    },
+    pointerMount: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: colors.textMuted,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOpacity: 0.4,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 6,
+      marginBottom: -4,
+    },
+    pointerMountInner: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.primary,
+    },
+    // Branik — jedan plastični trougao koji se rotira oko vrha.
+    pointerArm: {
+      alignItems: "center",
+    },
+    pointerArmShadow: {
+      position: "absolute",
+      top: 2,
+      width: 0,
+      height: 0,
+      borderLeftWidth: 6,
+      borderRightWidth: 6,
+      borderTopWidth: 46,
+      borderLeftColor: "transparent",
+      borderRightColor: "transparent",
+      borderTopColor: "rgba(0,0,0,0.3)",
+    },
+    pointerArmBody: {
+      width: 0,
+      height: 0,
+      borderLeftWidth: 4.5,
+      borderRightWidth: 4.5,
+      borderTopWidth: 44,
+      borderLeftColor: "transparent",
+      borderRightColor: "transparent",
+      borderTopColor: "#FFFFFF",
+    },
+    wheel: { width: SIZE, height: SIZE, marginTop: 12 },
+    emoji: {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    emojiText: { fontSize: 26, textAlign: "center" },
+    centerDot: {
+      position: "absolute",
+      top: CX - 28,
+      left: CY - 28,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.card,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    centerText: { fontSize: 26 },
+    spinBtn: {
+      marginTop: 24,
+      backgroundColor: colors.primary,
+      paddingHorizontal: 36,
+      paddingVertical: 14,
+      borderRadius: 30,
+      shadowColor: colors.primaryDark,
+      shadowOpacity: 0.4,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 4,
+    },
+    spinBtnDisabled: { backgroundColor: colors.textMuted },
+    spinText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  });

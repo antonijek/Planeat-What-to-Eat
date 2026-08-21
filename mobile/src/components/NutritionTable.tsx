@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Recipe } from "../types";
 import { perServing, perServingRound } from "../utils/helpers";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 /** Nutricioni prikaz recepta (po porciji), kao na proizvodima + "More values". */
 export function NutritionTable({ recipe }: { recipe: Recipe }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [showMore, setShowMore] = useState(false);
   const s = recipe.servings;
 
@@ -100,31 +102,32 @@ export function NutritionTable({ recipe }: { recipe: Recipe }) {
   );
 }
 
-const styles = StyleSheet.create({
-  nutritionCard: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 16,
-  },
-  nutritionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  nutritionTitle: { fontSize: 14, fontWeight: "700", color: colors.text },
-  nutritionServing: { fontSize: 12, color: colors.textMuted },
-  nutritionTotal: { fontSize: 12, color: colors.textMuted, marginBottom: 8, fontStyle: "italic" },
-  nutritionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 4,
-  },
-  nutritionRowSub: { paddingLeft: 12 },
-  nutritionName: { fontSize: 13, color: colors.text },
-  nutritionNameSub: { fontSize: 12, color: colors.textMuted },
-  nutritionValue: { fontSize: 13, color: colors.text, fontWeight: "600" },
-  nutritionValueSub: { fontSize: 12, color: colors.textMuted },
-  moreBtn: { marginTop: 8, alignSelf: "flex-start" },
-  moreBtnText: { color: colors.primary, fontWeight: "700", fontSize: 13 },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    nutritionCard: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 16,
+      marginTop: 16,
+    },
+    nutritionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    nutritionTitle: { fontSize: 14, fontWeight: "700", color: colors.text },
+    nutritionServing: { fontSize: 12, color: colors.textMuted },
+    nutritionTotal: { fontSize: 12, color: colors.textMuted, marginBottom: 8, fontStyle: "italic" },
+    nutritionRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 4,
+    },
+    nutritionRowSub: { paddingLeft: 12 },
+    nutritionName: { fontSize: 13, color: colors.text },
+    nutritionNameSub: { fontSize: 12, color: colors.textMuted },
+    nutritionValue: { fontSize: 13, color: colors.text, fontWeight: "600" },
+    nutritionValueSub: { fontSize: 12, color: colors.textMuted },
+    moreBtn: { marginTop: 8, alignSelf: "flex-start" },
+    moreBtnText: { color: colors.primary, fontWeight: "700", fontSize: 13 },
+  });

@@ -26,17 +26,18 @@ import { recipesForMoment } from "../constants/mealMoments";
 import { Recipe } from "../types";
 import { parseIngredientInput } from "../utils/ingredients";
 import { IngredientInputChips } from "../components/IngredientInputChips";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export function HomeScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { recipes, load, lastSpunRecipeId } = useRecipeStore();
   const { isPremium, trialActive } = useUserStore();
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
-  const [spinCount, setSpinCount] = useState(0);
   const [moment, setMoment] = useState<string | null>(null);
   const [result, setResult] = useState<Recipe | null>(null);
   const [haveIngredients, setHaveIngredients] = useState<string[]>([]);
@@ -82,7 +83,6 @@ export function HomeScreen() {
   function handleSpinEnd(recipe: Recipe) {
     historyService.record(recipe.id);
     premiumService.consumeSpin();
-    setSpinCount((c) => c + 1);
     refreshSpins();
     setResult(recipe);
   }
@@ -99,7 +99,9 @@ export function HomeScreen() {
                 {t("home.subtitle")}
               </Text>
             </View>
-            <Text style={styles.spinCount}>{t("home.spinLeft", { count: spinCount })}</Text>
+            {!hasUnlimitedSpins && spinsLeft !== null && (
+              <Text style={styles.spinCount}>{t("home.spinLeft", { count: spinsLeft })}</Text>
+            )}
             <ScreenMenu navigate={nav.navigate} style={styles.menuBtn} />
           </View>
 
@@ -155,10 +157,8 @@ export function HomeScreen() {
             <Text style={styles.limit}>{t("home.noRecipes")}</Text>
           )}
 
-          {!hasUnlimitedSpins && spinsLeft !== null && (
-            <Text style={styles.limit}>
-              {t("home.spinsLeftToday", { count: spinsLeft })}
-            </Text>
+          {!hasUnlimitedSpins && spinsLeft === 0 && (
+            <Text style={styles.limit}>{t("home.noSpinsLeft")}</Text>
           )}
 
           {lastSpunRecipeId ? (
@@ -183,96 +183,98 @@ export function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  content: { flexGrow: 1, padding: 16, paddingTop: 28, paddingBottom: 40 },
-  header: { marginBottom: 8 },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
-  titleWrap: { flex: 1 },
-  title: { fontSize: 24, fontWeight: "800", color: colors.text },
-  sub: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
-  spinCount: { fontSize: 13, fontWeight: "600", color: colors.primary },
-  menuBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  wheelArea: {
-    flex: 1,
-    minHeight: 280,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  bottomArea: { alignItems: "center", paddingBottom: 8 },
-  limit: { marginTop: 12, color: colors.textMuted, fontSize: 13 },
-  last: {
-    marginTop: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    backgroundColor: colors.primaryLight,
-  },
-  lastText: { color: colors.primary, fontWeight: "600" },
-  haveWrap: {
-    width: "100%",
-    marginTop: 14,
-    backgroundColor: colors.primaryLight,
-    borderRadius: 14,
-    padding: 12,
-  },
-  haveLocked: {
-    width: "100%",
-    marginTop: 14,
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  haveLockedText: { color: "#fff", fontWeight: "700" },
-  haveHead: { alignItems: "center", paddingVertical: 2 },
-  haveHeadText: { color: colors.text, fontSize: 14, fontWeight: "700" },
-  haveInput: {
-    flex: 1,
-    backgroundColor: colors.card,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    fontSize: 14,
-  },
-  haveAdd: {
-    width: 40,
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  haveAddText: { color: "#fff", fontSize: 22, lineHeight: 26 },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
-  chip: {
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  chipText: { color: colors.primary, fontSize: 13, fontWeight: "600" },
-  haveHint: { color: colors.textMuted, fontSize: 12, marginTop: 8, textAlign: "center" },
-  haveGuide: {
-    color: colors.primary,
-    fontSize: 13,
-    fontWeight: "700",
-    marginTop: 8,
-    textAlign: "center",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    content: { flexGrow: 1, padding: 16, paddingTop: 28, paddingBottom: 40 },
+    header: { marginBottom: 8 },
+    titleRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 8,
+    },
+    titleWrap: { flex: 1 },
+    title: { fontSize: 24, fontWeight: "800", color: colors.text },
+    sub: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
+    spinCount: { fontSize: 13, fontWeight: "600", color: colors.primary },
+    menuBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    wheelArea: {
+      flex: 1,
+      minHeight: 280,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingVertical: 8,
+    },
+    bottomArea: { alignItems: "center", paddingBottom: 8 },
+    limit: { marginTop: 12, color: colors.textMuted, fontSize: 13 },
+    last: {
+      marginTop: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      borderRadius: 12,
+      backgroundColor: colors.primaryLight,
+    },
+    lastText: { color: colors.primary, fontWeight: "600" },
+    haveWrap: {
+      width: "100%",
+      marginTop: 14,
+      backgroundColor: colors.primaryLight,
+      borderRadius: 14,
+      padding: 12,
+    },
+    haveLocked: {
+      width: "100%",
+      marginTop: 14,
+      backgroundColor: colors.primary,
+      borderRadius: 14,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
+    haveLockedText: { color: "#fff", fontWeight: "700" },
+    haveHead: { alignItems: "center", paddingVertical: 2 },
+    haveHeadText: { color: colors.text, fontSize: 14, fontWeight: "700" },
+    haveInput: {
+      flex: 1,
+      backgroundColor: colors.card,
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 9,
+      fontSize: 14,
+      color: colors.text,
+    },
+    haveAdd: {
+      width: 40,
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    haveAddText: { color: "#fff", fontSize: 22, lineHeight: 26 },
+    chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
+    chip: {
+      backgroundColor: colors.card,
+      borderRadius: 14,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    chipText: { color: colors.primary, fontSize: 13, fontWeight: "600" },
+    haveHint: { color: colors.textMuted, fontSize: 12, marginTop: 8, textAlign: "center" },
+    haveGuide: {
+      color: colors.primary,
+      fontSize: 13,
+      fontWeight: "700",
+      marginTop: 8,
+      textAlign: "center",
+    },
+  });
 

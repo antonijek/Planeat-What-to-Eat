@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { useUserStore } from "../store/userStore";
 import { planService } from "../services/planService";
 import { isFeatureUnlocked } from "../services/premiumService";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { ScreenMenu } from "../components/ScreenMenu";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
@@ -26,6 +26,8 @@ import { Screen } from "../components/Screen";
 export function ShoppingScreen() {
   const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { ingredient: ingredientLabel } = useTranslatedRecipe();
   const { items, load, toggle, remove, addManual, replaceMany, clearChecked } = useShoppingStore();
   const { isPremium, trialActive } = useUserStore();
@@ -151,111 +153,113 @@ export function ShoppingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
-  content: { padding: 16, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: "800", color: colors.text },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 8,
-  },
-  planRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 12,
-  },
-  planBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
-  planBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
-  inputRow: { flexDirection: "row", gap: 10, marginTop: 16 },
-  input: {
-    flex: 1,
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  addBtn: {
-    width: 46,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addBtnText: { color: "#fff", fontSize: 26, lineHeight: 30 },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 16,
-  },
-  summary: { color: colors.textMuted, fontSize: 13 },
-  clearBtn: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: "700",
-    backgroundColor: colors.dangerLight,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    overflow: "hidden",
-  },
-  item: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    marginTop: 8,
-  },
-  itemDone: { opacity: 0.6 },
-  check: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    marginRight: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkText: { color: colors.primary, fontWeight: "700" },
-  itemName: { flex: 1, color: colors.text, fontSize: 15 },
-  itemNameDone: { textDecorationLine: "line-through" },
-  itemAmount: { color: colors.textMuted, fontSize: 13 },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: colors.overlay,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  modalCard: {
-    width: "100%",
-    maxWidth: 340,
-    backgroundColor: colors.card,
-    borderRadius: 20,
-    padding: 24,
-    alignItems: "center",
-  },
-  modalIcon: { fontSize: 40, marginBottom: 12 },
-  modalText: { fontSize: 15, color: colors.text, textAlign: "center", lineHeight: 22 },
-  modalBtn: {
-    marginTop: 18,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-  },
-  modalBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background, paddingTop: 12 },
+    content: { padding: 16, paddingBottom: 40 },
+    title: { fontSize: 24, fontWeight: "800", color: colors.text },
+    headerRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingTop: 8,
+    },
+    planRow: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      marginTop: 12,
+    },
+    planBtn: {
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+    },
+    planBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
+    inputRow: { flexDirection: "row", gap: 10, marginTop: 16 },
+    input: {
+      flex: 1,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 15,
+      borderWidth: 1,
+      borderColor: colors.border,
+      color: colors.text,
+    },
+    addBtn: {
+      width: 46,
+      borderRadius: 12,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    addBtnText: { color: "#fff", fontSize: 26, lineHeight: 30 },
+    summaryRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: 16,
+    },
+    summary: { color: colors.textMuted, fontSize: 13 },
+    clearBtn: {
+      color: colors.danger,
+      fontSize: 14,
+      fontWeight: "700",
+      backgroundColor: colors.dangerLight,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      overflow: "hidden",
+    },
+    item: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 14,
+      marginTop: 8,
+    },
+    itemDone: { opacity: 0.6 },
+    check: {
+      width: 24,
+      height: 24,
+      borderRadius: 6,
+      borderWidth: 2,
+      borderColor: colors.primary,
+      marginRight: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    checkText: { color: colors.primary, fontWeight: "700" },
+    itemName: { flex: 1, color: colors.text, fontSize: 15 },
+    itemNameDone: { textDecorationLine: "line-through" },
+    itemAmount: { color: colors.textMuted, fontSize: 13 },
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: lightColors.overlay,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 24,
+    },
+    modalCard: {
+      width: "100%",
+      maxWidth: 340,
+      backgroundColor: lightColors.card,
+      borderRadius: 20,
+      padding: 24,
+      alignItems: "center",
+    },
+    modalIcon: { fontSize: 40, marginBottom: 12 },
+    modalText: { fontSize: 15, color: lightColors.text, textAlign: "center", lineHeight: 22 },
+    modalBtn: {
+      marginTop: 18,
+      backgroundColor: lightColors.primary,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 32,
+    },
+    modalBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  });

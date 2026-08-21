@@ -7,6 +7,7 @@ export interface DailyTotals {
   protein: number;
   fat: number;
   carbs: number;
+  fiber: number;
   entries: CalorieEntry[];
   count: number;
 }
@@ -58,7 +59,7 @@ export const calorieLogService = {
     name: string,
     grams: number,
     dateKey?: string,
-    per100?: { kcal: number; protein: number; fat: number; carbs: number }
+    per100?: { kcal: number; protein: number; fat: number; carbs: number; fiber?: number }
   ): Promise<DailyTotals> {
     const { matched } = per100
       ? calcForPer100(name, grams, per100)
@@ -76,6 +77,9 @@ export const calorieLogService = {
       protein: Math.round((matched.per100.protein * matched.grams) / 100),
       fat: Math.round((matched.per100.fat * matched.grams) / 100),
       carbs: Math.round((matched.per100.carbs * matched.grams) / 100),
+      fiber: matched.per100.fiber
+        ? Math.round((matched.per100.fiber * matched.grams) / 100)
+        : 0,
       loggedAt: new Date().toISOString(),
     };
     day.entries.push(entry);
@@ -153,14 +157,15 @@ export const calorieLogService = {
 
 function summarize(day: CalorieDayLog | null): DailyTotals {
   if (!day) {
-    return { kcal: 0, protein: 0, fat: 0, carbs: 0, entries: [], count: 0 };
+    return { kcal: 0, protein: 0, fat: 0, carbs: 0, fiber: 0, entries: [], count: 0 };
   }
-  let kcal = 0, protein = 0, fat = 0, carbs = 0;
+  let kcal = 0, protein = 0, fat = 0, carbs = 0, fiber = 0;
   for (const e of day.entries) {
     kcal += e.kcal;
     protein += e.protein;
     fat += e.fat;
     carbs += e.carbs;
+    fiber += e.fiber ?? 0;
   }
-  return { kcal, protein, fat, carbs, entries: day.entries, count: day.entries.length };
+  return { kcal, protein, fat, carbs, fiber, entries: day.entries, count: day.entries.length };
 }

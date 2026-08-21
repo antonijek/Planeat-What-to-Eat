@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Screen } from "../components/Screen";
 import { historyService } from "../services/historyService";
@@ -6,7 +6,7 @@ import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
 import { isFeatureUnlocked } from "../services/premiumService";
 import { useTranslation } from "react-i18next";
-import { colors } from "../constants/theme";
+import { useTheme, ThemeColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 
@@ -20,6 +20,8 @@ interface RankItem {
 
 export function StatsScreen() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { category: categoryLabel, recipeName } = useTranslatedRecipe();
   const { isPremium, trialActive } = useUserStore();
   const [totalCooked, setTotalCooked] = useState(0);
@@ -162,40 +164,41 @@ export function StatsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 20, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: "800", color: colors.text },
-  cardsRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 16 },
-  card: {
-    flex: 1,
-    minWidth: 90,
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    paddingVertical: 18,
-    alignItems: "center",
-  },
-  cardValue: { fontSize: 20, fontWeight: "800", color: colors.primary },
-  cardLabel: { fontSize: 11, color: colors.textMuted, marginTop: 4, textAlign: "center" },
-  banner: {
-    marginTop: 16,
-    backgroundColor: colors.primaryLight,
-    borderRadius: 12,
-    padding: 14,
-  },
-  bannerText: { color: colors.text, fontSize: 14, fontWeight: "600" },
-  section: { fontSize: 17, fontWeight: "700", color: colors.text, marginTop: 24, marginBottom: 8 },
-  listRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginTop: 6,
-  },
-  rank: { width: 24, color: colors.primary, fontWeight: "700" },
-  listName: { flex: 1, fontSize: 14, color: colors.text },
-  listCount: { color: colors.textMuted, fontWeight: "600" },
-  empty: { color: colors.textMuted, marginTop: 6 },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    content: { padding: 20, paddingBottom: 40 },
+    title: { fontSize: 24, fontWeight: "800", color: colors.text },
+    cardsRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 16 },
+    card: {
+      flex: 1,
+      minWidth: 90,
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      paddingVertical: 18,
+      alignItems: "center",
+    },
+    cardValue: { fontSize: 20, fontWeight: "800", color: colors.primary },
+    cardLabel: { fontSize: 11, color: colors.textMuted, marginTop: 4, textAlign: "center" },
+    banner: {
+      marginTop: 16,
+      backgroundColor: colors.primaryLight,
+      borderRadius: 12,
+      padding: 14,
+    },
+    bannerText: { color: colors.text, fontSize: 14, fontWeight: "600" },
+    section: { fontSize: 17, fontWeight: "700", color: colors.text, marginTop: 24, marginBottom: 8 },
+    listRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      marginTop: 6,
+    },
+    rank: { width: 24, color: colors.primary, fontWeight: "700" },
+    listName: { flex: 1, fontSize: 14, color: colors.text },
+    listCount: { color: colors.textMuted, fontWeight: "600" },
+    empty: { color: colors.textMuted, marginTop: 6 },
+  });

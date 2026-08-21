@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ingredient } from "../types";
 import { suggestIngredients, matchIngredient } from "../services/calorieCalculator";
 import { gramsFromAmountAndUnit, pieceApproxGrams } from "../utils/helpers";
 import { translateUnit } from "../utils/ingredientTranslation";
-import { AppModal, appModalStyles } from "./AppModal";
-import { colors } from "../constants/theme";
+import { AppModal, makeAppModalStyles } from "./AppModal";
+import { lightColors, ThemeColors } from "../constants/theme";
 
 interface Props {
   ingredients: Ingredient[];
@@ -25,6 +25,9 @@ export function IngredientEditor({
   onMessage,
 }: Props) {
   const { t } = useTranslation();
+  const colors = lightColors;
+  const styles = useMemo(() => createStyles(colors), []);
+  const appModalStyles = useMemo(() => makeAppModalStyles(colors), []);
   const [ingName, setIngName] = useState("");
   const [ingAmount, setIngAmount] = useState("");
   const [ingUnit, setIngUnit] = useState("g");
@@ -261,61 +264,62 @@ export function IngredientEditor({
   );
 }
 
-const styles = StyleSheet.create({
-  ingAddRow: { flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center", flexWrap: "wrap" },
-  ingHint: { color: colors.textMuted, fontSize: 12, marginTop: 6 },
-  manualReason: { color: colors.textMuted, fontSize: 14, lineHeight: 20, marginBottom: 4 },
-  ingNameInput: { flex: 1 },
-  ingAmountInput: { width: 90 },
-  unitChips: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
-  unitChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.card,
-  },
-  unitChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  unitChipText: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
-  unitChipTextActive: { color: "#fff", fontWeight: "700" },
-  ingAddBtn: {
-    height: 48,
-    minWidth: 48,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 18,
-  },
-  ingAddBtnText: { color: "#fff", fontSize: 26, lineHeight: 30, fontWeight: "700" },
-  ingList: { marginTop: 10 },
-  ingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.primaryLight,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginTop: 6,
-  },
-  ingRowText: { flex: 1, color: colors.text, fontSize: 14 },
-  ingDel: { color: colors.danger, fontSize: 16 },
-  ingSugBox: { marginTop: 8, backgroundColor: colors.primaryLight, borderRadius: 12, padding: 6 },
-  ingSugRow: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    marginVertical: 1,
-  },
-  ingSugText: { color: colors.success, fontSize: 15, fontWeight: "600" },
-  computeBtn: {
-    marginTop: 14,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  computeBtnText: { color: "#fff", fontWeight: "700" },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    ingAddRow: { flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center", flexWrap: "wrap" },
+    ingHint: { color: colors.textMuted, fontSize: 12, marginTop: 6 },
+    manualReason: { color: colors.textMuted, fontSize: 14, lineHeight: 20, marginBottom: 4 },
+    ingNameInput: { flex: 1 },
+    ingAmountInput: { width: 90 },
+    unitChips: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
+    unitChip: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    unitChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+    unitChipText: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
+    unitChipTextActive: { color: "#fff", fontWeight: "700" },
+    ingAddBtn: {
+      height: 48,
+      minWidth: 48,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 18,
+    },
+    ingAddBtnText: { color: "#fff", fontSize: 26, lineHeight: 30, fontWeight: "700" },
+    ingList: { marginTop: 10 },
+    ingRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primaryLight,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      marginTop: 6,
+    },
+    ingRowText: { flex: 1, color: colors.text, fontSize: 14 },
+    ingDel: { color: colors.danger, fontSize: 16 },
+    ingSugBox: { marginTop: 8, backgroundColor: colors.primaryLight, borderRadius: 12, padding: 6 },
+    ingSugRow: {
+      backgroundColor: colors.card,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      marginVertical: 1,
+    },
+    ingSugText: { color: colors.success, fontSize: 15, fontWeight: "600" },
+    computeBtn: {
+      marginTop: 14,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    computeBtnText: { color: "#fff", fontWeight: "700" },
+  });

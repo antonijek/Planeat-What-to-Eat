@@ -11,19 +11,20 @@ import { MyRecipesScreen } from "../screens/MyRecipesScreen";
 import { CalorieLogScreen } from "../screens/CalorieLogScreen";
 import { AboutScreen } from "../screens/AboutScreen";
 import { RootStackParamList } from "./types";
-import { colors } from "../constants/theme";
+import { useTheme } from "../constants/theme";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: colors.background,
-  },
-};
-
 export function RootNavigator() {
+  const { colors } = useTheme();
+  const theme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: colors.background,
+    },
+  };
+
   return (
     <NavigationContainer theme={theme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>

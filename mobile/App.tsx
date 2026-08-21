@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 import { useUserStore } from "./src/store/userStore";
+import { ThemeProvider } from "./src/constants/theme";
 
 export default function App() {
   const loadUserData = useUserStore((s) => s.loadUserData);
@@ -15,8 +16,10 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <RootNavigator />
-      <StatusBar style="auto" />
+      <ThemeProvider>
+        <RootNavigator />
+        <StatusBar style="auto" />
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }
