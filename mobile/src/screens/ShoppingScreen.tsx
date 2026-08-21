@@ -15,6 +15,7 @@ import { RootStackParamList } from "../navigation/types";
 import { useShoppingStore } from "../store/shoppingStore";
 import { useUserStore } from "../store/userStore";
 import { planService } from "../services/planService";
+import { isFeatureUnlocked } from "../services/premiumService";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
@@ -27,7 +28,7 @@ export function ShoppingScreen() {
   const { t } = useTranslation();
   const { ingredient: ingredientLabel } = useTranslatedRecipe();
   const { items, load, toggle, remove, addManual, replaceMany, clearChecked } = useShoppingStore();
-  const { isPremium } = useUserStore();
+  const { isPremium, trialActive } = useUserStore();
   const [name, setName] = useState("");
   const [info, setInfo] = useState<string | null>(null);
 
@@ -35,7 +36,7 @@ export function ShoppingScreen() {
     load();
   }, []);
 
-  if (!isPremium) {
+  if (!isFeatureUnlocked("shopping", isPremium, trialActive)) {
     return (
       <PremiumLockScreen
         emoji="🛒"
@@ -104,7 +105,7 @@ export function ShoppingScreen() {
               </View>
               <View style={styles.summaryRow}>
                 <Text style={styles.summary}>
-                  {items.filter((i) => i.isChecked).length}/{items.length} done
+                  {items.filter((i) => i.isChecked).length}/{items.length} {t("shopping.done")}
                 </Text>
                 <Pressable onPress={clearChecked}>
                   <Text style={styles.clearBtn}>{t("shopping.clearChecked")}</Text>

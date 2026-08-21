@@ -47,6 +47,7 @@ export const planService = {
       if (!base) continue;
       // override primeni samo na bazične recepte (user- nemaju override)
       let ingredients: Ingredient[];
+      let servings = base.servings || 1;
       if (entry.recipeId.startsWith("user-")) {
         ingredients = base.ingredients;
       } else {
@@ -54,6 +55,7 @@ export const planService = {
         try {
           const effective = await overrideService.getEffective(entry.recipeId);
           ingredients = effective.ingredients ?? base.ingredients;
+          if (effective.servings) servings = effective.servings;
         } catch {
           ingredients = base.ingredients;
         }
@@ -63,7 +65,8 @@ export const planService = {
         const grams = ing.grams ?? 0;
         // bez gramaže ili 0g (npr. "pinch", "to taste", "salt") ne možemo reći koliko kupiti — preskoči
         if (grams <= 0) continue;
-        const qty = grams * entry.persons;
+        // sastojci pokrivaju CELU seriju (servings), pa se količina skalira odnosom osoba/servings
+        const qty = grams * (entry.persons / servings);
         const cur = totals.get(key);
         if (cur) {
           cur.amount += qty;

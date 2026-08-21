@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -32,12 +33,15 @@ export function AppModal({
   title,
   onClose,
   onSave,
-  saveLabel = "Save",
+  saveLabel,
   onCancel,
-  cancelLabel = "Cancel",
+  cancelLabel,
   onDelete,
   children,
 }: Props) {
+  const { t } = useTranslation();
+  const save = saveLabel ?? t("common.save");
+  const cancel = cancelLabel ?? t("common.cancel");
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <KeyboardAvoidingView
@@ -65,11 +69,11 @@ export function AppModal({
                 </Pressable>
               )}
               <Pressable style={styles.cancelBtn} onPress={onCancel ?? onClose}>
-                <Text style={styles.cancelText}>{cancelLabel}</Text>
+                <Text style={styles.cancelText}>{cancel}</Text>
               </Pressable>
               {onSave && (
                 <Pressable style={styles.saveBtn} onPress={onSave}>
-                  <Text style={styles.saveText}>{saveLabel}</Text>
+                  <Text style={styles.saveText}>{save}</Text>
                 </Pressable>
               )}
             </View>

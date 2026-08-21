@@ -17,7 +17,7 @@ import { useRecipeStore } from "../store/recipeStore";
 import { useUserStore } from "../store/userStore";
 import { useTranslation } from "react-i18next";
 import { historyService } from "../services/historyService";
-import { premiumService } from "../services/premiumService";
+import { premiumService, isFeatureUnlocked } from "../services/premiumService";
 import { recipeService } from "../services/recipeService";
 import { MealMomentPicker } from "../components/MealMomentPicker";
 import { WheelResultModal } from "../components/WheelResultModal";
@@ -34,13 +34,16 @@ export function HomeScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
   const { recipes, load, lastSpunRecipeId } = useRecipeStore();
-  const { isPremium } = useUserStore();
+  const { isPremium, trialActive } = useUserStore();
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
   const [spinCount, setSpinCount] = useState(0);
   const [moment, setMoment] = useState<string | null>(null);
   const [result, setResult] = useState<Recipe | null>(null);
   const [haveIngredients, setHaveIngredients] = useState<string[]>([]);
   const [haveInput, setHaveInput] = useState("");
+
+  // Neograničene vrtnje = premium ili aktivan trial (free = 5/dan)
+  const hasUnlimitedSpins = isFeatureUnlocked("wheelUnlimited", isPremium, trialActive);
 
   const filteredRecipes = useMemo(() => {
     let list = recipesForMoment(recipes, moment) as Recipe[];
@@ -100,42 +103,48 @@ export function HomeScreen() {
             <ScreenMenu navigate={nav.navigate} style={styles.menuBtn} />
           </View>
 
-          <View style={styles.haveWrap}>
-            <Pressable
-              onPress={() => setHaveIngredients([])}
-              hitSlop={8}
-              style={styles.haveHead}
-            >
-              <Text style={styles.haveHeadText}>
-                {t("home.haveHead")}
-                {haveIngredients.length > 0 ? ` (${haveIngredients.length})` : ""}
-              </Text>
+          {isFeatureUnlocked("haveIngredients", isPremium, trialActive) ? (
+            <View style={styles.haveWrap}>
+              <Pressable
+                onPress={() => setHaveIngredients([])}
+                hitSlop={8}
+                style={styles.haveHead}
+              >
+                <Text style={styles.haveHeadText}>
+                  {t("home.haveHead")}
+                  {haveIngredients.length > 0 ? ` (${haveIngredients.length})` : ""}
+                </Text>
+              </Pressable>
+              <IngredientInputChips
+                value={haveInput}
+                onChangeText={setHaveInput}
+                onSubmit={addHave}
+                ingredients={haveIngredients}
+                onRemove={(ing) => setHaveIngredients(haveIngredients.filter((i) => i !== ing))}
+                placeholder={t("home.havePlaceholder")}
+                emptyHint={t("home.haveGuide")}
+                hint={
+                  haveIngredients.length > 0
+                    ? t("home.haveHint", {
+                        count: filteredRecipes.length,
+                        list: haveIngredients.join(", "),
+                      })
+                    : undefined
+                }
+              />
+            </View>
+          ) : (
+            <Pressable style={styles.haveLocked} onPress={() => nav.navigate("Premium")}>
+              <Text style={styles.haveLockedText}>💎 {t("recipes.premiumBanner")}</Text>
             </Pressable>
-            <IngredientInputChips
-              value={haveInput}
-              onChangeText={setHaveInput}
-              onSubmit={addHave}
-              ingredients={haveIngredients}
-              onRemove={(ing) => setHaveIngredients(haveIngredients.filter((i) => i !== ing))}
-              placeholder={t("home.havePlaceholder")}
-              emptyHint={t("home.haveGuide")}
-              hint={
-                haveIngredients.length > 0
-                  ? t("home.haveHint", {
-                      count: filteredRecipes.length,
-                      list: haveIngredients.join(", "),
-                    })
-                  : undefined
-              }
-            />
-          </View>
+          )}
         </View>
 
         <View style={styles.wheelArea}>
           <Wheel
             recipes={filteredRecipes}
             onSpinEnd={(r) => handleSpinEnd(r)}
-            disabled={!isPremium && spinsLeft === 0}
+            disabled={!hasUnlimitedSpins && spinsLeft === 0}
           />
         </View>
 
@@ -146,7 +155,7 @@ export function HomeScreen() {
             <Text style={styles.limit}>{t("home.noRecipes")}</Text>
           )}
 
-          {!isPremium && spinsLeft !== null && (
+          {!hasUnlimitedSpins && spinsLeft !== null && (
             <Text style={styles.limit}>
               {t("home.spinsLeftToday", { count: spinsLeft })}
             </Text>
@@ -222,6 +231,15 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 12,
   },
+  haveLocked: {
+    width: "100%",
+    marginTop: 14,
+    backgroundColor: colors.primary,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  haveLockedText: { color: "#fff", fontWeight: "700" },
   haveHead: { alignItems: "center", paddingVertical: 2 },
   haveHeadText: { color: colors.text, fontSize: 14, fontWeight: "700" },
   haveInput: {

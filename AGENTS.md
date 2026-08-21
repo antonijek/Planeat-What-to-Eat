@@ -1,4 +1,4 @@
-# MealMate AI — Uputstvo za razvoj (AGENTS.md)
+# Planeat — Uputstvo za razvoj (AGENTS.md)
 
 Ovo je dokument koji pomaže svakom AI agentu (i developeru) da nastavi rad na projektu
 bez gubljenja konteksta. **Pročitaj ovo pre bilo kakve izmene.**
@@ -7,8 +7,14 @@ bez gubljenja konteksta. **Pročitaj ovo pre bilo kakve izmene.**
 
 ## Šta je aplikacija
 
-**MealMate AI** ("Šta danas da jedem?") — React Native (Expo) mobilna aplikacija za
+**Planeat** ("Šta danas da jedem?") — React Native (Expo) mobilna aplikacija za
 odlučivanje šta jesti, planiranje obroka i pravljenje liste za kupovinu.
+
+### Branding / naziv (podsetnik — namera, NIJE još primenjeno u kod)
+- Ime app: **Planeat** (naziv u `About` već je "Planeat — What to Eat"; stari naziv u AGENTS bio "MealMate AI").
+- Namera za slogan (ispod logoa/splash, podnaslov na Home-u): **"Plan. Cook. Track."** — JOŠ NIJE postavljeno u `i18n/home.subtitle`.
+- NAMERA za store listing: **"Planeat – Recipes, Meal Planner & Calories"** — JOŠ NIJE postavljeno u `app.json` (trenutno `name: "Planeat — What to Eat"`, `description` je opis točka).
+- Kad se odluči: `app.json` → `name: "Planeat"`, `description` sadrži store listing, `slug: "planeat"`; `i18n/home.subtitle` → "Plan. Cook. Track." (slogan ostaje engleski kao brend).
 
 - **Glavni ekran** je točak 🎡 koji korisnik vrti i dobija nasumičan recept.
 - Točak je *ulazna tačka* (zabava), ali prava vrednost je rešavanje svakodnevnih problema:
@@ -255,6 +261,8 @@ Dve odvojene stvari:
 ### 1. UI prevodi — `mobile/src/i18n/`
 - `en.ts` (izvor) + `de/es/fr/it/pt/sr.ts` — svaki importuje `en` i overriduje ključeve (fallback na en).
 - `index.ts` registruje jezike u `resources` + `supported`. Dodaj novi jezik: napravi `xx.ts`, dodaš u `resources` i `supported`, i u listu `LANGUAGES` u `AboutScreen.tsx`.
+- ⚠️ **Jezici override-uju CELE sekcije** (npr. `home: { ... }`), pa ključ dodan u `en` ne postoji automatski u ostalim → ispadne engleski.
+- **OBAVEZNO** nakon dodavanja bilo kog UI stringa: pokreni `node scripts/check_i18n.js` i popuni prevode koje prijavi. Ne isporučuj prevođenje dok skripta ne prikaže 0 nedostaje.
 - Prevod sadržaja baze je **odvojen** od UI prevoda.
 
 ### 2. Prevod sadržaja baze (recepti, sastojci, kuhinje, instrukcije)
@@ -285,10 +293,20 @@ Dve odvojene stvari:
 - **Ocene recepata (1-5) UI** — store ima `rate()`, ekran nema
 - **Izmene recepata** — radi (override), ali forma je gruba (jedan TextInput za sve sastojke).
   Moguće poboljšanje: dodavanje pojedinačnih sastojaka u UI.
+- **Tamna tema** — reklamirana kao premium (`premium.pfTheme`), ali NE postoji u kodu!
+  Pre lansiranja: implementirati (colors u `constants/theme.ts` + `UserSettings.darkMode`).
+
+### Analitika — KAD DOĐE VREME (za sada NEMOJ)
+- **Firebase Analytics** (Google, besplatan SDK) — meri šta korisnici rade: event-i `recipe_added`,
+  `spun`, `cooked`, `premium_purchased`... Odlučuje kada je baza dovoljno narasla za backend/UGC.
+- Store konzola (Play Console / App Store Connect) daje preuzimanja, DAU/WAU, retention — bez koda.
+- **Okidač za backend:** 500+ aktivnih dnevno + desetine dodavanja recepata nedeljno.
+- **Premium kupovina:** za lansiranje je dovoljan IAP (Google/Apple vode trial i pretplatu);
+  backend je tek kasnije za validaciju/sync.
 
 ### Budućnost
-- Tamna tema
 - Laravel backend (prebaci services/ na API, SQL baza, login, cloud sync)
+- Deljenje sopstvenih recepata + zajedničke ocene (UGC) — najjači razlog za backend
 
 ## ⚠️ Bitna upozorenja za nastavak rada (naučeno u razvoju)
 

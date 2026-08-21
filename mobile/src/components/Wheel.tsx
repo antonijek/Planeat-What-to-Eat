@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Dimensions } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,6 +8,7 @@ import Animated, {
   runOnJS,
   SharedValue,
 } from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useAudioPlayer } from "expo-audio";
 import Svg, { Path, G, Circle } from "react-native-svg";
 import { Recipe } from "../types";
@@ -26,6 +27,14 @@ const SIZE = 260 + PAD * 2;
 const R = 130;
 const CX = SIZE / 2;
 const CY = SIZE / 2;
+
+// Za vrtnju prstom: prevlačenje po širini ekrana = 1 pun obrtaj.
+const SCREEN_W = Dimensions.get("window").width;
+const DRAG_DEG = 360; // pun okret za pomeraj = širina ekrana
+/** Minimalni "flick" (u st°/s) da točak krene — ispod toga se vraća na granicu. */
+const FLICK_MIN_DEG_PER_S = 110;
+/** Koliko se najviše okrene od brzine flicka (stepeni). */
+const MAX_SWIPE_DEG = 360 * 3;
 
 /** 12 univerzalnih emoji-ja — po jedan na segment, uvek različiti. */
 const WHEEL_EMOJIS = [
@@ -119,6 +128,15 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
   const tickPlayer = useAudioPlayer(require("../../assets/sounds/tick.wav"));
   const tickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const offsetSet = useRef(false);
+
+  // Stanje za vrtnju prstom (UI-thread, bez setState po frame-u).
+  const dragStart = useSharedValue(0);
+  const isDragging = useSharedValue(false);
+  const segmentCount = useSharedValue(0);
+  const wheelDisabled = useSharedValue(0);
+
+  useEffect(() => { segmentCount.value = segments.length; }, [segments]);
+  useEffect(() => { wheelDisabled.value = disabled ? 1 : 0; }, [disabled]);
 
   useEffect(() => {
     setSegments(pickRandom(recipes, Math.min(MAX_SEGMENTS, recipes.length)));
@@ -214,17 +232,13 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
     return { transform: [{ rotate: `${-snap}deg` }] };
   });
 
-  function spin() {
-    if (isSpinning || segments.length === 0) return;
-    setIsSpinning(true);
+  /** Pokreće animaciju vrtnje od start do target (sa tik zvukom). */
+  function runSpinAnimation(start: number, target: number, duration: number) {
     spinning.value = 1;
-    const extra = Math.floor(Math.random() * 360 * 5 + 360 * 3); // 3-8 punih krugova
-    const start = rotation.value;
-    const target = start + extra + 3600;
-    scheduleTicks(start, target, 3000);
+    scheduleTicks(start, target, duration);
     rotation.value = withTiming(
       target,
-      { duration: 3000, easing: Easing.out(Easing.cubic) },
+      { duration, easing: Easing.out(Easing.cubic) },
       (finished) => {
         if (finished) {
           runOnJS(finishSpin)(target % 360);
@@ -232,6 +246,61 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
       }
     );
   }
+
+  function spin() {
+    if (isSpinning || segments.length === 0) return;
+    setIsSpinning(true);
+    const extra = Math.floor(Math.random() * 360 * 5 + 360 * 3); // 3-8 punih krugova
+    const start = rotation.value;
+    const target = start + extra + 3600;
+    runSpinAnimation(start, target, 3000);
+  }
+
+  /** Vrtnja inicirana prstom (flick). start = trenutni ugao, spinDeg = koliko da se okrene. */
+  function triggerSwipeSpin(start: number, spinDeg: number) {
+    if (isSpinning || segments.length === 0) return;
+    setIsSpinning(true);
+    const target = start + spinDeg;
+    // Veći pomak → duže trajanje (da svaki flick ima prirodnu inerciju).
+    const dist = Math.abs(target - start);
+    const duration = Math.min(2600, Math.max(1100, Math.round(dist * 0.04 + 900)));
+    runSpinAnimation(start, target, duration);
+  }
+
+  /** Slab pomak (ispod praga flicka): vrati točak na najbližu granicu segmenta bez rezultata. */
+  function snapToBoundary() {
+    const step = 360 / Math.max(1, segmentCount.value);
+    const norm = ((rotation.value % 360) + 360) % 360;
+    const nearest = Math.round(norm / step) * step;
+    rotation.value = withTiming(rotation.value + (nearest - norm), { duration: 200 });
+  }
+
+  // Prepozna pokret prstom po točku; trka na UI thread za glatku vrtnju.
+  const swipeGesture = Gesture.Pan()
+    .onBegin(() => {
+      if (wheelDisabled.value === 1 || spinning.value === 1 || segmentCount.value === 0) return;
+      dragStart.value = rotation.value;
+      isDragging.value = true;
+    })
+    .onUpdate((e) => {
+      if (!isDragging.value) return;
+      rotation.value = dragStart.value + (e.translationX / SCREEN_W) * DRAG_DEG;
+    })
+    .onEnd((e) => {
+      if (!isDragging.value) return;
+      isDragging.value = false;
+      const degVel = (e.velocityX / SCREEN_W) * DRAG_DEG;
+      if (Math.abs(degVel) < FLICK_MIN_DEG_PER_S) {
+        runOnJS(snapToBoundary)();
+        return;
+      }
+      const start = rotation.value;
+      const deg = Math.sign(degVel) * Math.min(Math.abs(degVel) * 0.45 + 360, MAX_SWIPE_DEG);
+      runOnJS(triggerSwipeSpin)(start, deg);
+    })
+    .onFinalize(() => {
+      isDragging.value = false;
+    });
 
   function finishSpin(finalRotation: number) {
     stopTicks();
@@ -254,21 +323,23 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
         <View style={styles.pointerMount}><View style={styles.pointerMountInner} /></View>
         <View style={styles.pointerArm}><View style={styles.pointerArmShadow} /><View style={styles.pointerArmBody} /></View>
       </Animated.View>
-      <Animated.View style={[styles.wheel, animatedStyle]}>
-        <Svg width={SIZE} height={SIZE}>
-          {segments.map((recipe, i) => {
-            const start = (360 / segments.length) * i;
-            const end = (360 / segments.length) * (i + 1);
-            const colour = colors.wheel[i % colors.wheel.length];
-            return <G key={recipe.id}><Path d={segmentPath(start, end, R - 2)} fill={colour} /></G>;
-          })}
-          {segments.map((recipe, i) => {
-            const boundary = (360 / segments.length) * i;
-            return <Nail key={`nail-${recipe.id}`} angle={boundary} />;
-          })}
-        </Svg>
-        <View style={styles.centerDot}><Text style={styles.centerText}>🍽️</Text></View>
-      </Animated.View>
+      <GestureDetector gesture={swipeGesture}>
+        <Animated.View style={[styles.wheel, animatedStyle]}>
+          <Svg width={SIZE} height={SIZE}>
+            {segments.map((recipe, i) => {
+              const start = (360 / segments.length) * i;
+              const end = (360 / segments.length) * (i + 1);
+              const colour = colors.wheel[i % colors.wheel.length];
+              return <G key={recipe.id}><Path d={segmentPath(start, end, R - 2)} fill={colour} /></G>;
+            })}
+            {segments.map((recipe, i) => {
+              const boundary = (360 / segments.length) * i;
+              return <Nail key={`nail-${recipe.id}`} angle={boundary} />;
+            })}
+          </Svg>
+          <View style={styles.centerDot}><Text style={styles.centerText}>🍽️</Text></View>
+        </Animated.View>
+      </GestureDetector>
       {segments.map((recipe, i) => {
         const mid = ((360 / segments.length) * i + (360 / segments.length) * (i + 1)) / 2;
         return <EmojiLabel key={recipe.id} angle={mid} emoji={WHEEL_EMOJIS[i % WHEEL_EMOJIS.length]} rotation={rotation} />;

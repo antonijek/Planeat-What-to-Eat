@@ -4,6 +4,7 @@ import { Screen } from "../components/Screen";
 import { historyService } from "../services/historyService";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
+import { isFeatureUnlocked } from "../services/premiumService";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
@@ -20,7 +21,7 @@ interface RankItem {
 export function StatsScreen() {
   const { t } = useTranslation();
   const { category: categoryLabel, recipeName } = useTranslatedRecipe();
-  const { isPremium } = useUserStore();
+  const { isPremium, trialActive } = useUserStore();
   const [totalCooked, setTotalCooked] = useState(0);
   const [thisWeek, setThisWeek] = useState(0);
   const [avgKcal, setAvgKcal] = useState(0);
@@ -30,7 +31,7 @@ export function StatsScreen() {
   const [topCategories, setTopCategories] = useState<RankItem[]>([]);
 
   useEffect(() => {
-    if (!isPremium) return;
+    if (!isFeatureUnlocked("stats", isPremium, trialActive)) return;
     (async () => {
       const entries = await historyService.getCooked();
       if (entries.length === 0) {
@@ -90,9 +91,9 @@ export function StatsScreen() {
           .map(([name, count]) => ({ name, count }))
       );
     })();
-  }, [isPremium]);
+  }, [isPremium, trialActive]);
 
-  if (!isPremium) {
+  if (!isFeatureUnlocked("stats", isPremium, trialActive)) {
     return (
       <PremiumLockScreen
         emoji="📊"

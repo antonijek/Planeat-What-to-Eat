@@ -16,18 +16,19 @@ import {
 } from "../services/calorieLogService";
 import { suggestIngredients } from "../services/calorieCalculator";
 import { useUserStore } from "../store/userStore";
+import { isFeatureUnlocked } from "../services/premiumService";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { CalorieGoalModal } from "../components/CalorieGoalModal";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { Screen } from "../components/Screen";
 
-function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown>) => string): string {
+function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown>) => string, lang: string): string {
   if (offset === 0) return t("tracker.today");
   if (offset === -1) return t("tracker.yesterday");
   const d = new Date();
   d.setDate(d.getDate() + offset);
-  return d.toLocaleDateString();
+  return d.toLocaleDateString(lang);
 }
 
 /** Prikaz makroa za stavku — samo vrednosti >0, da se ne vide "0g · Protein 0g · …". */
@@ -64,8 +65,8 @@ export function CalorieLogScreen() {
   const [manualKcal, setManualKcal] = useState("");
   const gramsRef = useRef<TextInput>(null);
   const [goalModal, setGoalModal] = useState(false);
-  const { isPremium, calorieGoal, setCalorieGoal } = useUserStore();
-  const { t } = useTranslation();
+  const { isPremium, trialActive, calorieGoal, setCalorieGoal } = useUserStore();
+  const { t, i18n } = useTranslation();
 
   const dateKey = dateKeyOffset(offset);
   const todayKey = dateKeyForToday();
@@ -78,7 +79,7 @@ export function CalorieLogScreen() {
     load(0);
   }, [load]);
 
-  if (!isPremium) {
+  if (!isFeatureUnlocked("calorieTracker", isPremium, trialActive)) {
     return (
       <PremiumLockScreen
         emoji="🥗"
@@ -181,7 +182,7 @@ export function CalorieLogScreen() {
               <Pressable style={styles.navBtn} onPress={() => changeOffset(-1)}>
                 <Text style={styles.navText}>◀</Text>
               </Pressable>
-              <Text style={styles.dayLabel}>{dayTitle(offset, t)}</Text>
+              <Text style={styles.dayLabel}>{dayTitle(offset, t, i18n.language)}</Text>
               <Pressable
                 style={styles.navBtn}
                 onPress={() => (offset < 0 ? changeOffset(1) : null)}
@@ -291,7 +292,7 @@ export function CalorieLogScreen() {
             )}
 
             <Text style={styles.section}>
-              {dayTitle(offset, t)} {totals.count ? `(${totals.count})` : ""}
+              {dayTitle(offset, t, i18n.language)} {totals.count ? `(${totals.count})` : ""}
             </Text>
           </View>
         }

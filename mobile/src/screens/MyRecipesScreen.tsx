@@ -15,6 +15,7 @@ import { RecipeCard } from "../components/RecipeCard";
 import { AddRecipeModal } from "../components/AddRecipeModal";
 import { myRecipesService } from "../services/myRecipesService";
 import { useUserStore } from "../store/userStore";
+import { isFeatureUnlocked } from "../services/premiumService";
 import { Recipe } from "../types";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
@@ -27,7 +28,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 export function MyRecipesScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
-  const { isPremium } = useUserStore();
+  const { isPremium, trialActive } = useUserStore();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<Recipe | null>(null);
@@ -63,7 +64,7 @@ export function MyRecipesScreen() {
     reload();
   }
 
-  if (!isPremium) {
+  if (!isFeatureUnlocked("myRecipes", isPremium, trialActive)) {
     return (
       <PremiumLockScreen
         emoji="👨‍🍳"

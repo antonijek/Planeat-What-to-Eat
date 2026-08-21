@@ -21,6 +21,9 @@ import { overrideService } from "../services/overrideService";
 import { historyService } from "../services/historyService";
 import { recipeService } from "../services/recipeService";
 import { calorieLogService } from "../services/calorieLogService";
+import { planService } from "../services/planService";
+import { isFeatureUnlocked } from "../services/premiumService";
+import { MealPlanEntry } from "../types";
 import { useUserStore } from "../store/userStore";
 import { useRecipeStore } from "../store/recipeStore";
 import { Recipe } from "../types";
@@ -37,7 +40,7 @@ export function RecipeDetailScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
   const { id } = route.params;
-  const { isPremium, toggleFavorite, favorites } = useUserStore();
+  const { isPremium, trialActive, toggleFavorite, favorites } = useUserStore();
   const { translate } = useTranslatedRecipe();
   const recipeStoreGetById = useRecipeStore((s) => s.getById);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -46,6 +49,16 @@ export function RecipeDetailScreen() {
   const [editOpen, setEditOpen] = useState(false);
   const [cooked, setCooked] = useState(false);
   const [trackerMsg, setTrackerMsg] = useState<string | null>(null);
+  const [planOpen, setPlanOpen] = useState(false);
+  const [planDay, setPlanDay] = useState(0);
+  const [planMeal, setPlanMeal] = useState<"lunch" | "dinner">("lunch");
+  const [planMsg, setPlanMsg] = useState<string | null>(null);
+  const [planEntries, setPlanEntries] = useState<MealPlanEntry[]>([]);
+
+  function openPlanModal() {
+    setPlanOpen(true);
+    planService.getPlan().then(setPlanEntries);
+  }
 
   const isFav = favorites.some((f) => f.recipeId === id);
 
@@ -68,6 +81,7 @@ export function RecipeDetailScreen() {
 
   async function handleShare() {
     if (!recipe) return;
+    const translated = translate(recipe);
     const s = recipe.servings || 1;
     const kc = recipe.calories ? Math.round(recipe.calories / s) : null;
     const pr = recipe.protein ? Math.round(recipe.protein / s) : null;
@@ -77,24 +91,24 @@ export function RecipeDetailScreen() {
       .map((i) => `• ${i.measure} ${i.name}`)
       .join("\n");
     const nutrition = [
-      kc != null ? `Energy: ${kc} kcal` : "",
-      fa != null ? `Fat: ${fa}g` : "",
-      ca != null ? `Carbs: ${ca}g` : "",
-      pr != null ? `Protein: ${pr}g` : "",
+      kc != null ? `${t("recipeDetail.energy")}: ${kc} kcal` : "",
+      fa != null ? `${t("recipeDetail.fat")}: ${fa}g` : "",
+      ca != null ? `${t("recipeDetail.carbohydrate")}: ${ca}g` : "",
+      pr != null ? `${t("recipeDetail.protein")}: ${pr}g` : "",
     ].filter(Boolean);
     const instructionLines = recipe.instructions.map((ins) => `• ${ins}`).join("\n");
     const message = [
-      `🍽️ ${recipe.name}`,
-      recipe.area ? `From ${recipe.area}` : "",
-      `Serves ~${s}`,
+      `🍽️ ${translated.name}`,
+      recipe.area ? t("recipeDetail.shareFrom", { area: translated.area }) : "",
+      t("recipeDetail.shareServes", { count: s }),
       `⏱️ ${formatDuration(recipe.prepTime)}`,
-      nutrition.length ? "\nNutrition (per serving):" : "",
+      nutrition.length ? t("recipeDetail.shareNutrition") : "",
       ...nutrition,
-      "\nIngredients:",
+      t("recipeDetail.ingredients") + ":",
       ingredientLines || "—",
-      instructionLines ? "\nInstructions:" : "",
+      instructionLines ? t("recipeDetail.instructions") + ":" : "",
       instructionLines || "",
-      "\nMade with MealMate AI",
+      t("recipeDetail.shareMadeWith"),
     ]
       .filter(Boolean)
       .join("\n");
@@ -135,7 +149,7 @@ export function RecipeDetailScreen() {
         <View style={styles.body}>
           <View style={styles.titleRow}>
             <Text style={styles.title}>{r.name}</Text>
-            {isPremium && (
+            {isFeatureUnlocked("editRecipes", isPremium, trialActive) && (
               <Pressable onPress={() => setEditOpen(true)} hitSlop={8} style={styles.editBtn}>
                 <Text style={styles.editBtnText}>✏️</Text>
               </Pressable>
@@ -186,23 +200,42 @@ export function RecipeDetailScreen() {
             <Pressable
               style={styles.calorieLogBtn}
               onPress={async () => {
+                if (!isFeatureUnlocked("calorieTracker", isPremium, trialActive)) {
+                  nav.navigate("Premium");
+                  return;
+                }
                 const s = recipe.servings || 1;
-                const kcal = recipe.calories
-                  ? Math.round((recipe.calories / s) * persons)
-                  : 0;
-                await calorieLogService.addCookedMeal(recipe.name, kcal, {
-                  protein: recipe.protein,
-                  carbs: recipe.carbs,
-                  fats: recipe.fats,
+                // Dnevnik prati JEDNU porciju (kcal/makroi za jedan obrok),
+                // jer recept u bazi opisuje celu seriju. Po potrebi se doda više puta.
+                const round = (v?: number) =>
+                  v && Number.isFinite(v) ? Math.round(v / s) : undefined;
+                const kcal = recipe.calories ? Math.round(recipe.calories / s) : 0;
+                await calorieLogService.addCookedMeal(r.name, kcal, {
+                  protein: round(recipe.protein),
+                  carbs: round(recipe.carbs),
+                  fats: round(recipe.fats),
                 });
                 setTrackerMsg(
-                  `"${recipe.name}" (~${kcal} kcal for ${persons} people) added to today.`
+                  t("recipeDetail.addedPerServing", { name: r.name, kcal })
                 );
               }}
             >
                 <Text style={styles.calorieLogBtnText}>{t("recipeDetail.addToTracker")}</Text>
             </Pressable>
           )}
+
+          <Pressable
+            style={styles.planBtn}
+            onPress={() => {
+              if (!isFeatureUnlocked("planer", isPremium, trialActive)) {
+                nav.navigate("Premium");
+                return;
+              }
+              openPlanModal();
+            }}
+          >
+            <Text style={styles.planBtnText}>📅 {t("recipeDetail.addToPlaner")}</Text>
+          </Pressable>
 
           <NutritionTable recipe={recipe} />
 
@@ -235,7 +268,7 @@ export function RecipeDetailScreen() {
             </Pressable>
           )}
 
-          {!isPremium && (
+          {!isFeatureUnlocked("editRecipes", isPremium, trialActive) && (
             <Pressable style={styles.premiumBtn} onPress={() => nav.navigate("Premium")}>
               <Text style={styles.premiumText}>💎 Unlock recipe editing</Text>
             </Pressable>
@@ -286,12 +319,90 @@ export function RecipeDetailScreen() {
 
       <AppModal
         visible={trackerMsg !== null}
-        title="Added to Calorie tracker"
+        title={t("recipeDetail.addedTitle")}
         onClose={() => setTrackerMsg(null)}
         onSave={() => setTrackerMsg(null)}
         saveLabel="OK"
       >
         <Text style={{ color: colors.text }}>{trackerMsg}</Text>
+      </AppModal>
+
+      <AppModal
+        visible={planMsg !== null}
+        title={t("recipeDetail.addToPlaner")}
+        onClose={() => setPlanMsg(null)}
+        onSave={() => setPlanMsg(null)}
+        saveLabel="OK"
+      >
+        <Text style={{ color: colors.text }}>{planMsg}</Text>
+      </AppModal>
+
+      <AppModal
+        visible={planOpen}
+        title={t("recipeDetail.addToPlaner")}
+        onClose={() => setPlanOpen(false)}
+        onSave={async () => {
+          const entry: MealPlanEntry = {
+            id: `${planDay}-${planMeal}`,
+            dayOfWeek: planDay,
+            mealType: planMeal,
+            recipeId: recipe.id,
+            persons: persons,
+          };
+          await planService.upsert(entry);
+          setPlanOpen(false);
+          setPlanMsg(t("recipeDetail.addedToPlaner"));
+        }}
+        saveLabel={t("recipeDetail.planToAdd")}
+      >
+        <Text style={styles.planSectionLabel}>{t("recipeDetail.planDay")}</Text>
+        <View style={styles.planDayRow}>
+          {["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map((d, i) => (
+            <Pressable
+              key={d}
+              style={[styles.planDayChip, planDay === i && styles.planDayChipOn]}
+              onPress={() => setPlanDay(i)}
+            >
+              <Text style={[styles.planDayText, planDay === i && styles.planDayTextOn]}>{t(`planer.${d}`)}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <Text style={styles.planSectionLabel}>{t("recipeDetail.planMeal")}</Text>
+        <View style={styles.planDayRow}>
+          <Pressable
+            style={[styles.planMealBtn, planMeal === "lunch" && styles.planMealBtnOn]}
+            onPress={() => setPlanMeal("lunch")}
+          >
+            <Text style={[styles.planMealText, planMeal === "lunch" && styles.planMealTextOn]}>
+              {t("mealMoment.lunch")}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.planMealBtn, planMeal === "dinner" && styles.planMealBtnOn]}
+            onPress={() => setPlanMeal("dinner")}
+          >
+            <Text style={[styles.planMealText, planMeal === "dinner" && styles.planMealTextOn]}>
+              {t("mealMoment.dinner")}
+            </Text>
+          </Pressable>
+        </View>
+
+        {(() => {
+          const existing = planEntries.find(
+            (p) => p.dayOfWeek === planDay && p.mealType === planMeal
+          );
+          if (!existing) return null;
+          const existingRecipe = recipeService.getById(existing.recipeId);
+          return (
+            <View style={styles.planOccupied}>
+              <Text style={styles.planOccupiedText}>
+                {t("recipeDetail.planOccupied", {
+                  name: existingRecipe ? translate(existingRecipe).name : "",
+                })}
+              </Text>
+            </View>
+          );
+        })()}
       </AppModal>
     </Screen>
   );
@@ -344,6 +455,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   calorieLogBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
+  planBtn: {
+    marginTop: 10,
+    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  planBtnText: { color: colors.primary, fontSize: 15, fontWeight: "700" },
+  planSectionLabel: { fontSize: 14, fontWeight: "700", color: colors.text, marginTop: 10, marginBottom: 6 },
+  planDayRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  planDayChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
+  },
+  planDayChipOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+  planDayText: { fontSize: 13, fontWeight: "600", color: colors.text },
+  planDayTextOn: { color: "#fff" },
+  planMealBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
+    alignItems: "center",
+  },
+  planMealBtnOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+  planMealText: { fontSize: 14, fontWeight: "600", color: colors.text },
+  planMealTextOn: { color: "#fff" },
+  planOccupied: {
+    marginTop: 12,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 10,
+    padding: 10,
+  },
+  planOccupiedText: { color: colors.text, fontSize: 13, lineHeight: 18 },
   section: { fontSize: 18, fontWeight: "700", color: colors.text, marginTop: 20, marginBottom: 8 },
   step: { flexDirection: "row", marginBottom: 12, alignItems: "flex-start" },
   stepNum: {

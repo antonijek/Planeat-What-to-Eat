@@ -19,6 +19,7 @@ import { ScreenMenu } from "../components/ScreenMenu";
 import { Recipe } from "../types";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
+import { isFeatureUnlocked } from "../services/premiumService";
 import { useRecipeStore } from "../store/recipeStore";
 import { useRecipesFilterStore, RecipesFilters } from "../store/recipesFilterStore";
 import { parseIngredientInput } from "../utils/ingredients";
@@ -62,7 +63,7 @@ export function RecipesScreen() {
   const nav = useNavigation<Nav>();
   const { t } = useTranslation();
   const { area: areaLabel } = useTranslatedRecipe();
-  const { isPremium } = useUserStore();
+  const { isPremium, trialActive } = useUserStore();
   const allRecipes = useRecipeStore((s) => s.recipes);
   const userRecipes = allRecipes.filter((r) => r.id.startsWith("user-"));
   const {
@@ -167,7 +168,7 @@ export function RecipesScreen() {
             </View>
 
             {!query.trim() && (
-              <>{isPremium ? (
+              <>{isFeatureUnlocked("haveIngredients", isPremium, trialActive) ? (
               <View style={styles.haveBox}>
                 <Text style={styles.haveTitle}>🥘 {t("recipes.haveTitle")}</Text>
                 <IngredientInputChips

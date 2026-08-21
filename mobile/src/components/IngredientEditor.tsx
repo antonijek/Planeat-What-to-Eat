@@ -243,14 +243,14 @@ export function IngredientEditor({
         {manualReason ? <Text style={styles.manualReason}>{manualReason}</Text> : null}
         <Text style={appModalStyles.label}>{t("addRecipe.macrosPer100")}</Text>
         <View style={styles.ingAddRow}>
-          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mkcal} onChangeText={setMkcal} keyboardType="numeric" placeholder="kcal/100g" placeholderTextColor={colors.textFaint} />
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mkcal} onChangeText={setMkcal} keyboardType="numeric" placeholder={t("addRecipe.per100Kcal")} placeholderTextColor={colors.textFaint} />
         </View>
         <View style={styles.ingAddRow}>
-          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mp} onChangeText={setMp} keyboardType="numeric" placeholder="protein/100g" placeholderTextColor={colors.textFaint} />
-          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mc} onChangeText={setMc} keyboardType="numeric" placeholder="carbs/100g" placeholderTextColor={colors.textFaint} />
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mp} onChangeText={setMp} keyboardType="numeric" placeholder={t("addRecipe.per100Protein")} placeholderTextColor={colors.textFaint} />
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mc} onChangeText={setMc} keyboardType="numeric" placeholder={t("addRecipe.per100Carbs")} placeholderTextColor={colors.textFaint} />
         </View>
         <View style={styles.ingAddRow}>
-          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mf} onChangeText={setMf} keyboardType="numeric" placeholder="fats/100g" placeholderTextColor={colors.textFaint} />
+          <TextInput style={[appModalStyles.input, styles.ingAmountInput]} value={mf} onChangeText={setMf} keyboardType="numeric" placeholder={t("addRecipe.per100Fats")} placeholderTextColor={colors.textFaint} />
         </View>
       </AppModal>
 

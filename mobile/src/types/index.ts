@@ -1,5 +1,5 @@
 export type Difficulty = "easy" | "medium" | "hard";
-export type PremiumType = "free" | "monthly" | "lifetime";
+export type PremiumType = "free" | "monthly" | "yearly" | "lifetime";
 
 export interface Ingredient {
   name: string;

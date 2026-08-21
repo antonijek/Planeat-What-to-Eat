@@ -9,4 +9,12 @@ export const settingsService = {
   async saveCalorieGoal(kcal: number): Promise<void> {
     await setItem(STORAGE_KEYS.calorieGoal, kcal);
   },
+
+  async getLanguage(): Promise<string | null> {
+    return await getItem<string>(STORAGE_KEYS.language);
+  },
+
+  async saveLanguage(lang: string): Promise<void> {
+    await setItem(STORAGE_KEYS.language, lang);
+  },
 };

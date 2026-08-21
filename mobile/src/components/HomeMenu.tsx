@@ -14,6 +14,8 @@ import { colors } from "../constants/theme";
 import { RootStackParamList } from "../navigation/types";
 import { LANGUAGES } from "../i18n";
 import i18n from "../i18n";
+import { settingsService } from "../services/settingsService";
+import { useUserStore } from "../store/userStore";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -41,6 +43,7 @@ interface Props {
 export function HomeMenu({ visible, onClose, navigate }: Props) {
   const { t } = useTranslation();
   const current = i18n.language.slice(0, 2);
+  const { isPremium, trialActive, trialDaysLeft } = useUserStore();
 
   const items: MenuItem[] = useMemo(
     () => [
@@ -66,6 +69,14 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
             keyboardShouldPersistTaps="handled"
           >
             <Text style={styles.title}>{t("home.menuTitle")}</Text>
+
+            {!isPremium && trialActive && (
+              <View style={styles.trialBanner}>
+                <Text style={styles.trialBannerText}>
+                  {t("home.trialLeft", { count: trialDaysLeft })}
+                </Text>
+              </View>
+            )}
 
             <View style={styles.grid}>
               {items.map((item) => (
@@ -95,6 +106,7 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
                     style={[styles.langChip, active && styles.langChipActive]}
                     onPress={() => {
                       i18n.changeLanguage(l.code);
+                      settingsService.saveLanguage(l.code);
                       onClose();
                     }}
                   >
@@ -136,6 +148,14 @@ const styles = StyleSheet.create({
   },
   sheetContent: { paddingBottom: 8 },
   title: { fontSize: 20, fontWeight: "800", color: colors.text, marginBottom: 16 },
+  trialBanner: {
+    backgroundColor: colors.primaryLight,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+  },
+  trialBannerText: { color: colors.primary, fontSize: 13, fontWeight: "700", textAlign: "center" },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",

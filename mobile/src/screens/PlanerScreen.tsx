@@ -15,6 +15,7 @@ import { RootStackParamList } from "../navigation/types";
 import { planService } from "../services/planService";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
+import { isFeatureUnlocked } from "../services/premiumService";
 import { MealPlanEntry } from "../types";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
@@ -24,7 +25,6 @@ import { Screen } from "../components/Screen";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MEAL_TYPES: { key: "lunch" | "dinner"; labelKey: string }[] = [
   { key: "lunch", labelKey: "planer.lunch" },
   { key: "dinner", labelKey: "planer.dinner" },
@@ -32,13 +32,20 @@ const MEAL_TYPES: { key: "lunch" | "dinner"; labelKey: string }[] = [
 
 export function PlanerScreen() {
   const nav = useNavigation<Nav>();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { translate } = useTranslatedRecipe();
-  const { isPremium } = useUserStore();
+  const { isPremium, trialActive } = useUserStore();
   const [plan, setPlan] = useState<MealPlanEntry[]>([]);
   const [pickerDay, setPickerDay] = useState<number | null>(null);
   const [pickerMeal, setPickerMeal] = useState<"lunch" | "dinner" | null>(null);
   const [search, setSearch] = useState("");
+
+  // Lokalizovani nazivi dana (Pon...Ned) preko i18n — toLocaleDateString na
+  // Androidu (Hermes/Intl) često ignoriše lokal i vrati engleski.
+  const dayNames = useMemo(
+    () => ["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map((k) => t(`planer.${k}`)),
+    [i18n.language, t]
+  );
 
   useEffect(() => {
     planService.getPlan().then(setPlan);
@@ -74,7 +81,7 @@ export function PlanerScreen() {
     return { kcal, protein, fat, carbs, sugar, meals };
   }, [plan]);
 
-  if (!isPremium) {
+  if (!isFeatureUnlocked("planer", isPremium, trialActive)) {
     return (
       <PremiumLockScreen
         emoji="📅"
@@ -87,7 +94,7 @@ export function PlanerScreen() {
   return (
     <Screen scroll={false}>
       <FlatList
-        data={DAYS}
+        data={dayNames}
         keyExtractor={(d, i) => String(i)}
         ListHeaderComponent={
           <View>
@@ -181,7 +188,7 @@ export function PlanerScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>
-              {DAYS[pickerDay ?? 0]} · {MEAL_TYPES.find((m) => m.key === pickerMeal)?.labelKey ? t(MEAL_TYPES.find((m) => m.key === pickerMeal)!.labelKey) : ""}
+              {dayNames[pickerDay ?? 0]} · {MEAL_TYPES.find((m) => m.key === pickerMeal)?.labelKey ? t(MEAL_TYPES.find((m) => m.key === pickerMeal)!.labelKey) : ""}
             </Text>
             <TextInput
               style={styles.searchInput}
@@ -203,7 +210,7 @@ export function PlanerScreen() {
                       dayOfWeek: pickerDay!,
                       mealType: pickerMeal!,
                       recipeId: item.id,
-                      persons: 2,
+                      persons: item.servings || 2,
                     };
                     setPlan(await planService.upsert(entry));
                     setPickerDay(null);

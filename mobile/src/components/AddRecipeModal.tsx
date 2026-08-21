@@ -162,7 +162,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
             value={servings}
             onChangeText={setServings}
             keyboardType="numeric"
-            placeholder="e.g. 4"
+            placeholder={t("addRecipe.servingsPlaceholder")}
             placeholderTextColor={colors.textFaint}
           />
         </View>

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 
 interface Props {
@@ -20,10 +21,12 @@ export function IngredientInputChips({
   onSubmit,
   ingredients,
   onRemove,
-  placeholder = "E.g. chicken, potatoes...",
+  placeholder,
   hint,
   emptyHint,
 }: Props) {
+  const { t } = useTranslation();
+  const ph = placeholder ?? t("recipes.havePlaceholder");
   return (
     <View style={styles.container}>
       <View style={styles.inputRow}>
@@ -32,7 +35,7 @@ export function IngredientInputChips({
           value={value}
           onChangeText={onChangeText}
           onSubmitEditing={onSubmit}
-          placeholder={placeholder}
+          placeholder={ph}
           placeholderTextColor={colors.textFaint}
         />
         <Pressable style={styles.add} onPress={onSubmit} hitSlop={8}>

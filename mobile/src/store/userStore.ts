@@ -7,6 +7,10 @@ import { settingsService } from "../services/settingsService";
 interface UserState {
   premium: PremiumType;
   isPremium: boolean;
+  /** Da li je probni period trenutno aktivan. */
+  trialActive: boolean;
+  /** Preostalo dana probnog perioda (samo kada je aktivan). */
+  trialDaysLeft: number;
   favorites: Favorite[];
   ratings: Record<string, number>;
   calorieGoal: number;
@@ -15,11 +19,15 @@ interface UserState {
   setCalorieGoal: (kcal: number) => Promise<void>;
   toggleFavorite: (recipeId: string, pinned?: boolean) => Promise<void>;
   rate: (recipeId: string, score: number) => Promise<void>;
+  /** Startuje probni period (ako još nije korišćen) i osvežava stanje. */
+  startTrial: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
   premium: "free",
   isPremium: false,
+  trialActive: false,
+  trialDaysLeft: 0,
   favorites: [],
   ratings: {},
   calorieGoal: 2000,
@@ -30,7 +38,17 @@ export const useUserStore = create<UserState>((set, get) => ({
     const favorites = await favoritesService.getFavorites();
     const ratings = await favoritesService.getRatings();
     const calorieGoal = await settingsService.getCalorieGoal();
-    set({ isPremium, premium: st.type, favorites, ratings, calorieGoal });
+    const trialActive = !isPremium && (await premiumService.isTrialActive());
+    const trialDaysLeft = trialActive ? await premiumService.getTrialDaysLeft() : 0;
+    set({ isPremium, premium: st.type, favorites, ratings, calorieGoal, trialActive, trialDaysLeft });
+  },
+
+  async startTrial() {
+    await premiumService.startTrialIfNeeded();
+    const isPremium = await premiumService.isPremium();
+    const trialActive = !isPremium && (await premiumService.isTrialActive());
+    const trialDaysLeft = trialActive ? await premiumService.getTrialDaysLeft() : 0;
+    set({ isPremium, trialActive, trialDaysLeft });
   },
 
   async setPremium(type: PremiumType) {
@@ -38,12 +56,17 @@ export const useUserStore = create<UserState>((set, get) => ({
       const expires = new Date();
       expires.setMonth(expires.getMonth() + 1);
       await premiumService.setMonthly(expires);
+    } else if (type === "yearly") {
+      const expires = new Date();
+      expires.setFullYear(expires.getFullYear() + 1);
+      await premiumService.setYearly(expires);
     } else if (type === "lifetime") {
       await premiumService.setLifetime();
     } else {
       await premiumService.setFree();
     }
-    set({ premium: type, isPremium: type !== "free" });
+    const isPremium = type !== "free";
+    set({ premium: type, isPremium, trialActive: false, trialDaysLeft: 0 });
   },
 
   async setCalorieGoal(kcal: number) {

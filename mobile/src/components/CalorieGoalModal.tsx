@@ -101,11 +101,11 @@ export function CalorieGoalModal({ visible, initialGoal, onClose, onSave }: Prop
       </View>
 
       <Text style={appModalStyles.label}>{t("tracker.weightKg")}</Text>
-      <TextInput style={appModalStyles.input} value={pKg} onChangeText={setPKg} keyboardType="numeric" placeholder="e.g. 75" placeholderTextColor={colors.textFaint} />
+      <TextInput style={appModalStyles.input} value={pKg} onChangeText={setPKg} keyboardType="numeric" placeholder={t("tracker.exampleWeight")} placeholderTextColor={colors.textFaint} />
       <Text style={appModalStyles.label}>{t("tracker.heightCm")}</Text>
-      <TextInput style={appModalStyles.input} value={pCm} onChangeText={setPCm} keyboardType="numeric" placeholder="e.g. 178" placeholderTextColor={colors.textFaint} />
+      <TextInput style={appModalStyles.input} value={pCm} onChangeText={setPCm} keyboardType="numeric" placeholder={t("tracker.exampleHeight")} placeholderTextColor={colors.textFaint} />
       <Text style={appModalStyles.label}>{t("tracker.age")}</Text>
-      <TextInput style={appModalStyles.input} value={pAge} onChangeText={setPAge} keyboardType="numeric" placeholder="e.g. 30" placeholderTextColor={colors.textFaint} />
+      <TextInput style={appModalStyles.input} value={pAge} onChangeText={setPAge} keyboardType="numeric" placeholder={t("tracker.exampleAge")} placeholderTextColor={colors.textFaint} />
 
       <Text style={appModalStyles.label}>{t("tracker.activity")}</Text>
       {ACTIVITIES.map(([val, labelKey]) => (

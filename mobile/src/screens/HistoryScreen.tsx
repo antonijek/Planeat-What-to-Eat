@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { historyService, CookedDay } from "../services/historyService";
 import { useUserStore } from "../store/userStore";
+import { isFeatureUnlocked } from "../services/premiumService";
 import { useTranslation } from "react-i18next";
 import { colors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
@@ -13,7 +14,7 @@ import { Screen } from "../components/Screen";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-function dayLabel(day: string): string {
+function dayLabel(day: string, t: (key: string, opts?: Record<string, unknown>) => string, lang: string): string {
   const today = new Date();
   const toKey = (d: Date) =>
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -21,23 +22,23 @@ function dayLabel(day: string): string {
   const yest = new Date();
   yest.setDate(today.getDate() - 1);
   const yestKey = toKey(yest);
-  if (day === todayKey) return "Today";
-  if (day === yestKey) return "Yesterday";
-  return new Date(day + "T00:00:00").toLocaleDateString();
+  if (day === todayKey) return t("tracker.today");
+  if (day === yestKey) return t("tracker.yesterday");
+  return new Date(day + "T00:00:00").toLocaleDateString(lang);
 }
 
 export function HistoryScreen() {
   const nav = useNavigation<Nav>();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { recipeName } = useTranslatedRecipe();
-  const { isPremium } = useUserStore();
+  const { isPremium, trialActive } = useUserStore();
   const [days, setDays] = useState<CookedDay[]>([]);
 
   useEffect(() => {
     historyService.getCookedGroupedByDay().then(setDays);
   }, []);
 
-  if (!isPremium) {
+  if (!isFeatureUnlocked("history", isPremium, trialActive)) {
     return (
       <PremiumLockScreen
         emoji="🥘"
@@ -72,7 +73,7 @@ export function HistoryScreen() {
         }
         renderItem={({ item }) => (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{dayLabel(item.day)}</Text>
+            <Text style={styles.sectionLabel}>{dayLabel(item.day, t, i18n.language)}</Text>
             {item.items.map((c) => (
               <Pressable
                 key={c.recipeId + c.time}
