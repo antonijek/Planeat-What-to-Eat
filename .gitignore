@@ -6,6 +6,7 @@ node_modules/
 .env.local
 .env*.local
 .env.example
+scripts/.env
 
 # Expo
 .expo/
@@ -34,5 +35,6 @@ data/badmap.json
 .venv/
 
 # Generisani prevodi baze (regenerisani sa scripts/translate_db.js)
+# mobile/src/data/translations/ NIJE ovde — app ga direktno importuje u runtime (translationContent.ts),
+# mora biti u git-u ili EAS build puca (Unable to resolve module ../data/translations/*.json)
 data/translations/
-mobile/src/data/translations/
