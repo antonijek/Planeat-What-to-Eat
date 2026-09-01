@@ -20,6 +20,7 @@ import { isFeatureUnlocked } from "../services/premiumService";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { CalorieGoalModal } from "../components/CalorieGoalModal";
 import { useTranslation } from "react-i18next";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTheme, ThemeColors } from "../constants/theme";
 import { Screen } from "../components/Screen";
 
@@ -83,6 +84,12 @@ export function CalorieLogScreen() {
     load(0);
   }, [load]);
 
+  useFocusEffect(
+    useCallback(() => {
+      load(offset);
+    }, [load, offset])
+  );
+
   if (!isFeatureUnlocked("calorieTracker", isPremium, trialActive)) {
     return (
       <PremiumLockScreen
@@ -137,7 +144,7 @@ export function CalorieLogScreen() {
     const manual = parseFloat(manualKcal);
     // Ručni unos kalorija (jelo/sastojak nije u bazi)
     if (manualKcal.trim() && Number.isFinite(manual) && manual > 0) {
-      setTotals(await calorieLogService.addManualEntry(name, manual, dateKey));
+      setTotals(await calorieLogService.addManualEntry(foodName, manual, dateKey));
       setName("");
       setGrams("");
       setManualKcal("");
@@ -158,8 +165,11 @@ export function CalorieLogScreen() {
       setSuggestions([]);
       setSelectedSug(null);
       setManualKcal("");
-    } catch {
-      // sastojak nije nađen u mapi — tiho
+    } catch (err) {
+      // sastojak nije nađen u mapi i nema ručnog unosa
+      if (err instanceof Error && err.message === "NOT_FOUND") {
+        // tiho za sada — TODO: prikaži poruku u UI
+      }
     }
   }
 
@@ -216,15 +226,35 @@ export function CalorieLogScreen() {
 
             <View style={styles.dayCard}>
               <View style={styles.dayTop}>
-                <Text style={styles.dayTotal}>{t("tracker.macKcal", { count: totals.kcal.toLocaleString() })}</Text>
-                {isToday && (
-                  overBudget ? (
-                    <Text style={styles.dayOver}>{t("tracker.overBudget", { count: Math.abs(kcalLeft).toLocaleString(), goal: calorieGoal })}</Text>
+                <View>
+                  <Text style={styles.dayTotal}>{totals.kcal.toLocaleString()} kcal</Text>
+                  <Text style={styles.dayGoal}>{t("tracker.goalOf", { goal: calorieGoal })}</Text>
+                </View>
+                {isToday &&
+                  (overBudget ? (
+                    <View style={styles.leftBadgeOver}>
+                      <Text style={styles.leftBadgeOverText}>
+                        +{Math.abs(kcalLeft).toLocaleString()} kcal
+                      </Text>
+                    </View>
                   ) : (
-                    <Text style={styles.dayLeft}>{t("tracker.leftOf", { count: kcalLeft, goal: calorieGoal })}</Text>
-                  )
-                )}
+                    <View style={styles.leftBadge}>
+                      <Text style={styles.leftBadgeValue}>{kcalLeft.toLocaleString()}</Text>
+                      <Text style={styles.leftBadgeLabel}>{t("tracker.kcalLeft")}</Text>
+                    </View>
+                  ))}
               </View>
+              {isToday && (
+                <View style={styles.progressTrack}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      overBudget && styles.progressFillOver,
+                      { width: `${Math.min(100, (totals.kcal / Math.max(1, calorieGoal)) * 100)}%` },
+                    ]}
+                  />
+                </View>
+              )}
               <Pressable style={styles.goalBtn} onPress={openGoalModal}>
                 <Text style={styles.goalBtnText}>{t("tracker.goalBtn", { count: calorieGoal })}</Text>
               </Pressable>
@@ -377,10 +407,23 @@ const createStyles = (colors: ThemeColors) =>
     borderRadius: 16,
     padding: 16,
   },
-  dayTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
+  dayTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   dayTotal: { fontSize: 30, fontWeight: "800", color: colors.primary },
-  dayLeft: { fontSize: 13, color: colors.textMuted },
-  dayOver: { fontSize: 13, color: colors.danger, fontWeight: "700" },
+  dayGoal: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  leftBadge: { alignItems: "center", backgroundColor: colors.primaryLight, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
+  leftBadgeValue: { fontSize: 20, fontWeight: "800", color: colors.primary },
+  leftBadgeLabel: { fontSize: 11, color: colors.textMuted },
+  leftBadgeOver: { backgroundColor: colors.dangerLight, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 },
+  leftBadgeOverText: { fontSize: 16, fontWeight: "800", color: colors.danger },
+  progressTrack: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.border,
+    marginTop: 12,
+    overflow: "hidden",
+  },
+  progressFill: { height: "100%", borderRadius: 4, backgroundColor: colors.primary },
+  progressFillOver: { backgroundColor: colors.danger },
   overBanner: {
     marginTop: 12,
     backgroundColor: colors.dangerLight,

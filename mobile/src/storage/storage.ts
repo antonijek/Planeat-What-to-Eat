@@ -22,6 +22,8 @@ export const STORAGE_KEYS = {
   calorieGoal: "mm_calorie_goal",
   language: "mm_language",
   darkMode: "mm_dark_mode",
+  reviewPrompted: "mm_review_prompted",
+  reviewCookedCount: "mm_review_cooked_count",
 } as const;
 
 export async function getItem<T>(key: string): Promise<T | null> {

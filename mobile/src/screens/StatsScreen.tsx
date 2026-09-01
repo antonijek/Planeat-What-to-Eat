@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { Screen } from "../components/Screen";
 import { historyService } from "../services/historyService";
 import { recipeService } from "../services/recipeService";
@@ -28,72 +29,99 @@ export function StatsScreen() {
   const [thisWeek, setThisWeek] = useState(0);
   const [avgKcal, setAvgKcal] = useState(0);
   const [avgProtein, setAvgProtein] = useState(0);
+  const [avgFat, setAvgFat] = useState(0);
+  const [avgCarbs, setAvgCarbs] = useState(0);
+  const [avgFiber, setAvgFiber] = useState(0);
   const [sumSugar, setSumSugar] = useState(0);
   const [top, setTop] = useState<RankItem[]>([]);
   const [topCategories, setTopCategories] = useState<RankItem[]>([]);
 
+  const load = useCallback(async () => {
+    const entries = await historyService.getCooked();
+    if (entries.length === 0) {
+      setTotalCooked(0);
+      setThisWeek(0);
+      setAvgKcal(0);
+      setAvgProtein(0);
+      setAvgFat(0);
+      setAvgCarbs(0);
+      setAvgFiber(0);
+      setSumSugar(0);
+      setTop([]);
+      setTopCategories([]);
+      return;
+    }
+
+    const now = Date.now();
+    const weekAgo = now - 7 * 24 * 3600 * 1000;
+    const catCount = new Map<string, number>();
+    const recCount = new Map<string, { count: number; name: string }>();
+    let kcalSum = 0;
+    let protSum = 0;
+    let fatSum = 0;
+    let carbSum = 0;
+    let fiberSum = 0;
+    let sugarSum = 0;
+    let week = 0;
+
+    for (const e of entries) {
+      const r = recipeService.getById(e.recipeId);
+      if (r) {
+        const per = r.servings || 1;
+        const kcalP = r.calories ? r.calories / per : 0;
+        const protP = r.protein ? r.protein / per : 0;
+        const fatP = r.fats ? r.fats / per : 0;
+        const carbP = r.carbs ? r.carbs / per : 0;
+        const fiberP = r.fiber ? r.fiber / per : 0;
+        const sugP = r.addedSugar ? r.addedSugar / per : 0;
+        kcalSum += kcalP;
+        protSum += protP;
+        fatSum += fatP;
+        carbSum += carbP;
+        fiberSum += fiberP;
+        sugarSum += sugP;
+        catCount.set(r.category, (catCount.get(r.category) ?? 0) + 1);
+        const curRec = recCount.get(r.id) ?? { count: 0, name: r.name };
+        curRec.count += 1;
+        recCount.set(r.id, curRec);
+      }
+      if (new Date(e.cookedAt).getTime() >= weekAgo) week++;
+    }
+
+    setTotalCooked(entries.length);
+    setThisWeek(week);
+    setAvgKcal(Math.round(kcalSum / entries.length));
+    setAvgProtein(Math.round(protSum / entries.length));
+    setAvgFat(Math.round(fatSum / entries.length));
+    setAvgCarbs(Math.round(carbSum / entries.length));
+    setAvgFiber(Math.round(fiberSum / entries.length));
+    setSumSugar(Math.round(sugarSum));
+
+    setTop(
+      Array.from(recCount.entries())
+        .sort((a, b) => b[1].count - a[1].count)
+        .slice(0, 5)
+        .map(([id, { count, name }]) => ({ id, name, count }))
+    );
+    setTopCategories(
+      Array.from(catCount.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }))
+    );
+  }, []);
+
   useEffect(() => {
     if (!isFeatureUnlocked("stats", isPremium, trialActive)) return;
-    (async () => {
-      const entries = await historyService.getCooked();
-      if (entries.length === 0) {
-        setTotalCooked(0);
-        setThisWeek(0);
-        setAvgKcal(0);
-        setAvgProtein(0);
-        setSumSugar(0);
-        setTop([]);
-        setTopCategories([]);
-        return;
-      }
+    load();
+  }, [isPremium, trialActive, load]);
 
-      const now = Date.now();
-      const weekAgo = now - 7 * 24 * 3600 * 1000;
-      const catCount = new Map<string, number>();
-      const recCount = new Map<string, { count: number; name: string }>();
-      let kcalSum = 0;
-      let protSum = 0;
-      let sugarSum = 0;
-      let week = 0;
-
-      for (const e of entries) {
-        const r = recipeService.getById(e.recipeId);
-        if (r) {
-          const per = r.servings || 1;
-          const kcalP = r.calories ? r.calories / per : 0;
-          const protP = r.protein ? r.protein / per : 0;
-          const sugP = r.addedSugar ? r.addedSugar / per : 0;
-          kcalSum += kcalP;
-          protSum += protP;
-          sugarSum += sugP;
-          catCount.set(r.category, (catCount.get(r.category) ?? 0) + 1);
-          const curRec = recCount.get(r.id) ?? { count: 0, name: r.name };
-          curRec.count += 1;
-          recCount.set(r.id, curRec);
-        }
-        if (new Date(e.cookedAt).getTime() >= weekAgo) week++;
-      }
-
-      setTotalCooked(entries.length);
-      setThisWeek(week);
-      setAvgKcal(Math.round(kcalSum / entries.length));
-      setAvgProtein(Math.round(protSum / entries.length));
-      setSumSugar(Math.round(sugarSum));
-
-      setTop(
-        Array.from(recCount.entries())
-          .sort((a, b) => b[1].count - a[1].count)
-          .slice(0, 5)
-          .map(([id, { count, name }]) => ({ id, name, count }))
-      );
-      setTopCategories(
-        Array.from(catCount.entries())
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([name, count]) => ({ name, count }))
-      );
-    })();
-  }, [isPremium, trialActive]);
+  useFocusEffect(
+    useCallback(() => {
+      if (!isFeatureUnlocked("stats", isPremium, trialActive)) return;
+      load();
+    }, [isPremium, trialActive, load])
+  );
 
   if (!isFeatureUnlocked("stats", isPremium, trialActive)) {
     return (
@@ -110,6 +138,9 @@ export function StatsScreen() {
     { label: t("stats.thisWeek"), value: String(thisWeek) },
     { label: t("stats.avgKcal"), value: avgKcal ? `~${avgKcal}` : "—" },
     { label: t("stats.avgProtein"), value: avgProtein ? `~${avgProtein}g` : "—" },
+    { label: t("stats.avgFat"), value: avgFat ? `~${avgFat}g` : "—" },
+    { label: t("stats.avgCarbs"), value: avgCarbs ? `~${avgCarbs}g` : "—" },
+    { label: t("stats.avgFiber"), value: avgFiber ? `~${avgFiber}g` : "—" },
   ];
 
   return (

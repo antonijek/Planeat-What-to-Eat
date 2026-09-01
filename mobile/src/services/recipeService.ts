@@ -63,18 +63,21 @@ export const recipeService = {
    * "Šta imam kod kuće": recepti koji sadrže SVE unete namirnice.
    * Robusno čisti unose (uklanja skrivene znakove poput \u200b, \u00a0),
    * pa svaki mora biti prisutan u bar jednom sastojku recepta.
+   * Unosi se prevode isto kao u Search (englishAliases), da rezultati
+   * budu konzistentni (npr. "fromage" -> "cheese").
    */
   findByIngredients(ingredients: string[]): Recipe[] {
     const input = ingredients
       .map((i) => cleanIngredient(i))
-      .map((i) => toEnglishIngredient(i)) // "poulet" -> "chicken"
       .filter(Boolean);
     // ako korisnik želi filter ali je sve prazno, ne prikazuj sve — vrati prazno
     if (ingredients.some((i) => i.trim()) && input.length === 0) return [];
     if (input.length === 0) return RECIPES;
     return RECIPES.filter((r) =>
-      input.every((need) =>
-        r.ingredients.some((ing) => cleanIngredient(ing.name).includes(need))
+      input.every((raw) =>
+        englishAliases(raw).some((need) =>
+          r.ingredients.some((ing) => cleanIngredient(ing.name).includes(need))
+        )
       )
     );
   },

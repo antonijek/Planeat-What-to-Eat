@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -9,14 +9,14 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { planService } from "../services/planService";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
 import { isFeatureUnlocked } from "../services/premiumService";
-import { MealPlanEntry } from "../types";
+import { MealPlanEntry, Recipe } from "../types";
 import { useTranslation } from "react-i18next";
 import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
@@ -41,6 +41,9 @@ export function PlanerScreen() {
   const [pickerDay, setPickerDay] = useState<number | null>(null);
   const [pickerMeal, setPickerMeal] = useState<"lunch" | "dinner" | null>(null);
   const [search, setSearch] = useState("");
+  // Izabrano jelo + broj osoba pre potvrde (korisnik bira koliko osoba jede).
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [persons, setPersons] = useState(2);
 
   // Lokalizovani nazivi dana (Pon...Ned) preko i18n — toLocaleDateString na
   // Androidu (Hermes/Intl) često ignoriše lokal i vrati engleski.
@@ -56,6 +59,12 @@ export function PlanerScreen() {
   async function reload() {
     setPlan(await planService.getPlan());
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      reload();
+    }, [])
+  );
 
   const recipes = recipeService
     .search(search.trim())
@@ -80,7 +89,14 @@ export function PlanerScreen() {
       sugar += ((r.addedSugar ?? r.sugars) ?? 0) * mult;
       meals++;
     }
-    return { kcal, protein, fat, carbs, sugar, meals };
+    return {
+      kcal: Math.round(kcal),
+      protein: Math.round(protein),
+      fat: Math.round(fat),
+      carbs: Math.round(carbs),
+      sugar: Math.round(sugar),
+      meals,
+    };
   }, [plan]);
 
   if (!isFeatureUnlocked("planer", isPremium, trialActive)) {
@@ -108,29 +124,24 @@ export function PlanerScreen() {
                 <Text style={styles.summaryTitle}>
                   {t("planer.weekTotal", { count: summary.meals })}
                 </Text>
+                <Text style={styles.summaryKcal}>{summary.kcal.toLocaleString()} kcal</Text>
+                <View style={styles.summaryDivider} />
                 <View style={styles.summaryRow}>
                   <View style={styles.summaryStat}>
-                    <Text style={styles.summaryValue}>
-                      ~{summary.kcal.toLocaleString()} kcal
-                    </Text>
+                    <Text style={styles.summaryValue}>{summary.protein.toLocaleString()}g</Text>
+                    <Text style={styles.summaryLabel}>{t("planer.sumProtein")}</Text>
                   </View>
                   <View style={styles.summaryStat}>
-                    <Text style={styles.summaryValue}>
-                      ~{t("tracker.protein", { count: summary.protein.toLocaleString() })}
-                    </Text>
+                    <Text style={styles.summaryValue}>{summary.fat.toLocaleString()}g</Text>
+                    <Text style={styles.summaryLabel}>{t("planer.sumFat")}</Text>
                   </View>
                   <View style={styles.summaryStat}>
-                    <Text style={styles.summaryValue}>~{t("tracker.fat", { count: summary.fat.toLocaleString() })}</Text>
+                    <Text style={styles.summaryValue}>{summary.carbs.toLocaleString()}g</Text>
+                    <Text style={styles.summaryLabel}>{t("planer.sumCarbs")}</Text>
                   </View>
                   <View style={styles.summaryStat}>
-                    <Text style={styles.summaryValue}>
-                      ~{t("tracker.carbs", { count: summary.carbs.toLocaleString() })}
-                    </Text>
-                  </View>
-                  <View style={styles.summaryStat}>
-                    <Text style={styles.summaryValue}>
-                      ~{t("tracker.sugar", { count: summary.sugar.toLocaleString() })}
-                    </Text>
+                    <Text style={styles.summaryValue}>{summary.sugar.toLocaleString()}g</Text>
+                    <Text style={styles.summaryLabel}>{t("planer.sumSugar")}</Text>
                   </View>
                 </View>
               </View>
@@ -199,6 +210,51 @@ export function PlanerScreen() {
               onChangeText={setSearch}
               placeholderTextColor={lightColors.textFaint}
             />
+            {selectedRecipe && (
+              <View style={modalStyles.confirmBox}>
+                <Text style={modalStyles.confirmTitle} numberOfLines={1}>
+                  {translate(selectedRecipe).name}
+                </Text>
+                <View style={modalStyles.personsRow}>
+                  <Pressable
+                    style={modalStyles.personsBtn}
+                    onPress={() => setPersons(Math.max(1, persons - 1))}
+                    hitSlop={8}
+                  >
+                    <Text style={modalStyles.personsBtnText}>−</Text>
+                  </Pressable>
+                  <View style={modalStyles.personsCenter}>
+                    <Text style={modalStyles.personsLabel}>{t("planer.personsLabel")}</Text>
+                    <Text style={modalStyles.personsValue}>{persons}</Text>
+                  </View>
+                  <Pressable
+                    style={modalStyles.personsBtn}
+                    onPress={() => setPersons(Math.min(30, persons + 1))}
+                    hitSlop={8}
+                  >
+                    <Text style={modalStyles.personsBtnText}>+</Text>
+                  </Pressable>
+                  <Pressable
+                    style={modalStyles.confirmBtn}
+                    onPress={async () => {
+                      const entry: MealPlanEntry = {
+                        id: `${pickerDay}-${pickerMeal}`,
+                        dayOfWeek: pickerDay!,
+                        mealType: pickerMeal!,
+                        recipeId: selectedRecipe.id,
+                        persons,
+                      };
+                      setPlan(await planService.upsert(entry));
+                      setSelectedRecipe(null);
+                      setPersons(2);
+                      setPickerDay(null);
+                    }}
+                  >
+                    <Text style={modalStyles.confirmBtnText}>✓</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
             <FlatList
               data={recipes}
               keyExtractor={(r) => r.id}
@@ -206,16 +262,9 @@ export function PlanerScreen() {
               renderItem={({ item }) => (
                 <Pressable
                   style={modalStyles.recipeRow}
-                  onPress={async () => {
-                    const entry: MealPlanEntry = {
-                      id: `${pickerDay}-${pickerMeal}`,
-                      dayOfWeek: pickerDay!,
-                      mealType: pickerMeal!,
-                      recipeId: item.id,
-                      persons: item.servings || 2,
-                    };
-                    setPlan(await planService.upsert(entry));
-                    setPickerDay(null);
+                  onPress={() => {
+                    setSelectedRecipe(item);
+                    setPersons(2);
                   }}
                 >
                   <Text style={modalStyles.recipeRowName} numberOfLines={1}>
@@ -225,7 +274,13 @@ export function PlanerScreen() {
                 </Pressable>
               )}
             />
-            <Pressable style={modalStyles.cancelBtn} onPress={() => setPickerDay(null)}>
+            <Pressable
+              style={modalStyles.cancelBtn}
+              onPress={() => {
+                setSelectedRecipe(null);
+                setPickerDay(null);
+              }}
+            >
               <Text style={modalStyles.cancelText}>{t("common.close")}</Text>
             </Pressable>
           </View>
@@ -252,10 +307,13 @@ const createStyles = (colors: ThemeColors) =>
       padding: 16,
       marginBottom: 12,
     },
-    summaryTitle: { color: "#fff", fontSize: 13, fontWeight: "700", marginBottom: 10 },
-    summaryRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-    summaryStat: { flexBasis: "46%", flexGrow: 1 },
+    summaryTitle: { color: "#fff", fontSize: 13, fontWeight: "700", opacity: 0.9, marginBottom: 4 },
+    summaryKcal: { color: "#fff", fontSize: 32, fontWeight: "800" },
+    summaryDivider: { height: 1, backgroundColor: "rgba(255,255,255,0.25)", marginVertical: 12 },
+    summaryRow: { flexDirection: "row", justifyContent: "space-between", gap: 8 },
+    summaryStat: { flex: 1, alignItems: "center" },
     summaryValue: { color: "#fff", fontSize: 16, fontWeight: "800" },
+    summaryLabel: { color: "#fff", fontSize: 11, opacity: 0.85, marginTop: 2 },
     dayCard: {
       backgroundColor: colors.card,
       borderRadius: 16,
@@ -359,6 +417,35 @@ const modalStyles = StyleSheet.create({
   },
   recipeRowName: { flex: 1, color: lightColors.text, fontSize: 15 },
   recipeRowMeta: { color: lightColors.textMuted, fontSize: 13 },
+  confirmBox: {
+    backgroundColor: lightColors.primaryLight,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  confirmTitle: { fontSize: 15, fontWeight: "700", color: lightColors.text, marginBottom: 10 },
+  personsRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  personsBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: lightColors.card,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  personsBtnText: { fontSize: 22, color: lightColors.primary, lineHeight: 26 },
+  personsCenter: { flex: 1, alignItems: "center" },
+  personsLabel: { fontSize: 11, color: lightColors.textMuted, letterSpacing: 0.5 },
+  personsValue: { fontSize: 22, fontWeight: "700", color: lightColors.text },
+  confirmBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: lightColors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  confirmBtnText: { color: "#fff", fontSize: 20, fontWeight: "700" },
   cancelBtn: {
     marginTop: 12,
     backgroundColor: lightColors.border,

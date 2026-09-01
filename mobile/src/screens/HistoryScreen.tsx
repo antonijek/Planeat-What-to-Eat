@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, FlatList, Image, Pressable, StyleSheet, SafeAreaView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { historyService, CookedDay } from "../services/historyService";
@@ -39,6 +39,12 @@ export function HistoryScreen() {
   useEffect(() => {
     historyService.getCookedGroupedByDay().then(setDays);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      historyService.getCookedGroupedByDay().then(setDays);
+    }, [])
+  );
 
   if (!isFeatureUnlocked("history", isPremium, trialActive)) {
     return (

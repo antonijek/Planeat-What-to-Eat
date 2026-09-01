@@ -36,7 +36,7 @@ export function HomeScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { recipes, load, lastSpunRecipeId } = useRecipeStore();
-  const { isPremium, trialActive } = useUserStore();
+  const { isPremium, trialActive, trialDaysLeft } = useUserStore();
   const [spinsLeft, setSpinsLeft] = useState<number | null>(null);
   const [moment, setMoment] = useState<string | null>(null);
   const [result, setResult] = useState<Recipe | null>(null);
@@ -77,7 +77,8 @@ export function HomeScreen() {
 
   async function refreshSpins() {
     const remaining = await premiumService.remainingSpinsToday();
-    setSpinsLeft(remaining);
+    // null = premium/neograničeno → prikaži ∞ (badge uvek vidljiv)
+    setSpinsLeft(remaining === null ? 999 : remaining);
   }
 
   function handleSpinEnd(recipe: Recipe) {
@@ -92,18 +93,24 @@ export function HomeScreen() {
       <View style={styles.header}>
           <View style={styles.titleRow}>
             <View style={styles.titleWrap}>
-              <Text style={styles.title} numberOfLines={1}>
+              <Text style={styles.title} numberOfLines={2}>
                 {t("home.title")}
               </Text>
               <Text style={styles.sub} numberOfLines={1}>
                 {t("home.subtitle")}
               </Text>
             </View>
-            {!hasUnlimitedSpins && spinsLeft !== null && (
-              <Text style={styles.spinCount}>{t("home.spinLeft", { count: spinsLeft })}</Text>
+            {spinsLeft !== null && (
+              <Text style={styles.spinCount}>
+                {hasUnlimitedSpins ? t("home.spinUnlimited") : t("home.spinLeft", { count: spinsLeft })}
+              </Text>
             )}
             <ScreenMenu navigate={nav.navigate} style={styles.menuBtn} />
           </View>
+
+          {trialActive && (
+            <Text style={styles.trialNote}>{t("premium.trialActive", { count: trialDaysLeft })}</Text>
+          )}
 
           {isFeatureUnlocked("haveIngredients", isPremium, trialActive) ? (
             <View style={styles.haveWrap}>
@@ -195,9 +202,10 @@ const createStyles = (colors: ThemeColors) =>
       gap: 8,
     },
     titleWrap: { flex: 1 },
-    title: { fontSize: 24, fontWeight: "800", color: colors.text },
+    title: { fontSize: 21, fontWeight: "800", color: colors.text },
     sub: { fontSize: 13, color: colors.textMuted, marginTop: 2 },
     spinCount: { fontSize: 13, fontWeight: "600", color: colors.primary },
+    trialNote: { fontSize: 12, fontWeight: "600", color: colors.primary, marginTop: 6 },
     menuBtn: {
       width: 36,
       height: 36,

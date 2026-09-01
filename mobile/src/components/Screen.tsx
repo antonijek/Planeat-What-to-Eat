@@ -8,6 +8,8 @@ interface Props {
   scroll?: boolean;
   /** Bonus stil na sadržaj kontejner. */
   contentStyle?: object;
+  /** Boja pozadine celog ekrana (uključujući safe-area ivice). Podrazumevano colors.background. */
+  backgroundColor?: string;
 }
 
 /**
@@ -15,19 +17,20 @@ interface Props {
  * konzistentnim paddingom, bojom pozadine i razmakom na dnu.
  * Svi ekrani ga koriste da izgled bude isti.
  */
-export function Screen({ children, scroll = true, contentStyle }: Props) {
+export function Screen({ children, scroll = true, contentStyle, backgroundColor }: Props) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const safe = backgroundColor ? [styles.safe, { backgroundColor }] : styles.safe;
   const content = [styles.content, contentStyle];
   if (!scroll) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={safe}>
         <View style={content}>{children}</View>
       </SafeAreaView>
     );
   }
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={safe}>
       <ScrollView
         contentContainerStyle={content}
         keyboardShouldPersistTaps="handled"

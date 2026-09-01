@@ -167,5 +167,14 @@ function summarize(day: CalorieDayLog | null): DailyTotals {
     carbs += e.carbs;
     fiber += e.fiber ?? 0;
   }
-  return { kcal, protein, fat, carbs, fiber, entries: day.entries, count: day.entries.length };
+  // Uvek zaokruži zbir — sprečava decimalne prikaze (npr. 2016.44) kod starih podataka.
+  return {
+    kcal: Math.round(kcal),
+    protein: Math.round(protein),
+    fat: Math.round(fat),
+    carbs: Math.round(carbs),
+    fiber: Math.round(fiber),
+    entries: day.entries,
+    count: day.entries.length,
+  };
 }

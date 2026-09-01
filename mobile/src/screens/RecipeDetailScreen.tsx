@@ -20,6 +20,7 @@ import { AppModal } from "../components/AppModal";
 import { Screen } from "../components/Screen";
 import { overrideService } from "../services/overrideService";
 import { historyService } from "../services/historyService";
+import { reviewPromptService } from "../services/reviewPromptService";
 import { recipeService } from "../services/recipeService";
 import { calorieLogService } from "../services/calorieLogService";
 import { planService } from "../services/planService";
@@ -32,6 +33,7 @@ import { formatDuration, perServingRound } from "../utils/helpers";
 import { useTranslation } from "react-i18next";
 import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
+import { getStoreUrl } from "../utils/storeLinks";
 
 type Route = RouteProp<RootStackParamList, "RecipeDetail">;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -55,11 +57,14 @@ export function RecipeDetailScreen() {
   const [planOpen, setPlanOpen] = useState(false);
   const [planDay, setPlanDay] = useState(0);
   const [planMeal, setPlanMeal] = useState<"lunch" | "dinner">("lunch");
+  // Koliko osoba jede ovaj obrok (planer) — nezavisno od steppera za sastojke.
+  const [planPersons, setPlanPersons] = useState(2);
   const [planMsg, setPlanMsg] = useState<string | null>(null);
   const [planEntries, setPlanEntries] = useState<MealPlanEntry[]>([]);
 
   function openPlanModal() {
     setPlanOpen(true);
+    setPlanPersons(2);
     planService.getPlan().then(setPlanEntries);
   }
 
@@ -112,6 +117,7 @@ export function RecipeDetailScreen() {
       instructionLines ? t("recipeDetail.instructions") + ":" : "",
       instructionLines || "",
       t("recipeDetail.shareMadeWith"),
+      getStoreUrl() ?? "",
     ]
       .filter(Boolean)
       .join("\n");
@@ -193,6 +199,7 @@ export function RecipeDetailScreen() {
               } else {
                 await historyService.recordCooked(id);
                 setCooked(true);
+                reviewPromptService.notifyCooked();
               }
             }}
           >
@@ -330,6 +337,15 @@ export function RecipeDetailScreen() {
         saveLabel="OK"
       >
         <Text style={{ color: lightColors.text }}>{trackerMsg}</Text>
+        <Pressable
+          style={modalStyles.goBtn}
+          onPress={() => {
+            setTrackerMsg(null);
+            nav.navigate("CalorieLog");
+          }}
+        >
+          <Text style={modalStyles.goBtnText}>{t("recipeDetail.goToTracker")}</Text>
+        </Pressable>
       </AppModal>
 
       <AppModal
@@ -340,6 +356,15 @@ export function RecipeDetailScreen() {
         saveLabel="OK"
       >
         <Text style={{ color: lightColors.text }}>{planMsg}</Text>
+        <Pressable
+          style={modalStyles.goBtn}
+          onPress={() => {
+            setPlanMsg(null);
+            nav.navigate("Planer");
+          }}
+        >
+          <Text style={modalStyles.goBtnText}>{t("recipeDetail.goToPlaner")}</Text>
+        </Pressable>
       </AppModal>
 
       <AppModal
@@ -352,7 +377,7 @@ export function RecipeDetailScreen() {
             dayOfWeek: planDay,
             mealType: planMeal,
             recipeId: recipe.id,
-            persons: persons,
+            persons: planPersons,
           };
           await planService.upsert(entry);
           setPlanOpen(false);
@@ -391,6 +416,9 @@ export function RecipeDetailScreen() {
             </Text>
           </Pressable>
         </View>
+
+        <Text style={modalStyles.planSectionLabel}>{t("planer.personsLabel")}</Text>
+        <PersonStepper value={planPersons} onChange={setPlanPersons} />
 
         {(() => {
           const existing = planEntries.find(
@@ -583,4 +611,12 @@ const modalStyles = StyleSheet.create({
     padding: 10,
   },
   planOccupiedText: { color: lightColors.text, fontSize: 13, lineHeight: 18 },
+  goBtn: {
+    marginTop: 14,
+    backgroundColor: lightColors.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  goBtnText: { color: "#fff", fontWeight: "700" },
 });

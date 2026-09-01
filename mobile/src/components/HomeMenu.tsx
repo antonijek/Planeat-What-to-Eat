@@ -26,7 +26,8 @@ type MenuRoute =
   | "Planer"
   | "History"
   | "Stats"
-  | "About";
+  | "About"
+  | "Premium";
 
 interface MenuItem {
   key: string;
@@ -57,6 +58,7 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
       { key: "planer", icon: "calendar-month", label: t("home.shortcutPlaner"), route: "Planer" },
       { key: "cooked", icon: "history", label: t("home.shortcutCooked"), route: "History" },
       { key: "stats", icon: "chart-bar", label: t("home.shortcutStats"), route: "Stats" },
+      { key: "premium", icon: "diamond-stone", label: t("home.shortcutPremium"), route: "Premium" },
       { key: "about", icon: "information-outline", label: t("home.shortcutAbout"), route: "About" },
     ],
     [t]

@@ -15,14 +15,11 @@ interface UserState {
   ratings: Record<string, number>;
   calorieGoal: number;
   loadUserData: () => Promise<void>;
-  setPremium: (type: PremiumType) => Promise<void>;
   setCalorieGoal: (kcal: number) => Promise<void>;
   toggleFavorite: (recipeId: string, pinned?: boolean) => Promise<void>;
   /** Pin/unpin recept u omiljenima (max 5 pinned). Ne briše iz omiljenih. */
   pinFavorite: (recipeId: string) => Promise<boolean>;
   rate: (recipeId: string, score: number) => Promise<void>;
-  /** Startuje probni period (ako još nije korišćen) i osvežava stanje. */
-  startTrial: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -35,6 +32,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   calorieGoal: 2000,
 
   async loadUserData() {
+    await premiumService.startTrialIfNeeded();
     const isPremium = await premiumService.isPremium();
     const st = await premiumService.getState();
     const favorites = await favoritesService.getFavorites();
@@ -43,32 +41,6 @@ export const useUserStore = create<UserState>((set, get) => ({
     const trialActive = !isPremium && (await premiumService.isTrialActive());
     const trialDaysLeft = trialActive ? await premiumService.getTrialDaysLeft() : 0;
     set({ isPremium, premium: st.type, favorites, ratings, calorieGoal, trialActive, trialDaysLeft });
-  },
-
-  async startTrial() {
-    await premiumService.startTrialIfNeeded();
-    const isPremium = await premiumService.isPremium();
-    const trialActive = !isPremium && (await premiumService.isTrialActive());
-    const trialDaysLeft = trialActive ? await premiumService.getTrialDaysLeft() : 0;
-    set({ isPremium, trialActive, trialDaysLeft });
-  },
-
-  async setPremium(type: PremiumType) {
-    if (type === "monthly") {
-      const expires = new Date();
-      expires.setMonth(expires.getMonth() + 1);
-      await premiumService.setMonthly(expires);
-    } else if (type === "yearly") {
-      const expires = new Date();
-      expires.setFullYear(expires.getFullYear() + 1);
-      await premiumService.setYearly(expires);
-    } else if (type === "lifetime") {
-      await premiumService.setLifetime();
-    } else {
-      await premiumService.setFree();
-    }
-    const isPremium = type !== "free";
-    set({ premium: type, isPremium, trialActive: false, trialDaysLeft: 0 });
   },
 
   async setCalorieGoal(kcal: number) {

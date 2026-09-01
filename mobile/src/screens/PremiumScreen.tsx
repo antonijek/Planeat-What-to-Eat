@@ -1,18 +1,25 @@
-import React, { useMemo } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { useMemo, useEffect } from "react";
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useUserStore } from "../store/userStore";
 import { Screen } from "../components/Screen";
-import { PREMIUM_PRICES, TRIAL_DAYS } from "../services/premiumService";
 import { useTheme, ThemeColors } from "../constants/theme";
+import { usePremiumPurchase } from "../utils/usePremiumPurchase";
 
 export function PremiumScreen() {
   const nav = useNavigation();
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { isPremium, trialActive, trialDaysLeft, setPremium, startTrial } = useUserStore();
+  const { isPremium, trialActive, trialDaysLeft } = useUserStore();
+  const { products, purchasing, restoring, error, buy, restore } = usePremiumPurchase();
+  const priceFor = (id: "monthly" | "yearly" | "lifetime") =>
+    products.find((p) => p.id === id)?.price ?? "";
+
+  useEffect(() => {
+    if (error) Alert.alert(t("premium.purchaseErrorTitle"), error);
+  }, [error, t]);
 
   const features = [
     "premium.pfUnlimited",
@@ -21,6 +28,7 @@ export function PremiumScreen() {
     "premium.pfRecipes",
     "premium.pfPlaner",
     "premium.pfShopping",
+    "premium.pfCalorie",
     "premium.pfStats",
     "premium.pfTheme",
   ];
@@ -32,13 +40,16 @@ export function PremiumScreen() {
           <Text style={styles.doneEmoji}>💎</Text>
           <Text style={styles.doneTitle}>{t("premium.alreadyPremium")}</Text>
           <Text style={styles.doneText}>{t("premium.enjoy")}</Text>
+          <Pressable onPress={() => nav.goBack()}>
+            <Text style={styles.doneBack}>{t("premium.back")}</Text>
+          </Pressable>
         </View>
       </Screen>
     );
   }
 
   return (
-    <Screen scroll={false}>
+    <Screen backgroundColor={colors.primary}>
       <View style={styles.content}>
         <Text style={styles.badge}>{t("premium.badge")}</Text>
         <Text style={styles.title}>{t("premium.title")}</Text>
@@ -59,32 +70,47 @@ export function PremiumScreen() {
           </View>
         ))}
 
-        {!trialActive && (
-          <Pressable style={styles.trialButton} onPress={() => startTrial()}>
-            <Text style={styles.trialButtonText}>
-              {t("premium.trialStart", { count: TRIAL_DAYS })}
-            </Text>
-          </Pressable>
-        )}
-
         <Pressable
           style={styles.button}
-          onPress={() => setPremium("monthly")}
+          disabled={purchasing !== null}
+          onPress={() => buy("monthly")}
         >
-          <Text style={styles.buttonText}>{t("premium.monthly", { price: PREMIUM_PRICES.monthly })}</Text>
+          {purchasing === "monthly" ? (
+            <ActivityIndicator color={colors.primary} />
+          ) : (
+            <Text style={styles.buttonText}>{t("premium.monthly", { price: priceFor("monthly") })}</Text>
+          )}
         </Pressable>
         <Pressable
           style={[styles.button, styles.buttonYearly]}
-          onPress={() => setPremium("yearly")}
+          disabled={purchasing !== null}
+          onPress={() => buy("yearly")}
         >
-          <Text style={styles.buttonText}>{t("premium.yearly", { price: PREMIUM_PRICES.yearly })}</Text>
-          <Text style={styles.buttonBadge}>{t("premium.bestValue")}</Text>
+          {purchasing === "yearly" ? (
+            <ActivityIndicator color={colors.primary} />
+          ) : (
+            <>
+              <Text style={styles.buttonText}>{t("premium.yearly", { price: priceFor("yearly") })}</Text>
+              <Text style={styles.buttonBadge}>{t("premium.bestValue")}</Text>
+            </>
+          )}
         </Pressable>
         <Pressable
           style={[styles.button, styles.buttonAlt]}
-          onPress={() => setPremium("lifetime")}
+          disabled={purchasing !== null}
+          onPress={() => buy("lifetime")}
         >
-          <Text style={[styles.buttonText, styles.buttonTextAlt]}>{t("premium.lifetime", { price: PREMIUM_PRICES.lifetime })}</Text>
+          {purchasing === "lifetime" ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={[styles.buttonText, styles.buttonTextAlt]}>{t("premium.lifetime", { price: priceFor("lifetime") })}</Text>
+          )}
+        </Pressable>
+
+        <Pressable onPress={restore} disabled={restoring}>
+          <Text style={styles.back}>
+            {restoring ? t("premium.restoring") : t("premium.restore")}
+          </Text>
         </Pressable>
 
         <Pressable onPress={() => nav.goBack()}>
@@ -97,8 +123,7 @@ export function PremiumScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    safe: { flex: 1, backgroundColor: colors.primary },
-  content: { flex: 1, padding: 24, justifyContent: "center" },
+  content: { padding: 24 },
   badge: {
     alignSelf: "flex-start",
     backgroundColor: "#fff",
@@ -122,16 +147,6 @@ const createStyles = (colors: ThemeColors) =>
   featureRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   check: { color: colors.accent, fontWeight: "900", marginRight: 10, fontSize: 16 },
   featureText: { color: "#fff", fontSize: 15 },
-  trialButton: {
-    marginTop: 20,
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: colors.accent,
-    borderRadius: 16,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  trialButtonText: { color: colors.accent, fontSize: 15, fontWeight: "800" },
   button: {
     marginTop: 20,
     backgroundColor: "#fff",
@@ -149,4 +164,5 @@ const createStyles = (colors: ThemeColors) =>
   doneEmoji: { fontSize: 64 },
   doneTitle: { fontSize: 22, fontWeight: "800", color: colors.text, marginTop: 12 },
   doneText: { color: colors.textMuted, marginTop: 6 },
+  doneBack: { color: colors.primary, fontWeight: "700", marginTop: 24 },
   });

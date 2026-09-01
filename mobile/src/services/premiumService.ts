@@ -19,7 +19,7 @@ export const TRIAL_DAYS = 7;
 
 // TESTING: dok razvijamo, sve je otključano (premium + neograničene vrtnje).
 // Kada se završi, postavi na false da se vrati monetizacija.
-const DEV_UNLOCK_ALL = true;
+const DEV_UNLOCK_ALL = false;
 
 /**
  * JEDNO PODEŠAVANJE za premium funkcije.

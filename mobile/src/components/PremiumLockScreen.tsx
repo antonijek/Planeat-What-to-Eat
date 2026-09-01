@@ -4,8 +4,6 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useTranslation } from "react-i18next";
 import { RootStackParamList } from "../navigation/types";
-import { useUserStore } from "../store/userStore";
-import { TRIAL_DAYS } from "../services/premiumService";
 import { useTheme, ThemeColors } from "../constants/theme";
 
 interface Props {
@@ -25,7 +23,6 @@ export function PremiumLockScreen({ emoji, title, description }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { trialActive, startTrial } = useUserStore();
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -33,18 +30,6 @@ export function PremiumLockScreen({ emoji, title, description }: Props) {
         <Text style={styles.emoji}>{emoji}</Text>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
-        {!trialActive && (
-          <Pressable
-            style={[styles.button, styles.trialButton]}
-            onPress={async () => {
-              await startTrial();
-            }}
-          >
-            <Text style={styles.trialButtonText}>
-              {t("premiumLock.trial", { count: TRIAL_DAYS })}
-            </Text>
-          </Pressable>
-        )}
         <Pressable style={styles.button} onPress={() => nav.navigate("Premium")}>
           <Text style={styles.buttonText}>{t("premiumLock.upgrade")}</Text>
         </Pressable>
@@ -68,6 +53,4 @@ const createStyles = (colors: ThemeColors) =>
       paddingHorizontal: 32,
     },
     buttonText: { color: "#fff", fontWeight: "700" },
-    trialButton: { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary },
-    trialButtonText: { color: colors.primary, fontWeight: "700" },
   });

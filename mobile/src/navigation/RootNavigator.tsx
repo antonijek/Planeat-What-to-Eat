@@ -27,10 +27,26 @@ export function RootNavigator() {
 
   return (
     <NavigationContainer theme={theme}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={MainTabs} />
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: true,
+          headerTitle: "",
+          headerBackButtonDisplayMode: "minimal",
+          headerShadowVisible: false,
+          headerTintColor: colors.text,
+          headerStyle: { backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="Home" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
-        <Stack.Screen name="Premium" component={PremiumScreen} />
+        <Stack.Screen
+          name="Premium"
+          component={PremiumScreen}
+          options={{
+            headerStyle: { backgroundColor: colors.primary },
+            headerTintColor: "#fff",
+          }}
+        />
         <Stack.Screen name="History" component={HistoryScreen} />
         <Stack.Screen name="Stats" component={StatsScreen} />
         <Stack.Screen name="Planer" component={PlanerScreen} />

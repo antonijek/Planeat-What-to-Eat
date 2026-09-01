@@ -98,8 +98,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleMode = () => {
-    setModeState((prev) => (prev === "light" ? "dark" : "light"));
-    setItem(STORAGE_KEYS.darkMode, mode === "light" ? "dark" : "light");
+    setModeState((prev) => {
+      const next: ThemeMode = prev === "light" ? "dark" : "light";
+      setItem(STORAGE_KEYS.darkMode, next);
+      return next;
+    });
   };
 
   const value = useMemo(

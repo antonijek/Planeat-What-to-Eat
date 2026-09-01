@@ -184,13 +184,17 @@ export function Wheel({ recipes, onSpinEnd, disabled }: Props) {
   }, []);
 
   function playTick() {
-    try {
-      tickPlayer.volume = 1;
-      tickPlayer.seekTo(0);
-      tickPlayer.play();
-    } catch {
-      // tiho ignoriši greške zvuka
-    }
+    tickPlayer.volume = 1;
+    tickPlayer
+      .seekTo(0)
+      .catch(() => {})
+      .finally(() => {
+        try {
+          tickPlayer.play();
+        } catch {
+          // tiho ignoriši greške zvuka
+        }
+      });
   }
 
   function stopTicks() {

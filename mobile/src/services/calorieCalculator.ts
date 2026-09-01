@@ -1,6 +1,7 @@
 import { Ingredient } from "../types";
 import ingredientMap from "../data/ingredient_map.json";
 import dishMap from "../data/dish_map.json";
+import { pieceApproxGrams } from "../utils/helpers";
 import { toEnglishIngredient, toEnglishDish, localizedIngredient, localizedDish, translateUnit, englishKeysByLocalizedPartial, englishDishKeysByLocalizedPartial, currentLang } from "../utils/ingredientTranslation";
 
 export interface Macros {
@@ -416,6 +417,8 @@ export interface Suggestion {
 /**
  * Parsira "naziv 123g", "123g naziv", "naziv 2 tbsp", "1/2 šolje mleka" itd.
  * Vraća naziv bez količine + grams (ako je jedinica g/kg/ml/l prepoznata).
+ * Ako je broj bez jedinice ("2 jaja"), a namirnica je "komadna" (jaje, banana...),
+ * pretvara u gramažu (broj × približna gramaža komada).
  */
 export function parseNameAndGrams(input: string): { name: string; grams: number } {
   const t = input.trim();
@@ -430,6 +433,23 @@ export function parseNameAndGrams(input: string): { name: string; grams: number 
   if (m && m[3]) {
     const grams = parseFloat(m[1].replace(",", ".")) * (m[2].toLowerCase() === "kg" ? 1000 : 1);
     return { name: m[3].trim(), grams };
+  }
+  // Komadi: "2 jaja", "3 banane", "1 krompir" — broj bez jedinice
+  m = t.match(/^(.*?)\s*(\d+(?:[.,]\d+)?)\s*$/i);
+  if (m && m[1]) {
+    const g = pieceApproxGrams(m[1].trim(), "kom");
+    if (g > 0) {
+      const n = parseFloat(m[2].replace(",", "."));
+      return { name: m[1].trim(), grams: n * g };
+    }
+  }
+  m = t.match(/^(\d+(?:[.,]\d+)?)\s+(.*)$/i);
+  if (m && m[2]) {
+    const g = pieceApproxGrams(m[2].trim(), "kom");
+    if (g > 0) {
+      const n = parseFloat(m[1].replace(",", "."));
+      return { name: m[2].trim(), grams: n * g };
+    }
   }
   return { name: t, grams: 0 };
 }

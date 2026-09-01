@@ -8,7 +8,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { RecipeCard } from "../components/RecipeCard";
@@ -44,6 +44,12 @@ export function MyRecipesScreen() {
   useEffect(() => {
     reload();
   }, [reload]);
+
+  useFocusEffect(
+    useCallback(() => {
+      reload();
+    }, [reload])
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
