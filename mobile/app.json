@@ -3,7 +3,7 @@
     "name": "Planeat — What to Eat",
     "slug": "planeat",
     "description": "Spin to pick a meal, plan your week and track calories.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
