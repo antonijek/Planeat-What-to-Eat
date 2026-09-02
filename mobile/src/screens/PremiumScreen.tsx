@@ -49,7 +49,7 @@ export function PremiumScreen() {
   }
 
   return (
-    <Screen backgroundColor={colors.primary}>
+    <Screen backgroundColor={colors.primary} contentStyle={styles.screenContent}>
       <View style={styles.content}>
         <Text style={styles.badge}>{t("premium.badge")}</Text>
         <Text style={styles.title}>{t("premium.title")}</Text>
@@ -123,7 +123,8 @@ export function PremiumScreen() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-  content: { padding: 24 },
+  screenContent: { paddingTop: 0 },
+  content: { paddingHorizontal: 24, paddingBottom: 24 },
   badge: {
     alignSelf: "flex-start",
     backgroundColor: "#fff",
