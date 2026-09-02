@@ -8,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { lightColors, ThemeColors } from "../constants/theme";
@@ -43,6 +44,7 @@ export function AppModal({
   const { t } = useTranslation();
   const colors = lightColors;
   const styles = useMemo(() => createStyles(colors), []);
+  const insets = useSafeAreaInsets();
   const save = saveLabel ?? t("common.save");
   const cancel = cancelLabel ?? t("common.cancel");
   return (
@@ -51,7 +53,7 @@ export function AppModal({
         style={styles.backdrop}
         behavior="padding"
       >
-        <View style={styles.modal}>
+        <View style={[styles.modal, { paddingBottom: 20 + insets.bottom }]}>
           <View style={styles.titleRow}>
             <Text style={styles.title}>{title}</Text>
             <Pressable style={styles.closeBtn} onPress={onClose} hitSlop={8}>

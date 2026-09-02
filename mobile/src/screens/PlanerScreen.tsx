@@ -9,6 +9,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
@@ -35,6 +36,7 @@ export function PlanerScreen() {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
   const { translate } = useTranslatedRecipe();
   const { isPremium, trialActive } = useUserStore();
   const [plan, setPlan] = useState<MealPlanEntry[]>([]);
@@ -199,7 +201,7 @@ export function PlanerScreen() {
         onRequestClose={() => setPickerDay(null)}
       >
         <View style={modalStyles.backdrop}>
-          <View style={modalStyles.modal}>
+          <View style={[modalStyles.modal, { paddingBottom: 20 + insets.bottom }]}>
             <Text style={modalStyles.modalTitle}>
               {dayNames[pickerDay ?? 0]} · {MEAL_TYPES.find((m) => m.key === pickerMeal)?.labelKey ? t(MEAL_TYPES.find((m) => m.key === pickerMeal)!.labelKey) : ""}
             </Text>

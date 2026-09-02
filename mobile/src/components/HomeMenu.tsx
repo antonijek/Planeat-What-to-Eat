@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -49,6 +50,7 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
   const { mode, toggleMode } = useTheme();
   const colors = lightColors;
   const styles = useMemo(() => createStyles(colors), []);
+  const insets = useSafeAreaInsets();
   const themeUnlocked = isFeatureUnlocked("darkTheme", isPremium, trialActive);
 
   const items: MenuItem[] = useMemo(
@@ -68,7 +70,7 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <Pressable style={styles.backdropTouch} onPress={onClose} />
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { paddingBottom: 28 + insets.bottom }]}>
           <View style={styles.handle} />
           <ScrollView
             showsVerticalScrollIndicator={false}
