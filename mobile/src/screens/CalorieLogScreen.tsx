@@ -201,7 +201,7 @@ export function CalorieLogScreen() {
   const manualMode = !!name.trim() && !selectedSug && !lookup.found && suggestions.length === 0;
 
   return (
-    <Screen scroll={false}>
+    <Screen scroll={false} edges={["bottom", "left", "right"]}>
       <FlatList
         data={totals.entries}
         keyExtractor={(e) => e.id}

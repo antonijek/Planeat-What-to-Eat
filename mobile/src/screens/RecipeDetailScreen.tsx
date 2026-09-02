@@ -147,7 +147,7 @@ export function RecipeDetailScreen() {
     .slice(0, 3);
 
   return (
-    <Screen>
+    <Screen edges={["bottom", "left", "right"]}>
       {recipe.imageUrl ? (
           <Image source={{ uri: recipe.imageUrl }} style={styles.image} />
         ) : (

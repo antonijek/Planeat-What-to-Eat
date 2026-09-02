@@ -57,7 +57,7 @@ export function HistoryScreen() {
   }
 
   return (
-    <Screen scroll={false}>
+    <Screen scroll={false} edges={["bottom", "left", "right"]}>
       <FlatList
         data={days}
         keyExtractor={(d) => d.dateKey}

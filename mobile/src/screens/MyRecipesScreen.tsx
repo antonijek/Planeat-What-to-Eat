@@ -83,7 +83,7 @@ export function MyRecipesScreen() {
   }
 
   return (
-    <Screen scroll={false}>
+    <Screen scroll={false} edges={["bottom", "left", "right"]}>
       <FlatList
         data={filtered}
         keyExtractor={(r) => r.id}

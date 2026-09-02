@@ -144,7 +144,7 @@ export function StatsScreen() {
   ];
 
   return (
-    <Screen>
+    <Screen edges={["bottom", "left", "right"]}>
         <Text style={styles.title}>{t("stats.title")}</Text>
 
         <View style={styles.cardsRow}>

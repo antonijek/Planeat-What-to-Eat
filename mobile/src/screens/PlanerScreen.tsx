@@ -112,7 +112,7 @@ export function PlanerScreen() {
   }
 
   return (
-    <Screen scroll={false}>
+    <Screen scroll={false} edges={["bottom", "left", "right"]}>
       <FlatList
         data={dayNames}
         keyExtractor={(d, i) => String(i)}

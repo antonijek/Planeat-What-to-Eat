@@ -9,7 +9,7 @@ export function AboutScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   return (
-    <Screen>
+    <Screen edges={["bottom", "left", "right"]}>
       <Text style={styles.title}>{t("about.title")}</Text>
       <Text style={styles.subtitle}>{t("about.subtitle")}</Text>
 
