@@ -79,6 +79,6 @@ export const planService = {
         }
       }
     }
-    return Array.from(totals.values());
+    return Array.from(totals.values()).map((i) => ({ ...i, amount: Math.round(i.amount) }));
   },
 };

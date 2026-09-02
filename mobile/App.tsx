@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { setAudioModeAsync } from "expo-audio";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 import { useUserStore } from "./src/store/userStore";
 import { ThemeProvider } from "./src/constants/theme";
@@ -24,10 +25,12 @@ export default function App() {
   return (
     <ErrorBoundary>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <ThemeProvider>
-          <RootNavigator />
-          <StatusBar style="auto" />
-        </ThemeProvider>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <RootNavigator />
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        </SafeAreaProvider>
       </GestureHandlerRootView>
     </ErrorBoundary>
   );
