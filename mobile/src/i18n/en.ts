@@ -11,6 +11,8 @@ export default {
     remove: "Remove",
     loading: "Loading...",
     noData: "No data",
+    confirmRemoveTitle: "Remove item?",
+    confirmRemoveText: "Are you sure you want to remove this?",
   },
   tab: {
     wheel: "Wheel",
@@ -28,7 +30,7 @@ export default {
   wheelResult: {
     yourMeal: "Your meal",
     view: "View recipe",
-    spinAgain: "Spin again",
+    spinAgain: "Back to wheel",
   },
   home: {
     title: "What should I eat today?",
@@ -56,6 +58,7 @@ export default {
     theme: "Theme",
     themeLight: "Light",
     themeDark: "Dark",
+    themeSystem: "System",
     trialLeft: "🎁 Free trial: {{count}} days left",
     trialLeft_one: "🎁 Free trial: {{count}} day left",
   },
@@ -136,7 +139,7 @@ export default {
     source: "Source",
     similar: "Similar recipes",
     addedToTracker: '"{{name}}" (~{{kcal}} kcal for {{persons}} people) added to today.',
-    addedPerServing: "\"{{name}}\" (~{{kcal}} kcal per serving) added to today.",
+    addedPerServing: "\"{{name}}\" (~{{kcal}} kcal per serving) added to today's calorie log.",
     addedTitle: "Added to Calorie tracker",
     goToTracker: "→ Go to calorie log",
     goToPlaner: "→ Go to planer",
@@ -309,6 +312,7 @@ export default {
     avgFat: "Avg fat",
     avgCarbs: "Avg carbs",
     avgFiber: "Avg fiber",
+    avgSugar: "Total sugar",
     totalSugar: "Total added sugar from cooked meals: ~{{count}}g",
     mostCooked: "Most cooked",
     topCategories: "Top categories",
@@ -325,6 +329,9 @@ export default {
     cookedAt: "Cooked at {{time}}",
     premiumTitle: "What I cooked",
     premiumDesc: "Premium feature. Keep track of the meals you actually cooked.",
+    clearConfirmTitle: "Clear all history?",
+    clearConfirmText: "This will permanently delete your entire cooking history. This can't be undone.",
+    browseRecipes: "Browse recipes",
   },
   premium: {
     title: "Unlock the full power of the wheel",

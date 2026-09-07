@@ -21,8 +21,9 @@ import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { CalorieGoalModal } from "../components/CalorieGoalModal";
 import { useTranslation } from "react-i18next";
 import { useFocusEffect } from "@react-navigation/native";
-import { useTheme, ThemeColors } from "../constants/theme";
+import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { Screen } from "../components/Screen";
+import { AppModal } from "../components/AppModal";
 
 function dayTitle(offset: number, t: (key: string, opts?: Record<string, unknown>) => string, lang: string): string {
   if (offset === 0) return t("tracker.today");
@@ -68,6 +69,7 @@ export function CalorieLogScreen() {
   const [manualKcal, setManualKcal] = useState("");
   const gramsRef = useRef<TextInput>(null);
   const [goalModal, setGoalModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const { isPremium, trialActive, calorieGoal, setCalorieGoal } = useUserStore();
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
@@ -216,7 +218,7 @@ export function CalorieLogScreen() {
               </Pressable>
               <Text style={styles.dayLabel}>{dayTitle(offset, t, i18n.language)}</Text>
               <Pressable
-                style={styles.navBtn}
+                style={[styles.navBtn, offset >= 0 && styles.navBtnDisabled]}
                 onPress={() => (offset < 0 ? changeOffset(1) : null)}
                 disabled={offset >= 0}
               >
@@ -354,18 +356,32 @@ export function CalorieLogScreen() {
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.rowBody}>
-              <Text style={styles.rowName} numberOfLines={1}>
+              <Text style={styles.rowName} numberOfLines={2}>
                 {item.name}
               </Text>
               <Text style={styles.rowMeta}>{rowMetaText(item, t)}</Text>
             </View>
             <Text style={styles.rowKcal}>{item.kcal} kcal</Text>
-            <Pressable onPress={() => remove(item.id)} hitSlop={8}>
+            <Pressable onPress={() => setDeleteTarget({ id: item.id, name: item.name })} hitSlop={8}>
               <Text style={styles.remove}>✕</Text>
             </Pressable>
           </View>
         )}
       />
+
+      <AppModal
+        visible={deleteTarget !== null}
+        title={t("common.confirmRemoveTitle")}
+        onClose={() => setDeleteTarget(null)}
+        onCancel={() => setDeleteTarget(null)}
+        onSave={async () => {
+          if (deleteTarget) await remove(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        saveLabel={t("common.remove")}
+      >
+        <Text style={{ color: lightColors.text }}>{deleteTarget?.name ?? ""}</Text>
+      </AppModal>
 
       <CalorieGoalModal
         visible={goalModal}
@@ -398,6 +414,7 @@ const createStyles = (colors: ThemeColors) =>
     borderWidth: 1,
     borderColor: colors.border,
   },
+  navBtnDisabled: { opacity: 0.35 },
   navText: { fontSize: 20, color: colors.primary, fontWeight: "700" },
   navTextDisabled: { color: colors.textFaint },
   dayLabel: { fontSize: 16, fontWeight: "700", color: colors.text },
@@ -517,9 +534,9 @@ const createStyles = (colors: ThemeColors) =>
     padding: 12,
     marginTop: 8,
   },
-  rowBody: { flex: 1 },
+  rowBody: { flex: 1, marginRight: 10 },
   rowName: { color: colors.text, fontSize: 15, fontWeight: "600" },
-  rowMeta: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
-  rowKcal: { color: colors.primary, fontWeight: "700", marginRight: 14 },
+  rowMeta: { color: colors.textMuted, fontSize: 12, marginTop: 2, flexWrap: "wrap" },
+  rowKcal: { color: colors.primary, fontWeight: "700", marginRight: 14, flexShrink: 0 },
   remove: { color: colors.danger, fontSize: 18 },
   });

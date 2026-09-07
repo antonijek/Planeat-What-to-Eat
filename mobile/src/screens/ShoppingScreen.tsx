@@ -22,6 +22,8 @@ import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { ScreenMenu } from "../components/ScreenMenu";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
+import { AppModal } from "../components/AppModal";
+import { ShoppingItem } from "../types";
 
 export function ShoppingScreen() {
   const nav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -33,6 +35,7 @@ export function ShoppingScreen() {
   const { isPremium, trialActive } = useUserStore();
   const [name, setName] = useState("");
   const [info, setInfo] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ShoppingItem | null>(null);
 
   useEffect(() => {
     load();
@@ -125,7 +128,7 @@ export function ShoppingScreen() {
             <Pressable
               style={[styles.item, item.isChecked && styles.itemDone]}
               onPress={() => toggle(item.id)}
-              onLongPress={() => remove(item.id)}
+              onLongPress={() => setDeleteTarget(item)}
             >
               <View style={styles.check}>
                 <Text style={styles.checkText}>{item.isChecked ? "✓" : ""}</Text>
@@ -155,6 +158,22 @@ export function ShoppingScreen() {
           </View>
         </Modal>
       )}
+
+      <AppModal
+        visible={deleteTarget !== null}
+        title={t("common.confirmRemoveTitle")}
+        onClose={() => setDeleteTarget(null)}
+        onCancel={() => setDeleteTarget(null)}
+        onSave={() => {
+          if (deleteTarget) remove(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        saveLabel={t("common.remove")}
+      >
+        <Text style={{ color: lightColors.text }}>
+          {deleteTarget ? ingredientLabel(deleteTarget.name) : ""}
+        </Text>
+      </AppModal>
     </Screen>
   );
 }

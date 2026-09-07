@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useColorScheme } from "react-native";
 import { getItem, setItem, STORAGE_KEYS } from "../storage/storage";
 
 export type ThemeMode = "light" | "dark";
+export type ThemePreference = "light" | "dark" | "system";
 
 export interface ThemeColors {
   primary: string;
@@ -69,50 +71,56 @@ export const darkColors: ThemeColors = {
 interface ThemeContextValue {
   colors: ThemeColors;
   mode: ThemeMode;
-  setMode: (mode: ThemeMode) => void;
+  preference: ThemePreference;
+  setMode: (mode: ThemePreference) => void;
   toggleMode: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   colors: lightColors,
   mode: "light",
+  preference: "light",
   setMode: () => {},
   toggleMode: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>("light");
+  const systemScheme = useColorScheme();
+  const [preference, setPreferenceState] = useState<ThemePreference>("light");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const saved = await getItem<ThemeMode>(STORAGE_KEYS.darkMode);
-      if (saved === "dark" || saved === "light") setModeState(saved);
+      const saved = await getItem<ThemePreference>(STORAGE_KEYS.darkMode);
+      if (saved === "dark" || saved === "light" || saved === "system") setPreferenceState(saved);
       setLoaded(true);
     })();
   }, []);
 
-  const setMode = (m: ThemeMode) => {
-    setModeState(m);
+  const setMode = (m: ThemePreference) => {
+    setPreferenceState(m);
     setItem(STORAGE_KEYS.darkMode, m);
   };
 
   const toggleMode = () => {
-    setModeState((prev) => {
-      const next: ThemeMode = prev === "light" ? "dark" : "light";
+    setPreferenceState((prev) => {
+      const next: ThemePreference = prev === "dark" ? "light" : "dark";
       setItem(STORAGE_KEYS.darkMode, next);
       return next;
     });
   };
 
+  const mode: ThemeMode = preference === "system" ? (systemScheme === "dark" ? "dark" : "light") : preference;
+
   const value = useMemo(
     () => ({
       colors: mode === "dark" ? darkColors : lightColors,
       mode,
+      preference,
       setMode,
       toggleMode,
     }),
-    [mode]
+    [mode, preference]
   );
 
   return (

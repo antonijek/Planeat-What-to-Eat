@@ -89,7 +89,7 @@ export function HomeScreen() {
   }
 
   return (
-    <Screen>
+    <Screen contentStyle={styles.screenContent}>
       <View style={styles.header}>
           <View style={styles.titleRow}>
             <View style={styles.titleWrap}>
@@ -109,7 +109,9 @@ export function HomeScreen() {
           </View>
 
           {trialActive && (
-            <Text style={styles.trialNote}>{t("premium.trialActive", { count: trialDaysLeft })}</Text>
+            <Pressable onPress={() => nav.navigate("Premium")}>
+              <Text style={styles.trialNote}>{t("premium.trialActive", { count: trialDaysLeft })}</Text>
+            </Pressable>
           )}
 
           {isFeatureUnlocked("haveIngredients", isPremium, trialActive) ? (
@@ -194,6 +196,7 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     safe: { flex: 1, backgroundColor: colors.background },
     content: { flexGrow: 1, padding: 16, paddingTop: 28, paddingBottom: 40 },
+    screenContent: { paddingTop: 16, paddingBottom: 4 },
     header: { marginBottom: 8 },
     titleRow: {
       flexDirection: "row",
@@ -218,10 +221,10 @@ const createStyles = (colors: ThemeColors) =>
     },
     wheelArea: {
       flex: 1,
-      minHeight: 280,
+      minHeight: 240,
       justifyContent: "center",
       alignItems: "center",
-      paddingVertical: 8,
+      paddingVertical: 4,
     },
     bottomArea: { alignItems: "center", paddingBottom: 8 },
     limit: { marginTop: 12, color: colors.textMuted, fontSize: 13 },

@@ -295,6 +295,16 @@ export function RecipesScreen() {
             </View>
           </View>
         }
+        ListEmptyComponent={
+          <View style={styles.emptyWrap}>
+            <Text style={styles.empty}>{t("recipes.empty")}</Text>
+            {anyFilter && (
+              <Pressable style={styles.emptyClearBtn} onPress={clearAll}>
+                <Text style={styles.emptyClearBtnText}>{t("recipes.clearFilters")}</Text>
+              </Pressable>
+            )}
+          </View>
+        }
         renderItem={({ item }: { item: Recipe }) => (
           <RecipeCard recipe={item} onPress={() => nav.navigate("RecipeDetail", { id: item.id })} />
         )}
@@ -395,6 +405,16 @@ const createStyles = (colors: ThemeColors) =>
   filterToggle: { padding: 2 },
   filterSubtitle: { fontSize: 13, fontWeight: "700", color: colors.textMuted, marginTop: 14 },
   filterClear: { color: colors.primary, fontWeight: "600" },
+  emptyWrap: { alignItems: "center", paddingTop: 40, paddingHorizontal: 20 },
+  empty: { color: colors.textMuted, fontSize: 15, textAlign: "center", lineHeight: 22 },
+  emptyClearBtn: {
+    marginTop: 16,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  emptyClearBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
   chipsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 },
   filterChip: {
     flexDirection: "row",

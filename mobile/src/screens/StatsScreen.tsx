@@ -134,13 +134,14 @@ export function StatsScreen() {
   }
 
   const statCards = [
-    { label: t("stats.mealsCooked"), value: String(totalCooked) },
-    { label: t("stats.thisWeek"), value: String(thisWeek) },
+    { label: t("stats.mealsCooked"), value: totalCooked ? String(totalCooked) : "—" },
+    { label: t("stats.thisWeek"), value: thisWeek ? String(thisWeek) : "—" },
     { label: t("stats.avgKcal"), value: avgKcal ? `~${avgKcal}` : "—" },
     { label: t("stats.avgProtein"), value: avgProtein ? `~${avgProtein}g` : "—" },
     { label: t("stats.avgFat"), value: avgFat ? `~${avgFat}g` : "—" },
     { label: t("stats.avgCarbs"), value: avgCarbs ? `~${avgCarbs}g` : "—" },
     { label: t("stats.avgFiber"), value: avgFiber ? `~${avgFiber}g` : "—" },
+    { label: t("stats.avgSugar"), value: sumSugar ? `~${sumSugar}g` : "—" },
   ];
 
   return (
@@ -154,12 +155,6 @@ export function StatsScreen() {
               <Text style={styles.cardLabel}>{c.label}</Text>
             </View>
           ))}
-        </View>
-
-        <View style={styles.banner}>
-          <Text style={styles.bannerText}>
-            {t("stats.totalSugar", { count: sumSugar })}
-          </Text>
         </View>
 
         <Text style={styles.section}>{t("stats.mostCooked")}</Text>

@@ -333,8 +333,6 @@ export function RecipeDetailScreen() {
         visible={trackerMsg !== null}
         title={t("recipeDetail.addedTitle")}
         onClose={() => setTrackerMsg(null)}
-        onSave={() => setTrackerMsg(null)}
-        saveLabel="OK"
       >
         <Text style={{ color: lightColors.text }}>{trackerMsg}</Text>
         <Pressable
@@ -352,8 +350,6 @@ export function RecipeDetailScreen() {
         visible={planMsg !== null}
         title={t("recipeDetail.addToPlaner")}
         onClose={() => setPlanMsg(null)}
-        onSave={() => setPlanMsg(null)}
-        saveLabel="OK"
       >
         <Text style={{ color: lightColors.text }}>{planMsg}</Text>
         <Pressable

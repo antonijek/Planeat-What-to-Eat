@@ -47,7 +47,7 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
   const { t } = useTranslation();
   const current = i18n.language.slice(0, 2);
   const { isPremium, trialActive, trialDaysLeft } = useUserStore();
-  const { mode, toggleMode } = useTheme();
+  const { preference, setMode } = useTheme();
   const colors = lightColors;
   const styles = useMemo(() => createStyles(colors), []);
   const insets = useSafeAreaInsets();
@@ -80,11 +80,17 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
             <Text style={styles.title}>{t("home.menuTitle")}</Text>
 
             {!isPremium && trialActive && (
-              <View style={styles.trialBanner}>
+              <Pressable
+                style={styles.trialBanner}
+                onPress={() => {
+                  onClose();
+                  navigate("Premium");
+                }}
+              >
                 <Text style={styles.trialBannerText}>
                   {t("home.trialLeft", { count: trialDaysLeft })}
                 </Text>
-              </View>
+              </Pressable>
             )}
 
             <View style={styles.grid}>
@@ -110,23 +116,27 @@ export function HomeMenu({ visible, onClose, navigate }: Props) {
                 <Text style={styles.sectionTitle}>{t("home.theme")}</Text>
                 <View style={styles.langRow}>
                   <Pressable
-                    style={[styles.langChip, mode === "light" && styles.langChipActive]}
-                    onPress={() => {
-                      if (mode !== "light") toggleMode();
-                    }}
+                    style={[styles.langChip, preference === "light" && styles.langChipActive]}
+                    onPress={() => setMode("light")}
                   >
-                    <Text style={[styles.langText, mode === "light" && styles.langTextActive]}>
+                    <Text style={[styles.langText, preference === "light" && styles.langTextActive]}>
                       ☀️ {t("home.themeLight")}
                     </Text>
                   </Pressable>
                   <Pressable
-                    style={[styles.langChip, mode === "dark" && styles.langChipActive]}
-                    onPress={() => {
-                      if (mode !== "dark") toggleMode();
-                    }}
+                    style={[styles.langChip, preference === "dark" && styles.langChipActive]}
+                    onPress={() => setMode("dark")}
                   >
-                    <Text style={[styles.langText, mode === "dark" && styles.langTextActive]}>
+                    <Text style={[styles.langText, preference === "dark" && styles.langTextActive]}>
                       🌙 {t("home.themeDark")}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.langChip, preference === "system" && styles.langChipActive]}
+                    onPress={() => setMode("system")}
+                  >
+                    <Text style={[styles.langText, preference === "system" && styles.langTextActive]}>
+                      🌓 {t("home.themeSystem")}
                     </Text>
                   </Pressable>
                 </View>

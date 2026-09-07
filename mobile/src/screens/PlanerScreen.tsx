@@ -23,6 +23,7 @@ import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
+import { AppModal } from "../components/AppModal";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -46,6 +47,7 @@ export function PlanerScreen() {
   // Izabrano jelo + broj osoba pre potvrde (korisnik bira koliko osoba jede).
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [persons, setPersons] = useState(2);
+  const [removeTarget, setRemoveTarget] = useState<{ day: number; meal: "lunch" | "dinner"; name: string } | null>(null);
 
   // Lokalizovani nazivi dana (Pon...Ned) preko i18n — toLocaleDateString na
   // Androidu (Hermes/Intl) često ignoriše lokal i vrati engleski.
@@ -175,10 +177,9 @@ export function PlanerScreen() {
                       </Text>
                       <Text style={styles.mealPersons}>{t("planer.persons", { count: entry.persons })}</Text>
                       <Pressable
-                        onPress={async () => {
-                          await planService.remove(index, meal.key);
-                          reload();
-                        }}
+                        onPress={() =>
+                          setRemoveTarget({ day: index, meal: meal.key, name: translate(recipe).name })
+                        }
                         hitSlop={8}
                       >
                         <Text style={styles.removeText}>✕</Text>
@@ -288,6 +289,23 @@ export function PlanerScreen() {
           </View>
         </View>
       </Modal>
+
+      <AppModal
+        visible={removeTarget !== null}
+        title={t("common.confirmRemoveTitle")}
+        onClose={() => setRemoveTarget(null)}
+        onCancel={() => setRemoveTarget(null)}
+        onSave={async () => {
+          if (removeTarget) {
+            await planService.remove(removeTarget.day, removeTarget.meal);
+            reload();
+          }
+          setRemoveTarget(null);
+        }}
+        saveLabel={t("common.remove")}
+      >
+        <Text style={{ color: lightColors.text }}>{removeTarget?.name ?? ""}</Text>
+      </AppModal>
     </Screen>
   );
 }

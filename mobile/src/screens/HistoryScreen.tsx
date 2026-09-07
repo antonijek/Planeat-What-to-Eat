@@ -11,6 +11,8 @@ import { useTheme, ThemeColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
+import { AppModal } from "../components/AppModal";
+import { lightColors } from "../constants/theme";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -35,6 +37,7 @@ export function HistoryScreen() {
   const { recipeName } = useTranslatedRecipe();
   const { isPremium, trialActive } = useUserStore();
   const [days, setDays] = useState<CookedDay[]>([]);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   useEffect(() => {
     historyService.getCookedGroupedByDay().then(setDays);
@@ -64,20 +67,23 @@ export function HistoryScreen() {
         ListHeaderComponent={
           <View style={styles.headerRow}>
             <Text style={styles.title}>{t("history.title")}</Text>
-            <Pressable
-              onPress={async () => {
-                await historyService.clearCooked();
-                setDays([]);
-              }}
-            >
-              <Text style={styles.clearBtn}>{t("history.clear")}</Text>
-            </Pressable>
+            {days.length > 0 && (
+              <Pressable onPress={() => setClearConfirmOpen(true)}>
+                <Text style={styles.clearBtn}>{t("history.clear")}</Text>
+              </Pressable>
+            )}
           </View>
         }
         ListEmptyComponent={
-          <Text style={styles.empty}>
-            {t("history.empty")}
-          </Text>
+          <View style={styles.emptyWrap}>
+            <Text style={styles.empty}>{t("history.empty")}</Text>
+            <Pressable
+              style={styles.browseBtn}
+              onPress={() => (nav.navigate as (...args: unknown[]) => void)("Home", { screen: "RecipesTab" })}
+            >
+              <Text style={styles.browseBtnText}>{t("history.browseRecipes")}</Text>
+            </Pressable>
+          </View>
         }
         renderItem={({ item }) => (
           <View style={styles.section}>
@@ -104,6 +110,21 @@ export function HistoryScreen() {
           </View>
         )}
       />
+
+      <AppModal
+        visible={clearConfirmOpen}
+        title={t("history.clearConfirmTitle")}
+        onClose={() => setClearConfirmOpen(false)}
+        onCancel={() => setClearConfirmOpen(false)}
+        onSave={async () => {
+          await historyService.clearCooked();
+          setDays([]);
+          setClearConfirmOpen(false);
+        }}
+        saveLabel={t("common.delete")}
+      >
+        <Text style={{ color: lightColors.text }}>{t("history.clearConfirmText")}</Text>
+      </AppModal>
     </Screen>
   );
 }
@@ -131,4 +152,13 @@ const createStyles = (colors: ThemeColors) =>
     rowTitle: { fontSize: 15, fontWeight: "600", color: colors.text },
     rowSub: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
     empty: { color: colors.textMuted, fontSize: 15, marginTop: 24, textAlign: "center", lineHeight: 22 },
+    emptyWrap: { alignItems: "center" },
+    browseBtn: {
+      marginTop: 16,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+    },
+    browseBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
   });
