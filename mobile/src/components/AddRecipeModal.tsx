@@ -24,7 +24,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   const styles = useMemo(() => createStyles(colors), []);
   const appModalStyles = useMemo(() => makeAppModalStyles(colors), []);
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("Other");
+  const [category, setCategory] = useState(t("common.other"));
   const [prepTime, setPrepTime] = useState("30");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [calories, setCalories] = useState("");
@@ -42,7 +42,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
   useEffect(() => {
     if (visible) {
       setName(editing?.name ?? "");
-      setCategory(editing?.category ?? "Other");
+      setCategory(editing?.category ?? t("common.other"));
       setPrepTime(String(editing?.prepTime ?? 30));
       setDifficulty(editing?.difficulty ?? "medium");
       setCalories(String(editing?.calories ?? ""));
@@ -78,7 +78,7 @@ export function AddRecipeModal({ visible, editing, onClose, onSaved }: Props) {
     }
     const data = {
       name: name.trim(),
-      category: category.trim() || "Other",
+      category: category.trim() || t("common.other"),
       prepTime: parseInt(prepTime) || 30,
       difficulty,
       calories: parseInt(calories) || 0,

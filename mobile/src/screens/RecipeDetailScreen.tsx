@@ -176,7 +176,7 @@ export function RecipeDetailScreen() {
               <Text style={styles.chipText}>{r.category}</Text>
             </View>
             <View style={styles.chip}>
-              <Text style={styles.chipText}>{r.area || "General"}</Text>
+              <Text style={styles.chipText}>{r.area || t("common.general")}</Text>
             </View>
             <View style={styles.chip}>
               <Text style={styles.chipText}>{formatDuration(recipe.prepTime)}</Text>

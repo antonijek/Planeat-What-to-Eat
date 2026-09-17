@@ -16,6 +16,8 @@ export default {
     noData: "Nema podataka",
     confirmRemoveTitle: "Ukloniti stavku?",
     confirmRemoveText: "Da li sigurno želiš da ukloniš ovo?",
+    general: "Opšte",
+    other: "Ostalo",
   },
   tab: { wheel: "Točak", recipes: "Recepti", favorites: "Omiljeni", shopping: "Kupovina" },
   favorites: { title: "Omiljeni ({{count}})", empty: "Još nema omiljenih. 🤍 Okreni točak i sačuvaj nešto.", pin: "📌 Zakači na vrh", pinned: "Zakačeno na vrhu", max: "max 5" },

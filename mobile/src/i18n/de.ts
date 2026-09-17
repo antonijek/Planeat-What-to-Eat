@@ -16,6 +16,8 @@ export default {
     noData: "Keine Daten",
     confirmRemoveTitle: "Element entfernen?",
     confirmRemoveText: "Möchtest du das wirklich entfernen?",
+    general: "Allgemein",
+    other: "Sonstiges",
   },
   tab: { wheel: "Glücksrad", recipes: "Rezepte", favorites: "Favoriten", shopping: "Einkaufen" },
   favorites: { title: "Favoriten ({{count}})", empty: "Noch keine Favoriten. Dreh das Rad und speichere etwas.", pin: "📌 Nach oben pinnen", pinned: "Oben angepinnt", max: "max. 5" },

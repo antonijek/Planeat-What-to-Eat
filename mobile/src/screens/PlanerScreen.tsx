@@ -24,6 +24,7 @@ import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
 import { AppModal } from "../components/AppModal";
+import { formatDuration } from "../utils/helpers";
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -273,7 +274,7 @@ export function PlanerScreen() {
                   <Text style={modalStyles.recipeRowName} numberOfLines={1}>
                     {translate(item).name}
                   </Text>
-                  <Text style={modalStyles.recipeRowMeta}>{item.prepTime} min</Text>
+                  <Text style={modalStyles.recipeRowMeta}>{formatDuration(item.prepTime)}</Text>
                 </Pressable>
               )}
             />

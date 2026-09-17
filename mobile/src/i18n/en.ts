@@ -13,6 +13,8 @@ export default {
     noData: "No data",
     confirmRemoveTitle: "Remove item?",
     confirmRemoveText: "Are you sure you want to remove this?",
+    general: "General",
+    other: "Other",
   },
   tab: {
     wheel: "Wheel",

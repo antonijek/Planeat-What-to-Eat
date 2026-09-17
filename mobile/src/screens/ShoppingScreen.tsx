@@ -21,6 +21,7 @@ import { useTheme, ThemeColors, lightColors } from "../constants/theme";
 import { PremiumLockScreen } from "../components/PremiumLockScreen";
 import { ScreenMenu } from "../components/ScreenMenu";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
+import { translateUnit } from "../utils/ingredientTranslation";
 import { Screen } from "../components/Screen";
 import { AppModal } from "../components/AppModal";
 import { ShoppingItem } from "../types";
@@ -138,7 +139,7 @@ export function ShoppingScreen() {
               </Text>
               {item.amount > 0 && (
                 <Text style={styles.itemAmount}>
-                  {item.amount} {item.unit}
+                  {item.amount} {translateUnit(item.unit)}
                 </Text>
               )}
             </Pressable>
