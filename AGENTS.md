@@ -10,23 +10,26 @@ bez gubljenja konteksta. **Pročitaj ovo pre bilo kakve izmene.**
 **Planeat** ("Šta danas da jedem?") — React Native (Expo) mobilna aplikacija za
 odlučivanje šta jesti, planiranje obroka i pravljenje liste za kupovinu.
 
-### Branding / naziv (podsetnik — namera, NIJE još primenjeno u kod)
-- Ime app: **Planeat** (naziv u `About` već je "Planeat — What to Eat"; stari naziv u AGENTS bio "MealMate AI").
-- Namera za slogan (ispod logoa/splash, podnaslov na Home-u): **"Plan. Cook. Track."** — JOŠ NIJE postavljeno u `i18n/home.subtitle`.
-- NAMERA za store listing: **"Planeat – Recipes, Meal Planner & Calories"** — JOŠ NIJE postavljeno u `app.json` (trenutno `name: "Planeat — What to Eat"`, `description` je opis točka).
-- Kad se odluči: `app.json` → `name: "Planeat"`, `description` sadrži store listing, `slug: "planeat"`; `i18n/home.subtitle` → "Plan. Cook. Track." (slogan ostaje engleski kao brend).
+### Branding / naziv — ZAVRŠENO, primenjeno u kod
+- Ime app: **Planeat** — store listing naziv (oba store-a) je **"Planeat - what to eat today?"**
+  (`app.json` → `name`, App Store Connect, Play Console). Plain "Planeat" je bio zauzet na Apple-u.
+- Slogan (ispod naslova na Home-u): **"Plan. Cook. Track."** — postavljeno u `i18n/*.home.subtitle`.
+- Store listing opis, keywords, screenshots — svi gotovi na oba store-a, na više jezika
+  (7 na Apple-u, 17 na Play-u). Detalji u [[planeat_store_launch_status]] memoriji (van repo-a).
 
 - **Glavni ekran** je točak 🎡 koji korisnik vrti i dobija nasumičan recept.
 - Točak je *ulazna tačka* (zabava), ali prava vrednost je rešavanje svakodnevnih problema:
   "Imam 20 min, šta da skuvam?", "Imam piletinu i krompir, šta mogu?", "Šta da kupim za celu nedelju?".
 - **Monetizacija:** zaključane Premium funkcije (NEMA reklama). Free korisnik ima točak
-  (5 vrtnji/dan) i osnovne funkcije. Premium (2.99€/mes, 49.99€ doživotno) otključava sve.
+  (5 vrtnji/dan) i osnovne funkcije. Premium: **€4.99/mesec, €39/godina (best value), €69 doživotno**
+  — pravi IAP (expo-iap) na oba store-a, 7-dnevni besplatan probni period automatski pri prvom pokretanju.
 
-### ⚠️ TRENUTNO U RAZVOJU (VAŽNO ZA TESTIRANJE)
-- **UI je CELO na engleskom** (ne srpski) — baza recepata je engleska pa je tako konzistentno.
-  Višejezičnost se planira kasnije.
-- **`premiumService.ts` ima `DEV_UNLOCK_ALL = true`** — sve je otključano za testiranje
-  (neograničeno vrtnji, svi premium ekrani). Kada se završi razvoj → postavi na `false`.
+### Status (ažurirano 2026-09-07 — više detalja NE ovde, nego u Claude memoriji van repo-a)
+- **UI podržava 7 jezika** (en/de/es/fr/it/pt/sr) — više nije samo engleski.
+- **`premiumService.ts` `DEV_UNLOCK_ALL = false`** — potvrđeno, nije launch blocker.
+- App je u **Google Play closed testing** i **Apple TestFlight** fazi, priprema za pravi launch.
+  Detaljan trenutni checklist (šta čeka, šta je gotovo) živi u AI agent memoriji
+  (`planeat_store_launch_status.md`), ne u ovom fajlu — pitaj agenta za trenutni status ako treba.
 - **Expo SDK 54** (ne 57!). Zbog toga:
   - `babel.config.js` NEMA ručni worklets plugin — `babel-preset-expo` ga dodaje sam.
     Ako se doda ručno → "worklets not ready" greška.
@@ -247,10 +250,12 @@ Izbegni veb (`--platform web`) osim ako nisu instalirani `react-dom` + `react-na
   (kcal/protein/carbs/fats + fiber, sugars, addedSugar, sodium, cholesterol, saturatedFat)
 - ✅ **Gramaža sastojaka**: ~91% ima `grams` (USDA + CUP_DENSITY + komadi)
 - ✅ **Kanonska mapa** `ingredient_map.json` — deterministički izvor (bez pretrage)
-- ✅ UI ceo na **engleskom**; točak testiran na telefonu (Expo Go)
-- ⚠️ Premium kupovina je trenutno lokalni flag (NEMA pravog plaćanja/Stripe/in-app)
+- ✅ UI preveden na **7 jezika** (en/de/es/fr/it/pt/sr); testiran na fizičkim Android i iOS uređajima
+- ✅ **Pravo plaćanje** — expo-iap, 3 IAP proizvoda na oba store-a (mesečno/godišnje/doživotno), 7-dnevni trial
+- ✅ **Tamna tema** implementirana (uključujući "System" opciju koja prati OS temu)
+- ✅ **Pinovani (pinned) recepti** i **ocene recepata (1-5)** — logika i UI gotovi
 - ⚠️ Login ne postoji (sve lokalno) — moguće dodati kasnije za cloud/backend
-- ⚠️ `DEV_UNLOCK_ALL = true` u premiumService — vratiti na `false` pre lansiranja
+- ✅ `DEV_UNLOCK_ALL = false` u premiumService (potvrđeno)
 
 ---
 
@@ -282,19 +287,12 @@ Dve odvojene stvari:
 - ⚠️ **Instrukcije se prevode po rečenicama** (Argos je ~3× brži na kratkim rečenicama nego na dugom paragrafu).
 
 ## Sledeći mogući koraci
-- **Testirati celu app na telefonu** (Expo Go, SDK 54) — točak, ekrani, premium
-- **Provjeriti prikaz količina** posle skaliranja `persons/servings` (da nema više "12 cups")
-- **Provjeriti nutricioni prikaz** — redosled kao na proizvodima, "More values" expand
-
-### Funkcije koje su polugotove / nedovršene
-- **Pravo plaćanje** (Google Play Billing / Apple IAP) za premium — trenutno lokalni flag
-- **"Šta imam kod kuće" prikaz u samom točku** (bira samo recepte koje možeš)
-- **Zakačeni (pinned) recepti** (max 5, na vrhu) — logika postoji u favorites, UI fali
-- **Ocene recepata (1-5) UI** — store ima `rate()`, ekran nema
+App je u store launch fazi (Play closed testing + Apple TestFlight) — za tačan trenutni checklist
+pitaj AI agenta (memoriše se van repo-a, menja se često dok traje launch). Preostale sitnije stvari
+u samom kodu:
 - **Izmene recepata** — radi (override), ali forma je gruba (jedan TextInput za sve sastojke).
   Moguće poboljšanje: dodavanje pojedinačnih sastojaka u UI.
-- **Tamna tema** — reklamirana kao premium (`premium.pfTheme`), ali NE postoji u kodu!
-  Pre lansiranja: implementirati (colors u `constants/theme.ts` + `UserSettings.darkMode`).
+- **"Šta imam kod kuće" prikaz u samom točku** (bira samo recepte koje možeš)
 
 ### Analitika — KAD DOĐE VREME (za sada NEMOJ)
 - **Firebase Analytics** (Google, besplatan SDK) — meri šta korisnici rade: event-i `recipe_added`,
@@ -336,10 +334,9 @@ Dve odvojene stvari:
 
 ---
 
-## ⚠️ Završni korak pre lansiranja — licence i atribucija (OBAVEZNO)
-
-Pre nego što se objavi/proda app, mora se ispravno obeležiti izvor podataka.
-**Ovo je posao za sam kraj razvoja, ali ga je najbolje zabeležiti sada da se ne zaboravi.**
+## ✅ Licence i atribucija — ZAVRŠENO
+Plaćen premium TheMealDB API ključ nabavljen, atribucija je live u `AboutScreen.tsx`.
+Ostatak ove sekcije je zadržan kao istorijski kontekst/dokaz zašto je to urađeno.
 
 ### Izvor recepata i legalni okvir (provereno 2025, službeni Terms of Use)
 - Baza recepata dolazi iz **TheMealDB**.
@@ -354,17 +351,11 @@ Pre nego što se objavi/proda app, mora se ispravno obeležiti izvor podataka.
      artwork (custom artwork moraš link-back na sajt gde je primereno).
   4. Ne smeš uklanjati/izmeniti copyright ili trademark oznake.
 
-### Obaveze koje MORAJU biti urađene (checklist za završni korak)
-1. **Nabaviti plaćeni (premium) TheMealDB API ključ** — BEZ njega ne smeš app u app store.
-2. **Atribucija u app** — u Info/About/Podešavanja ekranu dodati:
-   > "Recipe data sourced from TheMealDB (TheMealDB.com)."
-   - Ako je premium — jasno naglasiti da je premium **funkcionalnost** (alati), ne otključavanje same baze.
-3. **Bez uklanjanja oznaka** — ne brisati copyright/TM niti prisvajati artwork kao sopstveni.
-4. **Obeležiti izmene** — u dokumentaciji (README/AGENTS) naznačiti koje delove je korisnik menjao:
-   - "Dodati sopstveni recepti"
-   - "Prilagođeni/poboljšani sastojci, makroi i gramaže (kcal/protein/fat/carbs/šećer...) iz USDA"
-   - "Sopstveno korisničko iskustvo (točak, planer, kalorijski dnevnik itd.)"
-   (Ove izmene ne uklanjaju obavezu iz poante 1 i 2.)
+### Obaveze — SVE ZAVRŠENE
+1. ✅ **Plaćeni (premium) TheMealDB API ključ** nabavljen.
+2. ✅ **Atribucija u app** — live u `AboutScreen.tsx`.
+3. ✅ Bez uklanjanja oznaka — copyright/TM netaknuti, artwork nije prisvojen kao sopstven.
+4. ✅ Izmene obeležene (sopstveni recepti, prilagođeni USDA makroi/gramaže, sopstveno UX).
 
 ### Kontekst za odluke (konkretno za ovaj projekat)
 - Svi recepti (baza) treba da budu **vidljivi svima besplatno** (manji rizik).
@@ -373,7 +364,3 @@ Pre nego što se objavi/proda app, mora se ispravno obeležiti izvor podataka.
 - **Napomena:** čak i sa plaćenim ključem, TheMealDB može smatrati da si u redu, ali
   i dalje **preporučujem** kratku proveru IP-advokata pre velike monetizacije (1 sat).
 
-### Kod za taj korak (indikativno)
-- Samo tekst/link u jednom ekranu (npr. `AboutScreen`) + opcioni `LICENSE`/`NOTICE` fajl u `mobile/`
-  koji navodi TheMealDB + link na sajt. (+ manuelni komentar u README/AGENTS.)
-- Ažurirati ovu checklistu kad se uradi (što je završeno obeležiti).
