@@ -38,3 +38,9 @@ data/badmap.json
 # mobile/src/data/translations/ NIJE ovde — app ga direktno importuje u runtime (translationContent.ts),
 # mora biti u git-u ili EAS build puca (Unable to resolve module ../data/translations/*.json)
 data/translations/
+
+# Store listing screenshot radni fajlovi (sirovi/captioned/tester screenshot-ovi) —
+# feature-graphic i icon ostaju u git-u, ovo su samo lokalni working fajlovi
+mobile-store-assets/screenshots/
+mobile-store-assets/screenshots-captioned/
+mobile-store-assets/ios-screenshots-fr/
