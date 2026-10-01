@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.antonijeknezevic.planeat",
       "appStoreUrl": "https://apps.apple.com/app/id6806250997",
       "infoPlist": {
