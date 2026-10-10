@@ -112,6 +112,7 @@ export default {
     addedToPlaner: "Ajouté à votre plan.",
     planOccupied: "Créneau occupé par « {{name}} ». L'ajout le remplacera.",
     edited: "📝 Modifié par vous",
+    unlockEditing: "💎 Débloquer la modification des recettes",
     resetChanges: "↩ Revenir à l'original",
     source: "Source",
     similar: "Recettes similaires",
@@ -336,6 +337,10 @@ export default {
     purchaseErrorTitle: "Échec de l'achat",
     trialActive: "🎁 Essai gratuit : encore {{count}} jours",
     trialActive_one: "🎁 Essai gratuit : encore {{count}} jour",
+    legal: "Les abonnements mensuel et annuel se renouvellent automatiquement, sauf annulation au moins 24 heures avant la fin de la période en cours. Le paiement est débité de votre compte {{store}} à la confirmation de l'achat. Vous pouvez gérer ou annuler votre abonnement dans les réglages de votre compte. L'option à vie est un achat unique.",
+    terms: "Conditions d'utilisation",
+    privacy: "Politique de confidentialité",
+    storeUnavailable: "La boutique n'est pas disponible pour le moment. Veuillez réessayer dans un instant.",
   },
   premiumLock: { title: "Premium", upgrade: "💎 Passer Premium" },
   about: {

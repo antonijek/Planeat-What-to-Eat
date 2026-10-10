@@ -119,6 +119,7 @@ export default {
     addedToPlaner: "Zu deinem Plan hinzugefügt.",
     planOccupied: "Slot belegt mit \"{{name}}\". Hinzufügen ersetzt ihn.",
     edited: "📝 Von dir bearbeitet",
+    unlockEditing: "💎 Rezeptbearbeitung freischalten",
     resetChanges: "↩ Auf Original zurücksetzen",
     source: "Quelle",
     similar: "Ähnliche Rezepte",
@@ -343,6 +344,10 @@ export default {
     purchaseErrorTitle: "Kauf fehlgeschlagen",
     trialActive: "🎁 Gratis-Testversion: noch {{count}} Tage",
     trialActive_one: "🎁 Gratis-Testversion: noch {{count}} Tag",
+    legal: "Monats- und Jahresabos verlängern sich automatisch, wenn sie nicht spätestens 24 Stunden vor Ende des aktuellen Zeitraums gekündigt werden. Die Zahlung wird bei Bestätigung des Kaufs über dein {{store}}-Konto abgerechnet. Du kannst dein Abo in deinen Kontoeinstellungen verwalten oder kündigen. Die Einmalzahlung ist kein Abo und verlängert sich nicht.",
+    terms: "Nutzungsbedingungen",
+    privacy: "Datenschutzerklärung",
+    storeUnavailable: "Der Store ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.",
   },
   premiumLock: { title: "Premium", upgrade: "💎 Upgrade" },
   about: {

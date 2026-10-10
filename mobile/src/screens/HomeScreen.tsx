@@ -22,6 +22,7 @@ import { recipeService } from "../services/recipeService";
 import { MealMomentPicker } from "../components/MealMomentPicker";
 import { WheelResultModal } from "../components/WheelResultModal";
 import { ScreenMenu } from "../components/ScreenMenu";
+import { PremiumBanner } from "../components/PremiumBanner";
 import { recipesForMoment } from "../constants/mealMoments";
 import { Recipe } from "../types";
 import { parseIngredientInput } from "../utils/ingredients";
@@ -145,9 +146,7 @@ export function HomeScreen() {
               />
             </View>
           ) : (
-            <Pressable style={styles.haveLocked} onPress={() => nav.navigate("Premium")}>
-              <Text style={styles.haveLockedText}>💎 {t("recipes.premiumBanner")}</Text>
-            </Pressable>
+            <PremiumBanner label={t("recipes.premiumBanner")} style={styles.haveLocked} />
           )}
         </View>
 
@@ -243,15 +242,7 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 14,
       padding: 12,
     },
-    haveLocked: {
-      width: "100%",
-      marginTop: 14,
-      backgroundColor: colors.primary,
-      borderRadius: 14,
-      paddingVertical: 14,
-      alignItems: "center",
-    },
-    haveLockedText: { color: "#fff", fontWeight: "700" },
+    haveLocked: { width: "100%", marginTop: 14 },
     haveHead: { alignItems: "center", paddingVertical: 2 },
     haveHeadText: { color: colors.text, fontSize: 14, fontWeight: "700" },
     haveInput: {

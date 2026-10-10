@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Platform } from "react-native";
 import { useIAP, ErrorCode, type Purchase } from "expo-iap";
+import { useTranslation } from "react-i18next";
 import { PRODUCT_SKUS, IAPProductId, IAPProduct, MOCK_PRODUCTS } from "../services/iapService";
 import { premiumService } from "../services/premiumService";
 import { useUserStore } from "../store/userStore";
@@ -44,6 +45,7 @@ export function usePremiumPurchase(): PurchaseFlowState {
   const [restoring, setRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const loadUserData = useUserStore((s) => s.loadUserData);
+  const { t } = useTranslation();
   const pendingRestore = useRef(false);
 
   const {
@@ -130,9 +132,13 @@ export function usePremiumPurchase(): PurchaseFlowState {
       setError(null);
       const sku = PRODUCT_SKUS[id];
       if (!connected) {
-        // Expo Go / no native module: simulate success so the UX can be tested.
-        await applyPurchase(id);
-        await loadUserData();
+        if (__DEV__) {
+          // Expo Go / no native module: simulate success so the UX can be tested.
+          await applyPurchase(id);
+          await loadUserData();
+        } else {
+          setError(t("premium.storeUnavailable"));
+        }
         return;
       }
       setPurchasing(id);
@@ -164,7 +170,7 @@ export function usePremiumPurchase(): PurchaseFlowState {
         setError((e as Error)?.message ?? "Purchase failed.");
       }
     },
-    [connected, requestPurchase, subscriptions, loadUserData]
+    [connected, requestPurchase, subscriptions, loadUserData, t]
   );
 
   const restore = useCallback(async () => {

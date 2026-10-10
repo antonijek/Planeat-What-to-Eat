@@ -137,6 +137,7 @@ export default {
     addedToPlaner: "Added to your plan.",
     planOccupied: "Slot taken by \"{{name}}\". Adding will replace it.",
     edited: "📝 Edited by you",
+    unlockEditing: "💎 Unlock recipe editing",
     resetChanges: "↩ Reset to original",
     source: "Source",
     similar: "Similar recipes",
@@ -361,6 +362,10 @@ export default {
     purchaseErrorTitle: "Purchase failed",
     trialActive: "🎁 Free trial: {{count}} days left",
     trialActive_one: "🎁 Free trial: {{count}} day left",
+    legal: "Monthly and yearly plans renew automatically unless cancelled at least 24 hours before the end of the current period. Payment is charged to your {{store}} account when you confirm the purchase. You can manage or cancel your subscription in your account settings. Lifetime is a one-time purchase.",
+    terms: "Terms of Use",
+    privacy: "Privacy Policy",
+    storeUnavailable: "The store isn't available right now. Please try again in a moment.",
   },
   premiumLock: {
     title: "Premium",

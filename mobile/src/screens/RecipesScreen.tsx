@@ -16,6 +16,7 @@ import { IngredientInputChips } from "../components/IngredientInputChips";
 import { useTranslatedRecipe } from "../utils/useTranslatedRecipe";
 import { Screen } from "../components/Screen";
 import { ScreenMenu } from "../components/ScreenMenu";
+import { PremiumBanner } from "../components/PremiumBanner";
 import { Recipe } from "../types";
 import { recipeService } from "../services/recipeService";
 import { useUserStore } from "../store/userStore";
@@ -188,11 +189,7 @@ export function RecipesScreen() {
                 />
               </View>
             ) : (
-              <Pressable style={styles.premiumBanner} onPress={() => nav.navigate("Premium")}>
-                <Text style={styles.premiumBannerText}>
-                  💎 {t("recipes.premiumBanner")}
-                </Text>
-              </Pressable>
+              <PremiumBanner label={t("recipes.premiumBanner")} style={styles.premiumBanner} />
             )}
             </>)}
 
@@ -391,14 +388,7 @@ const createStyles = (colors: ThemeColors) =>
   },
   chipText: { color: colors.primary, fontSize: 13, fontWeight: "600" },
   haveHint: { color: colors.textMuted, fontSize: 12, marginTop: 10 },
-  premiumBanner: {
-    marginTop: 16,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  premiumBannerText: { color: "#fff", fontWeight: "700" },
+  premiumBanner: { marginTop: 16 },
   filterSection: { marginTop: 16 },
   filterRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   filterTitle: { fontSize: 15, fontWeight: "700", color: colors.text },

@@ -112,6 +112,7 @@ export default {
     addedToPlaner: "Dodato u tvoj plan.",
     planOccupied: "Termin je zauzet receptom \"{{name}}\". Dodavanjem ćeš ga zameniti.",
     edited: "📝 Izmenio/la si ti",
+    unlockEditing: "💎 Otključaj izmenu recepata",
     resetChanges: "↩ Vrati na original",
     source: "Izvor",
     similar: "Slični recepti",
@@ -336,6 +337,10 @@ export default {
     purchaseErrorTitle: "Kupovina nije uspela",
     trialActive: "🎁 Besplatan period: još {{count}} dana",
     trialActive_one: "🎁 Besplatan period: još {{count}} dan",
+    legal: "Mesečna i godišnja pretplata se automatski obnavljaju ako ih ne otkažeš najmanje 24 sata pre isteka tekućeg perioda. Naplata se vrši preko tvog {{store}} naloga kada potvrdiš kupovinu. Pretplatom možeš da upravljaš ili da je otkažeš u podešavanjima naloga. Doživotna opcija je jednokratna kupovina.",
+    terms: "Uslovi korišćenja",
+    privacy: "Politika privatnosti",
+    storeUnavailable: "Prodavnica trenutno nije dostupna. Pokušaj ponovo za trenutak.",
   },
   premiumLock: { title: "Premium", upgrade: "💎 Nadogradi" },
   about: {

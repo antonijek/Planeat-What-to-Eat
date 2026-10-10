@@ -112,6 +112,7 @@ export default {
     addedToPlaner: "Añadido a tu plan.",
     planOccupied: "Espacio ocupado por \"{{name}}\". Al añadir, lo reemplazarás.",
     edited: "📝 Editado por ti",
+    unlockEditing: "💎 Desbloquea la edición de recetas",
     resetChanges: "↩ Volver al original",
     source: "Fuente",
     similar: "Recetas similares",
@@ -336,6 +337,10 @@ export default {
     purchaseErrorTitle: "Error en la compra",
     trialActive: "🎁 Prueba gratuita: {{count}} días restantes",
     trialActive_one: "🎁 Prueba gratuita: {{count}} día restante",
+    legal: "Los planes mensual y anual se renuevan automáticamente salvo que se cancelen al menos 24 horas antes del final del período actual. El pago se carga en tu cuenta de {{store}} al confirmar la compra. Puedes gestionar o cancelar tu suscripción en los ajustes de tu cuenta. La opción de por vida es un pago único.",
+    terms: "Términos de uso",
+    privacy: "Política de privacidad",
+    storeUnavailable: "La tienda no está disponible en este momento. Inténtalo de nuevo en un momento.",
   },
   premiumLock: { title: "Premium", upgrade: "💎 Hazte Premium" },
   about: {

@@ -1,11 +1,12 @@
 import React, { useMemo, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert, Linking, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useUserStore } from "../store/userStore";
 import { Screen } from "../components/Screen";
 import { useTheme, ThemeColors } from "../constants/theme";
 import { usePremiumPurchase } from "../utils/usePremiumPurchase";
+import { APPLE_EULA_URL, PRIVACY_POLICY_URL } from "../constants/links";
 
 export function PremiumScreen() {
   const nav = useNavigation();
@@ -107,6 +108,20 @@ export function PremiumScreen() {
           )}
         </Pressable>
 
+        <Text style={styles.legal}>
+          {t("premium.legal", { store: Platform.OS === "ios" ? "Apple ID" : "Google Play" })}
+        </Text>
+        <View style={styles.legalLinks}>
+          {Platform.OS === "ios" && (
+            <Text style={styles.legalLink} onPress={() => Linking.openURL(APPLE_EULA_URL)}>
+              {t("premium.terms")}
+            </Text>
+          )}
+          <Text style={styles.legalLink} onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+            {t("premium.privacy")}
+          </Text>
+        </View>
+
         <Pressable onPress={restore} disabled={restoring}>
           <Text style={styles.back}>
             {restoring ? t("premium.restoring") : t("premium.restore")}
@@ -159,6 +174,9 @@ const createStyles = (colors: ThemeColors) =>
   buttonBadge: { color: colors.primary, fontSize: 11, fontWeight: "700", marginTop: 2 },
   buttonAlt: { backgroundColor: "transparent", borderWidth: 2, borderColor: "#fff" },
   buttonTextAlt: { color: "#fff" },
+  legal: { color: colors.onPrimary, fontSize: 11, lineHeight: 16, textAlign: "center", marginTop: 20 },
+  legalLinks: { flexDirection: "row", justifyContent: "center", gap: 20, marginTop: 10 },
+  legalLink: { color: "#fff", fontSize: 13, fontWeight: "700", textDecorationLine: "underline" },
   back: { color: colors.onPrimary, textAlign: "center", marginTop: 24 },
   center: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background },
   doneEmoji: { fontSize: 64 },

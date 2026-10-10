@@ -18,6 +18,7 @@ import { RatingStars } from "../components/RatingStars";
 import { EditRecipeModal } from "../components/EditRecipeModal";
 import { AppModal } from "../components/AppModal";
 import { Screen } from "../components/Screen";
+import { PremiumBanner } from "../components/PremiumBanner";
 import { overrideService } from "../services/overrideService";
 import { historyService } from "../services/historyService";
 import { reviewPromptService } from "../services/reviewPromptService";
@@ -246,7 +247,7 @@ export function RecipeDetailScreen() {
               openPlanModal();
             }}
           >
-            <Text style={styles.planBtnText}>📅 {t("recipeDetail.addToPlaner")}</Text>
+            <Text style={styles.planBtnText}>{t("recipeDetail.addToPlaner")}</Text>
           </Pressable>
 
           <NutritionTable recipe={recipe} />
@@ -276,14 +277,12 @@ export function RecipeDetailScreen() {
                 setRecipe(await overrideService.getEffective(id));
               }}
             >
-                      <Text style={styles.resetText}>↩︎ {t("recipeDetail.resetChanges")}</Text>
+                      <Text style={styles.resetText}>{t("recipeDetail.resetChanges")}</Text>
             </Pressable>
           )}
 
           {!isFeatureUnlocked("editRecipes", isPremium, trialActive) && (
-            <Pressable style={styles.premiumBtn} onPress={() => nav.navigate("Premium")}>
-              <Text style={styles.premiumText}>💎 Unlock recipe editing</Text>
-            </Pressable>
+            <PremiumBanner label={t("recipeDetail.unlockEditing")} style={styles.premiumBtn} />
           )}
 
           {similar.length > 0 && (
@@ -549,14 +548,7 @@ const createStyles = (colors: ThemeColors) =>
       alignItems: "center",
     },
     resetText: { color: colors.primary, fontWeight: "700" },
-    premiumBtn: {
-      marginTop: 12,
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      paddingVertical: 14,
-      alignItems: "center",
-    },
-    premiumText: { color: "#fff", fontWeight: "700" },
+    premiumBtn: { marginTop: 12 },
     similarBlock: { marginTop: 8 },
     similarRow: {
       flexDirection: "row",
