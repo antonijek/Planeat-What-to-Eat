@@ -17,6 +17,8 @@ export function PremiumScreen() {
   const { products, purchasing, restoring, error, buy, restore } = usePremiumPurchase();
   const priceFor = (id: "monthly" | "yearly" | "lifetime") =>
     products.find((p) => p.id === id)?.price ?? "";
+  const titleFor = (id: "monthly" | "yearly" | "lifetime") =>
+    products.find((p) => p.id === id)?.title ?? "";
 
   useEffect(() => {
     if (error) Alert.alert(t("premium.purchaseErrorTitle"), error);
@@ -79,7 +81,10 @@ export function PremiumScreen() {
           {purchasing === "monthly" ? (
             <ActivityIndicator color={colors.primary} />
           ) : (
-            <Text style={styles.buttonText}>{t("premium.monthly", { price: priceFor("monthly") })}</Text>
+            <>
+              <Text style={styles.planTitle}>{titleFor("monthly")}</Text>
+              <Text style={styles.buttonText}>{t("premium.monthly", { price: priceFor("monthly") })}</Text>
+            </>
           )}
         </Pressable>
         <Pressable
@@ -91,6 +96,7 @@ export function PremiumScreen() {
             <ActivityIndicator color={colors.primary} />
           ) : (
             <>
+              <Text style={styles.planTitle}>{titleFor("yearly")}</Text>
               <Text style={styles.buttonText}>{t("premium.yearly", { price: priceFor("yearly") })}</Text>
               <Text style={styles.buttonBadge}>{t("premium.bestValue")}</Text>
             </>
@@ -104,7 +110,10 @@ export function PremiumScreen() {
           {purchasing === "lifetime" ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={[styles.buttonText, styles.buttonTextAlt]}>{t("premium.lifetime", { price: priceFor("lifetime") })}</Text>
+            <>
+              <Text style={[styles.planTitle, styles.buttonTextAlt]}>{titleFor("lifetime")}</Text>
+              <Text style={[styles.buttonText, styles.buttonTextAlt]}>{t("premium.lifetime", { price: priceFor("lifetime") })}</Text>
+            </>
           )}
         </Pressable>
 
@@ -169,6 +178,7 @@ const createStyles = (colors: ThemeColors) =>
     paddingVertical: 16,
     alignItems: "center",
   },
+  planTitle: { color: colors.primary, fontSize: 12, fontWeight: "600", marginBottom: 2 },
   buttonText: { color: colors.primary, fontSize: 16, fontWeight: "800" },
   buttonYearly: { borderWidth: 2, borderColor: colors.accent },
   buttonBadge: { color: colors.primary, fontSize: 11, fontWeight: "700", marginTop: 2 },

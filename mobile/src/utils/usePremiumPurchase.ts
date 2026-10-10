@@ -119,7 +119,7 @@ export function usePremiumPurchase(): PurchaseFlowState {
       return {
         id,
         sku,
-        title: found.title,
+        title: found.displayName ?? found.title,
         description: found.description,
         price: found.displayPrice,
         priceAmount: mock.priceAmount,

@@ -28,7 +28,7 @@ export const MOCK_PRODUCTS: IAPProduct[] = [
   {
     id: "monthly",
     sku: PRODUCT_SKUS.monthly,
-    title: "Planeat Premium — Monthly",
+    title: "Monthly Premium",
     description: "Unlock all premium features. Cancel anytime.",
     price: "4.99 €",
     priceAmount: 4.99,
@@ -36,7 +36,7 @@ export const MOCK_PRODUCTS: IAPProduct[] = [
   {
     id: "yearly",
     sku: PRODUCT_SKUS.yearly,
-    title: "Planeat Premium — Yearly",
+    title: "Yearly Premium",
     description: "Best value. Cancel anytime.",
     price: "39 €",
     priceAmount: 39,
@@ -44,7 +44,7 @@ export const MOCK_PRODUCTS: IAPProduct[] = [
   {
     id: "lifetime",
     sku: PRODUCT_SKUS.lifetime,
-    title: "Planeat Premium — Lifetime",
+    title: "Lifetime Premium",
     description: "One-time payment, yours forever.",
     price: "69 €",
     priceAmount: 69,
