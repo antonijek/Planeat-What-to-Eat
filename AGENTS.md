@@ -24,12 +24,14 @@ odlučivanje šta jesti, planiranje obroka i pravljenje liste za kupovinu.
   (5 vrtnji/dan) i osnovne funkcije. Premium: **€4.99/mesec, €39/godina (best value), €69 doživotno**
   — pravi IAP (expo-iap) na oba store-a, 7-dnevni besplatan probni period automatski pri prvom pokretanju.
 
-### Status (ažurirano 2026-09-07 — više detalja NE ovde, nego u Claude memoriji van repo-a)
+### Status (ažurirano 2026-11-11 — više detalja NE ovde, nego u Claude memoriji van repo-a)
+- ✅ **Objavljeno u obe prodavnice:**
+  - **App Store** od 2026-10-30 — verzija 1.0, build 13 (app verzija 1.0.2).
+  - **Google Play produkcija** od 2026-11-11 — 1.0.2, versionCode 7.
+  - Sve tri kupovine (`premium_monthly`, `premium_yearly`, `premium_lifetime`) odobrene/aktivne na oba store-a.
+- Svaka nova izmena do korisnika stiže tek novim buildom (`eas build` + slanje u oba store-a + pregled).
 - **UI podržava 7 jezika** (en/de/es/fr/it/pt/sr) — više nije samo engleski.
-- **`premiumService.ts` `DEV_UNLOCK_ALL = false`** — potvrđeno, nije launch blocker.
-- App je u **Google Play closed testing** i **Apple TestFlight** fazi, priprema za pravi launch.
-  Detaljan trenutni checklist (šta čeka, šta je gotovo) živi u AI agent memoriji
-  (`planeat_store_launch_status.md`), ne u ovom fajlu — pitaj agenta za trenutni status ako treba.
+- **`premiumService.ts` `DEV_UNLOCK_ALL = false`** — potvrđeno.
 - **Expo SDK 54** (ne 57!). Zbog toga:
   - `babel.config.js` NEMA ručni worklets plugin — `babel-preset-expo` ga dodaje sam.
     Ako se doda ručno → "worklets not ready" greška.
@@ -256,6 +258,7 @@ Izbegni veb (`--platform web`) osim ako nisu instalirani `react-dom` + `react-na
 - ✅ **Pinovani (pinned) recepti** i **ocene recepata (1-5)** — logika i UI gotovi
 - ⚠️ Login ne postoji (sve lokalno) — moguće dodati kasnije za cloud/backend
 - ✅ `DEV_UNLOCK_ALL = false` u premiumService (potvrđeno)
+- ✅ **Objavljeno**: App Store (2026-10-30) i Google Play produkcija (2026-11-11)
 
 ---
 
@@ -287,9 +290,11 @@ Dve odvojene stvari:
 - ⚠️ **Instrukcije se prevode po rečenicama** (Argos je ~3× brži na kratkim rečenicama nego na dugom paragrafu).
 
 ## Sledeći mogući koraci
-App je u store launch fazi (Play closed testing + Apple TestFlight) — za tačan trenutni checklist
-pitaj AI agenta (memoriše se van repo-a, menja se često dok traje launch). Preostale sitnije stvari
-u samom kodu:
+App je objavljen u obe prodavnice. Preostale sitnije stvari u samom kodu:
+- **Pitanje za ocenu** (`services/reviewPromptService.ts`) — pita samo jednom zauvek, i to tek posle
+  3× „Skuvao sam ovo“. Testeri su ga potrošili pre javnog izlaska (TestFlight/zatvoreni test ne
+  dozvoljavaju javne ocene), a većina korisnika nikad ne dođe do 3. Predlog za sledeći build: novi
+  ključ za flag (svi dobijaju novu priliku) + drugi okidač (npr. 5 različitih dana korišćenja).
 - **Izmene recepata** — radi (override), ali forma je gruba (jedan TextInput za sve sastojke).
   Moguće poboljšanje: dodavanje pojedinačnih sastojaka u UI.
 - **"Šta imam kod kuće" prikaz u samom točku** (bira samo recepte koje možeš)
