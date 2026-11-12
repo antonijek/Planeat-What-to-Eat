@@ -22,8 +22,11 @@ export const STORAGE_KEYS = {
   calorieGoal: "mm_calorie_goal",
   language: "mm_language",
   darkMode: "mm_dark_mode",
-  reviewPrompted: "mm_review_prompted",
+  // v2: novi ključ da i korisnici koji su pitani tokom testiranja (bez javnih ocena) dobiju novu priliku.
+  reviewPromptedV2: "mm_review_prompted_v2",
   reviewCookedCount: "mm_review_cooked_count",
+  reviewSpinCount: "mm_review_spin_count",
+  reviewFirstUseDay: "mm_review_first_use_day",
 } as const;
 
 export async function getItem<T>(key: string): Promise<T | null> {

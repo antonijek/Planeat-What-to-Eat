@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { historyService } from "../services/historyService";
 import { premiumService, isFeatureUnlocked } from "../services/premiumService";
 import { recipeService } from "../services/recipeService";
+import { reviewPromptService } from "../services/reviewPromptService";
 import { MealMomentPicker } from "../components/MealMomentPicker";
 import { WheelResultModal } from "../components/WheelResultModal";
 import { ScreenMenu } from "../components/ScreenMenu";
@@ -87,6 +88,11 @@ export function HomeScreen() {
     premiumService.consumeSpin();
     refreshSpins();
     setResult(recipe);
+  }
+
+  function closeResult() {
+    setResult(null);
+    reviewPromptService.notifySpin();
   }
 
   return (
@@ -183,9 +189,9 @@ export function HomeScreen() {
         recipe={result}
         onView={() => {
           if (result) nav.navigate("RecipeDetail", { id: result.id });
-          setResult(null);
+          closeResult();
         }}
-        onSpinAgain={() => setResult(null)}
+        onSpinAgain={closeResult}
       />
     </Screen>
   );
