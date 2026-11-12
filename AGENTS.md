@@ -230,8 +230,12 @@ npm start            # ili npx expo start (Expo Go / emulator)
 **Pre nego što završiš bilo koju izmenu, OBAVEZNO proveri:**
 ```
 npx tsc --noEmit                              # TypeScript — bez grešaka
+npm test                                      # Jest testovi (jest-expo preset) — moraju proći
 npx expo export --platform android            # bundle — mora proći (test)
 ```
+Testovi stoje pored koda (`*.test.ts`). Čista logika ide u `utils/` i dobija test.
+GitHub Actions (`.github/workflows/mobile-checks.yml`) pokreće TypeScript proveru i testove na svaki
+push na `master` i na svaki pull request.
 Izbegni veb (`--platform web`) osim ako nisu instalirani `react-dom` + `react-native-web`.
 
 ---
@@ -291,10 +295,11 @@ Dve odvojene stvari:
 
 ## Sledeći mogući koraci
 App je objavljen u obe prodavnice. Preostale sitnije stvari u samom kodu:
-- **Pitanje za ocenu** (`services/reviewPromptService.ts`) — pita samo jednom zauvek, i to tek posle
-  3× „Skuvao sam ovo“. Testeri su ga potrošili pre javnog izlaska (TestFlight/zatvoreni test ne
-  dozvoljavaju javne ocene), a većina korisnika nikad ne dođe do 3. Predlog za sledeći build: novi
-  ključ za flag (svi dobijaju novu priliku) + drugi okidač (npr. 5 različitih dana korišćenja).
+- **Pitanje za ocenu** — ✅ urađeno u kodu (2026-11-12), **čeka sledeći build**. Iskače kad korisnik
+  zatvori rezultat 5. vrtnje točka (ne prvog dana korišćenja) ili posle 3× „Skuvao sam ovo“, samo
+  jednom. Ključ `mm_review_prompted_v2` je nov da bi i testeri (koji su pitani dok javne ocene nisu
+  bile moguće) dobili novu priliku. Logika: `utils/reviewPrompt.ts` (+ test), poziv iz
+  `services/reviewPromptService.ts` i `HomeScreen` (zatvaranje `WheelResultModal`).
 - **Izmene recepata** — radi (override), ali forma je gruba (jedan TextInput za sve sastojke).
   Moguće poboljšanje: dodavanje pojedinačnih sastojaka u UI.
 - **"Šta imam kod kuće" prikaz u samom točku** (bira samo recepte koje možeš)
